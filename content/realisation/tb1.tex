@@ -13,8 +13,39 @@ Show meeting in week 9.
 \subsection{ARM to FPGA connector}
 Connecting the FPGA board (in our case a Spartan6 board by Digilent and the Arm board from EA) can be done in different ways. The fastest way if the number of connections are relatively low, is usually with a bunch of wires between the two boards. But even though such a setup can be much more flexible, it can be very hard to error searching if something is not working (maybe because of a broken wire or a short circuit) and is also very sensitive to noise. Instead of the wires a PCB solution has been chosen, which will be designed to fit 
 
-\subsection{Co-design}
+\subsection{Concurrent design}
+Concurrent design in the design of embedded system is a method to decided where to place different parts of the system, from the specification and performance requirements. The difference between traditional design and co-design is, in traditional design, two groups of experts design independently hardware and software, to implement when all is finish. In co-design one group is designing the whole system and implement the part where they get the best performance and power use.\\
+Concurrent design has four steps that is:
+\begin{enumerate}
+	\item Modelling
+	\item Partitioning
+	\item Concurrent synthesis
+	\item Concurrent simulation
+\end{enumerate}
+In this time box, only the two first steps are described according to the project time plan.
+
+\subsubsection{Modelling}
+In the modelling phase, the customers needs is taking into consideration, and the platform for the system is choose. In this project the platform is specified from the project requirements, to include an ARM7 CPU with uClinux as processor in the system, and a Spartan 6 or 3 FPGA for hardware parts in the system.
+
+\subsubsection{Partitioning}
+In "technical platform" from the launch phase, the hardware and software specification was made, and the table below shows which parts of the project that can be implementet both in the ARM7 CPU as software and in the FPGA as hardware.
+
+\begin{itemize}
+	\item PLC module
+	\item Power switch
+	\item A/D Converter
+	\item Ethernet
+	\item Web server
+	\item Interface
+	\item Indicator
+\end{itemize}
+
+\textbf{PLC module} is used to communicate with the other modules, this part is best implemented in the ARM7 CPU as software, because it is a data-communication protocols.\\
+\textbf{Power switch} is used to control the switch and is a rather complex algorithm, it have to be dynamic when controlling the switch, because the power consumption and production is never the same, this part is best implemented in software for the ARM7 CPU.\\
+\textbf{A/D Converter} is a very suitable part to implement in the FPGA as hardware, the frequency is high, the memory requirement is small, the task is static. And in this project there is more than one, so it is good to run this part in parallel.\\
+\textbf{Ethernet} is made in software, and supported by the linux kernel. \todo[inline]{finish with arguments l.46}
+\textbf{Interface/Indicator} is the buttons and LEDs where the user can interact with the system, this is put into hardware, because it is IOs that is best handle in the FPGA for parallel reading the inputs and setting outputs.
 
 \subsection{Relay-server}
-
+\todo[color=pink, inline, size=\Huge]{Bring cake Jesus!!}
 \subsection{Power Line module}
