@@ -43,7 +43,7 @@ In "technical platform" from the launch phase, the hardware and software specifi
 \textbf{PLC module} is used to communicate with the other modules, this part is best implemented in the ARM7 CPU as software, because it is a data-communication protocols.\\
 \textbf{Power switch} is used to control the switch and is a rather complex algorithm, it have to be dynamic when controlling the switch, because the power consumption and production is never the same, this part is best implemented in software for the ARM7 CPU.\\
 \textbf{A/D Converter} is a very suitable part to implement in the FPGA as hardware, the frequency is high, the memory requirement is small, the task is static. And in this project there is more than one, so it is good to run this part in parallel.\\
-\textbf{Ethernet} is made in software, and supported by the linux kernel. \todo[inline]{finish with arguments l.46}
+\textbf{Ethernet} is made in software, and supported by the linux kernel. The embedded arm board also have a dedicated chip to handle this part.\\
 \textbf{Interface/Indicator} is the buttons and LEDs where the user can interact with the system, this is put into hardware, because it is IOs that is best handle in the FPGA for parallel reading the inputs and setting outputs.
 
 \subsection{Relay-server}
