@@ -14,7 +14,7 @@
 *.log
 *.synctex-gz
 *.synctex.gz
-*.pdf
+#*.pdf
 *.project
 *.DS_Store
 *.toc
