@@ -75,7 +75,53 @@ In "technical platform" from the launch phase, the hardware and software specifi
 \textbf{Interface/Indicator} is the buttons and LEDs where the user can interact with the system, this is put into hardware, because it is IOs that is best handle in the FPGA for parallel reading the inputs and setting outputs.
 
 \subsection{Relay-server - Paulo}
-\todo[color=pink, inline, size=\Huge]{Bring cake Jesus!!}
+Relay server is developed in C++, this will be running on the development platform so remote access to the EA-LPC2478 board becomes possible.
+
+\begin{itemize}
+	\item Requirements
+	\item Setting the scene
+	\item Server data flow
+	\item Documentation (Generated with Doxygen)
+\end{itemize}
+
+\subsubsection{Requirements}
+The requirements given to the Relay Server are:
+
+\begin{itemize}
+	\item FR 1: Able to accept multiple telnet connections
+	\item FR 1.1 Shall accept both TCP and UDP connections
+ 	\item FR 1.2 Shall be able to connect to the daemon on the target
+ 	\item FR 13 Shall relay traffic unmodified between the telnet client and the daemon
+ 	\item NF 1: Shall be programmed in C++
+ 	\item BR 1: Handling more than one connection
+ 	\item BR 1.1: If more than one active let the others wait - give a message
+ 	\item BR 1.2 When a blocking connection is terminated the next waiting connection shall be connected to the daemon
+\end{itemize}
+
+\subsubsection{Setting the scene}
+In this exercise a C program was created as close as possible to what the daemon is supposed to archive.This will give advantages in the daemon programming (Time Box 2) since the communication by the TCP protocol is done.
+
+The "daemon" is a TCP echo server, it send resends the same message trough the same socket back to the relay server.
+
+The relay server only forward messages from the client ( by TCP or UDP ) to the "daemon" without changing any data.
+
+\subsubsection{Data Flow}
+
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=0.8\textwidth,page=2,angle=0]{images/dataflow1.png}
+		\caption{TCP Data flow between Client, Server, Daemon - Client connection}
+	\end{centering}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=0.8\textwidth,page=2,angle=0]{images/dataflow2.png}
+		\caption{TCP Data flow between Client, Server, Daemon - Client disconnect}
+	\end{centering}
+\end{figure}
+
+
 \subsection{Power Line module - Dennis}
 The documentation of the Power Line module can be found in a separate document \todo[inline]{Link to external document} as the work is done in corporation with another team. So far the first prototype has been mounted and tested, which has lead to some improvements of the design. The second prototype is ready for mounting and testing which will also be described in the design document. 
 
