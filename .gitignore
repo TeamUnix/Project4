@@ -20,6 +20,8 @@
 *.toc
 *.tdo
 *.out
+*.bbl
+*.blg
 #
 
 #	VHDL
