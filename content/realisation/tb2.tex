@@ -34,17 +34,41 @@ Show meeting in week 11.
 
 
 \subsection{PLC module}
+The second version of the Power line module was decreased size, which lead to problems when making the PCB, as a lot of tracks short-circuited. A third version has been made, which has larger clearance between the tracks and the ground plane. The PCB has been mounted and tested, which is describe in the \textit{EPRO 3 \& 4 PLC - Hardware Interface} report. As a short resume, the communication between two boards through power line works without reading any invalid characters (test period of 15 min.). The 5 volt power supply has been tester to withstand at minimum 2.4 Amp. where a voltage drop of approximately 0.1Volt was observed. 
+A single error has been found which is corrected before ordering and mounting the 6 PLC boards needed (one for each module in the system/group).
+
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=0.9\textwidth,page=1,angle=0]{images/SIG60_v0_4}
+		\caption{Power line circuit version 0.4}
+	\end{centering}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=0.8\textwidth,page=2,angle=0]{images/SIG60_v0_4}
+		\caption{Power supply. 2 x 5 volt 3 ampere version 0.4.}
+	\end{centering}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=0.8\textwidth,page=3,angle=0]{images/SIG60_v0_4}
+		\caption{PCB layout of the power line circuit and the 5 volt power supply version 0.4.}
+	\end{centering}
+\end{figure}
+
 
 \subsection{Daemon}
-\begin(itemize)
+\begin{itemize}
 	\item Overview
 	\item Make daemon to run on uClinux
 	\item The rc file (startup file)
-	\begin(itemize)
+	\begin{itemize}
 		\item Configure network
 		\item Start daemon as background process
-	\end(itemize)
-\end(itemize)
+	\end{itemize}
+\end{itemize}
 
 
 \subsection{Power switch}
