@@ -78,25 +78,70 @@ A single error has been found and corrected before ordering and mounting the 6 P
 \subsubsection{Section Contents}
 \begin{itemize}
 	\item Overview
-	\item Make daemon to run on uClinux
+	\item Background process on uClinux
 	\item The rc file (startup file)
 	\begin{itemize}
 		\item Configure network
 		\item Start daemon as background process
 	\end{itemize}
 	\item Further implementations
-	\item Documentation (Generated on Doxygen)
+	\item Documentation
 \end{itemize}
 
 \subsubsection{Overview}
-\subsubsection{Make daemon to run on uClinux}
+Daemon is a program that runs as background process, there is no direct control between user and the application.
+
+The background application is going to establish a socket ( way of communication through network ), that will allow TCP connections to port 5555 of the LPC2478 Development board running the uClinux. This distribution can be found at \footnote{\url{http://uclinux.org/}}( 09 / 03 / 2012 ).
+
+In further development of this application, the user is able to get status from the device by connecting to it using a TCP client (Putty, coolTerm, HyperTerminal, etc).
+
+In this version the user is able to light all the four LEDs on the development board by typing the command: led <number of the led to light on> <on/off>.
+
+\subsubsection{Background process on uClinux}
+A background process is an application that is disassociated from the initial terminal. 
+
+To make a application run as a process in UNIX environment:
+
+\begin{itemize}
+	\item Create a separate process.
+	\item Detach the process from the parent.
+	\item Reset file mask.
+	\item Change the current directory.
+	\item Close the standard files ( STDIN, STDOUT, STDERR ).
+\end{itemize}
+
+uClinux distribution runs on embedded system and since most of them don't have a MMU ( memory management unit ), the fork() function is not allowed int this implementation.
+
+The fork() function when called causes the creation of a new process (child process). The child process will be a exact same copy of the parent process being this impossible without a MMU.
+To implement the same functionality the vfork() function is use, this function creates a new process but the memory address is shared by the parent and child.
+
 \subsubsection{The rc file (startup file)}
+The rc is a file that contains the startup instructions for the operation system in use (uClinux) this file can be found at the specific vendor folder. 
+This file contains commands that will run automatically each time the system starts.
 \paragraph{Configure Network}
+When the system starts the network have to be configured so the device can be part of our network. The configuration can be done manually each time with the commands:
+
+ifconfig eth0 x.x.x.x netmask x.x.x.x up
+
+route add default gw x.x.x.x
+
+Defining this commands in the rc file will make the network to be always accessible after a reboot is needed, for example is a update is implemented to the software. 
+
 \paragraph{Start daemon as background process}
+The daemon developed on this Time Box is defined in this script by the command: daemon & , this way the application run as background when the operating system starts, allowing the communication between the device and the user.
+
 \subsubsection{Further implementations}
-\subsubsection{Documentation (Generated on Doxygen)}
+\begin{itemize}
+	\item A background application will be implemented to update data on a Mysql server and retrieve commands from the web server, this will be the pipe between all the modules in the system.
+\end{itemize}
 
 
+\subsubsection{Documentation}
+This daemon (background application), is a TCP echo server, this means it will answer back the same message that was send. This was explain in Time box 1 along with the development of the relay server. 
+
+In this TCP echo server, a command handler was implemented, this allow the user to turn on and off the LEDs on the development board: led <number of the led to light on> <on/off>
+
+The daemon is calling the application already existent in the development board made by Embedded Artists as example.
 
 \subsection{Power switch - Dennis}
 The power switch is the part of the hub that traffics the energy from and to its connected modules, such as: wind-turbine, photovoltaics, hydrogen-cell, battery-storage, load modules and similar. Inspiration to the creation of the power switch has been found at: Powerhub Systems \footnote{\url{http://www.pwrhub.com/}} (routing system) and TORC \footnote{\url{http://www.torcrobotics.com/products/powerhub}} (implementation and control of the hub).
