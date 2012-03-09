@@ -3,7 +3,7 @@
 Show meeting in week 11.
 \subsubsection{Work to be done in this time box}
 \begin{itemize}
-	\item ARM to FPGA interface
+	\item ARM to Spartan6 interface
 	\begin{itemize}
 		\item Mount
 		\item Test
@@ -22,33 +22,33 @@ Show meeting in week 11.
 \end{itemize}
 \paragraph{Description:}
 \begin{description}
-	\item[ARM to FPGA interface] The interface between the ARM7 CPU and the FPGA board, has to be mounted and tested. 
+	\item[ARM to Spartan6 interface] The interface between the ARM7 CPU and the Spartan6 board, has to be mounted and tested. 
 	\item[PLC module] The powerline module has to be mounted 6 times, in order to provide one for all the groups. The boards should also be tested and debugged.
 	\item[Daemon] 
 	\item[Power switch] Block diagram of the power switch, which shall activate the different modules connected to it (wind-turbine, photo-voltaic cells etc.) and control the current flow.
 	\item[Module design] is an overview of the part connection in the system
 \end{description}
 
-\subsection{ARM to FPGA interface - Dennis}
+\subsection{ARM to Spartan6 interface - Dennis}
 The first version of the PCB was hard to solder because of the small pad sizes. A second version of the interface has been made, with increased pad size and increased clearance between the tracks. Also the Chip select connector pin has been more centralized on the PCB to decrease cable length. The hole in the one site of the PCB is needed to avoid removing a connector on the arm-board, the tracks beside this connector have been rerouted to give more space for this connector. 
 \begin{figure}[H]
 	\begin{centering}
 		 \includegraphics[width=0.60\textwidth,page=1]{images/dig_to_ea_v0_2}
-		\caption{Schematic of the ARM to FPGA connector, v0.2.}
+		\caption{Schematic of the ARM to Spartan6 connector, v0.2.}
 	\end{centering}
 \end{figure}
 
 \begin{figure}[H]
 	\begin{centering}
 		 \includegraphics[height=0.8\textwidth,page=2,angle=90]{images/dig_to_ea_v0_2}
-		\caption{PCB of the ARM to FPGA connector, v0.2 (top view)}
+		\caption{PCB of the ARM to Spartan6 connector, v0.2 (top view)}
 	\end{centering}
 \end{figure}
 
 \begin{figure}[H]
 	\begin{centering}
 		\includegraphics[width=0.8\textwidth,page=1,angle=0]{images/interface_photo_v0_2.jpg}
-		\caption{Picture of the mounted interface PCB. The connector in the bottom right of the picture is the connection to the Diligent FPGA board.}
+		\caption{Picture of the mounted interface PCB. The connector in the bottom right of the picture is the connection to the Diligent Spartan6 board.}
 		\label{fig:interface_photo_v0_2}
 	\end{centering}
 \end{figure}
@@ -147,7 +147,7 @@ The system makes use of two LTC4357 to control the two MOSFETS used as diode sub
 
 \subsection{Module design}
 
-The module design is to give an overview of the part connection in the system. On the module design there is shown what parts is in software and what parts is made in hardware. The connection between the parts is also shown, plus the connection to external parts.
+The module design is to give an overview of the part connection in the system. On the module design is shown which parts shall be made in software and which parts shall be made in hardware. The connection between the parts is also shown, plus the connection to external parts.
 
 \begin{figure}[H]
 	\begin{centering}
@@ -174,7 +174,7 @@ In the table below the pin names on the PLC module and their corresponding pin o
 \end{table}
 
 \textbf{Interface}\\
-The pins for the interface on the FPGA is listed in the table below
+The pins for the interface on the Spartan6 is listed in the table below
 \begin{table}[H]
     \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{5cm}|}
         \hline
@@ -196,11 +196,11 @@ The pins for the interface on the FPGA is listed in the table below
         7                     & E4           & 3             & IO\_L54P\_M3RESET       \\
         \hline
     \end{tabular}
-    \caption{FPGA interface pins}
+    \caption{Spartan6 interface pins}
 \end{table}
 
 \textbf{Indicator}\\
-The FPGA pin names for the LED indicators on the board is listed in the table below
+The Spartan6 pin names for the LED indicators on the board is listed in the table below
 \begin{table}[H]
     \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{5cm}|}
         \hline
@@ -215,11 +215,11 @@ The FPGA pin names for the LED indicators on the board is listed in the table be
         7                       & N12          & 2             & IO\_L13P\_M1\_2        \\
         \hline
     \end{tabular}
-    \caption{Indicator FPGA pins}
+    \caption{Indicator Spartan6 pins}
 \end{table}
 
 \textbf{Analog to digital converter}\\
-On the FPGA board there is a 8 pin connector that shall be used for the analog to digital converter. The pins for the connector is shown in the table below
+On the Spartan6 board there is a 8 pin connector that shall be used for the analog to digital converter. The pins for the connector is shown in the table below
 \begin{table}[H]
     \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{5cm}|}
         \hline
@@ -238,7 +238,7 @@ On the FPGA board there is a 8 pin connector that shall be used for the analog t
 \end{table}
 
 \textbf{Host controller}\\
-The pin connection between the FPGA and ARM7 board is listed in the table below
+The pin connection between the Spartan6 and ARM7 board is listed in the table below
 \begin{table}[H]
     \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
         \hline
@@ -273,7 +273,8 @@ The pin connection between the FPGA and ARM7 board is listed in the table below
         28          & V8           & RESET\_IN        & RESET\_IN         \\
         \hline
     \end{tabular}
-    \caption{Address data bus between the FPGA and AMR7}
+    \caption{Address data bus between the Spartan6 and AMR7}
 \end{table}
 
 With the module design, the design of the different parts is straight forward. The module design show what shall be hardware and software, plus it shows witch pins is used for the specific part in software and hardware.
+
