@@ -103,11 +103,11 @@ A single error has been found and corrected before ordering and mounting the 6 P
 \subsubsection{Overview}
 Daemon is a program that runs as background process, there is no direct control between user and the application.
 
-The background application is going to establish a socket ( way of communication through network ), that will allow TCP connections to port 5555 of the LPC2478 Development board running the uClinux. This distribution can be found at \footnote{\url{http://uclinux.org/}}( 09 / 03 / 2012 ).
+The background application is going to establish a socket ( way of communication through network ), that will allow TCP connections to port 5555 of the LPC2478 Development board running the uClinux. This distribution can be found at \footnote{\url{http://uclinux.org/}}.
 
 In further development of this application, the user is able to get status from the device by connecting to it using a TCP client (Putty, coolTerm, HyperTerminal, etc).
 
-In this version the user is able to light all the four LEDs on the development board by typing the command: led <number of the led to light on> <on/off>.
+In this version the user is able to light all the four LEDs on the development board by typing the command: led \textless number of the led to light on\textgreater  \textless on/off \textgreater
 
 \subsubsection{Background process on uClinux}
 A background process is an application that is disassociated from the initial terminal. 
@@ -136,11 +136,12 @@ When the system starts the network have to be configured so the device can be pa
 ifconfig eth0 x.x.x.x netmask x.x.x.x up
 
 route add default gw x.x.x.x
-
+\newline
+\newline
 Defining this commands in the rc file will make the network to be always accessible after a reboot is needed, for example is a update is implemented to the software. 
 
 \paragraph{Start daemon as background process}
-The daemon developed on this Time Box is defined in this script by the command: daemon & , this way the application run as background when the operating system starts, allowing the communication between the device and the user.
+The daemon developed on this Time Box is defined in this script by the command: daemon \& , this way the application run as background when the operating system starts, allowing the communication between the device and the user.
 
 \subsubsection{Further implementations}
 \begin{itemize}
