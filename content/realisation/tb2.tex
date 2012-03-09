@@ -1,9 +1,16 @@
 \section{Time box 2}
 \subsection{Time box planning}
-Show meeting in week 11.
+Overview of the what work is put into which time boxes.
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=1.0\textwidth]{images/tb_r2.pdf}
+		\caption{Updated time-box}
+	\end{centering}
+\end{figure}
+
 \subsubsection{Work to be done in this time box}
 \begin{itemize}
-	\item ARM to Spartan6 interface
+	\item ARM7 to Spartan6 interface
 	\begin{itemize}
 		\item Mount
 		\item Test
@@ -14,6 +21,17 @@ Show meeting in week 11.
 		\item Test
 	\end{itemize}
 	\item Daemon
+	\begin{itemize}
+		\item Overview
+		\item Background process on uClinux
+		\item The rc file (startup file)
+		\begin{itemize}
+			\item Configure network
+			\item Start daemon as background process
+		\end{itemize}
+		\item Further implementations
+		\item Documentation
+	\end{itemize}
 	\item Power switch
 	\begin{itemize}
 		\item Block diagram
@@ -86,6 +104,7 @@ A single error has been found and corrected before ordering and mounting the 6 P
 	\end{centering}
 \end{figure}
 
+\newpage
 \subsection{Daemon}
 \subsubsection{Section Contents}
 \begin{itemize}
@@ -107,7 +126,7 @@ The background application is going to establish a socket ( way of communication
 
 In further development of this application, the user is able to get status from the device by connecting to it using a TCP client (Putty, coolTerm, HyperTerminal, etc).
 
-In this version the user is able to light all the four LEDs on the development board by typing the command: led \textless number of the led to light on \textgreater  \textless on/off \textgreater
+In this version the user is able to light all the four LEDs on the development board by typing the command: led \textless number of the led to light on\textgreater  \textless on/off\textgreater
 
 \subsubsection{Background process on uClinux}
 A background process is an application that is disassociated from the initial terminal. 
@@ -152,9 +171,11 @@ The daemon developed on this Time Box is defined in this script by the command: 
 \subsubsection{Documentation}
 This daemon (background application), is a TCP echo server, this means it will answer back the same message that was send. This was explain in Time box 1 along with the development of the relay server. 
 
-In this TCP echo server, a command handler was implemented, this allow the user to turn on and off the LEDs on the development board: led <number of the led to light on> <on/off>
+In this TCP echo server, a command handler was implemented, this allow the user to turn on and off the LEDs on the development board: \textbf{led \textless number of the led to light on\textgreater  \textless on/off\textgreater}
 
 The daemon is calling the application already existent in the development board made by Embedded Artists as example.
+
+\newpage
 
 \subsection{Power switch - Dennis}
 The power switch is the part of the hub that traffics the energy from and to its connected modules, such as: wind-turbine, photovoltaics, hydrogen-cell, battery-storage, load modules and similar. Inspiration to the creation of the power switch has been found at: Powerhub Systems \footnote{\url{http://www.pwrhub.com/}} (routing system) and TORC \footnote{\url{http://www.torcrobotics.com/products/powerhub}} (implementation and control of the hub).
