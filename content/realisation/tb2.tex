@@ -26,7 +26,7 @@ Show meeting in week 11.
 	\item[PLC module] The powerline module has to be mounted 6 times, in order to provide one for all the groups. The boards should also be tested and debugged.
 	\item[Daemon] 
 	\item[Power switch] Block diagram of the power switch, which shall activate the different modules connected to it (wind-turbine, photo-voltaic cells etc.) and control the current flow.
-	\item[Module design]
+	\item[Module design] is an overview of the part connection in the system
 \end{description}
 
 \subsection{ARM to FPGA interface - Dennis}
@@ -147,4 +147,131 @@ The system makes use of two LTC4357 to control the two MOSFETS used as diode sub
 
 \subsection{Module design}
 
+The module design is to give an overview of the part connection in the system. On the module design there is shown what parts is in software and what parts is made in hardware. The connection between the parts is also shown, plus the connection to external parts.
 
+\begin{figure}[H]
+	\begin{centering}
+		\includegraphics[width=0.8\textwidth,page=1,angle=0]{images/module_design.png}
+		\caption{Module diagram}
+		\label{fig:module_design_diagram}
+	\end{centering}
+\end{figure}
+
+\textbf{Power line module}\\
+In the table below the pin names on the PLC module and their corresponding pin on the ARM7 is listed.
+\begin{table}[H]
+    \begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
+        \hline
+        \textbf{PLC-pin} & \textbf{ARM-pin}& \textbf{Other}     \\ \hline
+        HDO    & p0.11 & RXD2       \\ \hline
+        HDI    & p0.10 & TXD2       \\ \hline
+        Wake   & p0.13 & LED-B      \\ \hline
+        nReset & p0.12 & Port-PWR-B \\ \hline
+        nSleep & p0.18 & MOSI       \\
+        \hline
+    \end{tabular}
+    \caption{Power line module connection}
+\end{table}
+
+\textbf{Interface}\\
+The pins for the interface on the FPGA is listed in the table below
+\begin{table}[H]
+    \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{5cm}|}
+        \hline
+        \textbf{Push buttons} & \textbf{LOC} & \textbf{BANK} & \textbf{Pin name}     \\ \hline
+        0                     & T15          & 3             & IO\_L1N\_M0\_CMPMISO\_2   \\ \hline
+        1                     & N4           & 3             & IO\_L1P                \\ \hline
+        2                     & P4           & 3             & IO\_L2P                \\ \hline
+        3                     & P3           & 3             & IO\_L2N                \\ \hline
+        4                     & F6           & 3             & IO\_L55P\_M3A13         \\ \hline
+        5                     & F5           & 3             & IO\_L55N\_M3A14         \\ \hline
+        \textbf{Switchs}      & ~            & ~             & ~                     \\ \hline
+        0                     & A10          & 0             & IO\_L37N\_GCLK12        \\ \hline
+        1                     & D14          & 0             & IO\_L65P\_SCP3          \\ \hline
+        2                     & C14          & 0             & IO\_L65N\_SCP2          \\ \hline
+        3                     & P15          & 1             & IO\_L74P\_AWAKE\_1       \\ \hline
+        4                     & P12          & 2             & IO\_L13N\_D10           \\ \hline
+        5                     & R5           & 2             & IO\_L48P\_D7            \\ \hline
+        6                     & T5           & 2             & IO\_L48N\_RDWR\_B\_VREF\_2 \\ \hline
+        7                     & E4           & 3             & IO\_L54P\_M3RESET       \\
+        \hline
+    \end{tabular}
+    \caption{FPGA interface pins}
+\end{table}
+
+\textbf{Indicator}\\
+The FPGA pin names for the LED indicators on the board is listed in the table below
+\begin{table}[H]
+    \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{5cm}|}
+        \hline
+        \textbf{Indicator LEDs} & \textbf{LOC} & \textbf{BANK} & \textbf{Pin name}   \\ \hline
+        0                       & U18          & 1             & IO\_L52N\_M1DQ15      \\ \hline
+        1                       & M14          & 1             & IO\_L53P             \\ \hline
+        2                       & N14          & 1             & IO\_L53N\_VREF        \\ \hline
+        3                       & L14          & 1             & IO\_L61P             \\ \hline
+        4                       & M13          & 1             & IO\_L61N             \\ \hline
+        5                       & D4           & 0             & IO\_L1P\_HSWAPEN\_0    \\ \hline
+        6                       & P16          & 1             & IO\_L74N\_DOUT\_BUSY\_1 \\ \hline
+        7                       & N12          & 2             & IO\_L13P\_M1\_2        \\
+        \hline
+    \end{tabular}
+    \caption{Indicator FPGA pins}
+\end{table}
+
+\textbf{Analog to digital converter}\\
+On the FPGA board there is a 8 pin connector that shall be used for the analog to digital converter. The pins for the connector is shown in the table below
+\begin{table}[H]
+    \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{5cm}|}
+        \hline
+        \textbf{ADC pins} & \textbf{LOC} & \textbf{BANK} & \textbf{Pin name}   \\ \hline
+        0 & T3 & 2 & IO\_L62N\_D6     \\ \hline
+        1 & R3 & 2 & IO\_L62P\_D5     \\ \hline
+        2 & P6 & 2 & IO\_L64N\_D9     \\ \hline
+        3 & N5 & 2 & IO\_L64P\_D8     \\ \hline
+        4 & V9 & 2 & IO\_L32N\_GCLK28 \\ \hline
+        5 & T9 & 2 & IO\_L32P\_GCLK29 \\ \hline
+        6 & V4 & 2 & IO\_L63N        \\ \hline
+        7 & T4 & 2 & IO\_L63P        \\
+        \hline
+    \end{tabular}
+    \caption{Analog to digital converter connector}
+\end{table}
+
+\textbf{Host controller}\\
+The pin connection between the FPGA and ARM7 board is listed in the table below
+\begin{table}[H]
+    \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
+        \hline
+        \textbf{IO} & \textbf{LOC} & \textbf{EMC pin} & \textbf{ARM7 pin} \\ \hline
+        1           & U16          & OE               & BOE               \\ \hline
+        2           & U15          & A7               & BA7               \\ \hline
+        3           & U13          & A5               & BA5               \\ \hline
+        4           & M11          & A3               & BA3               \\ \hline
+        5           & R11          & A1               & BA1               \\ \hline
+        6           & T12          & CS2              & DBUS\_EN          \\ \hline
+        7           & N10          & D15              & BD15              \\ \hline
+        8           & M10          & D13              & BD13              \\ \hline
+        9           & U11          & D11              & BD11              \\ \hline
+        10          & R10          & D9               & BD9               \\ \hline
+        11          & U10          & D7               & BD7               \\ \hline
+        12          & R8           & D5               & BD5               \\ \hline
+        13          & M8           & D3               & BD3               \\ \hline
+        14          & U8           & D1               & BD1               \\ \hline
+        15          & V16          & D14              & BD14              \\ \hline
+        16          & V15          & D12              & BD12              \\ \hline
+        17          & V13          & D10              & BD10              \\ \hline
+        18          & N11          & D8               & BD8               \\ \hline
+        19          & T11          & D6               & BD6               \\ \hline
+        20          & V12          & D4               & BD4               \\ \hline
+        21          & P11          & D2               & BD2               \\ \hline
+        22          & N9           & D0               & BD0               \\ \hline
+        23          & V11          & A2               & BA2               \\ \hline
+        24          & T10          & A4               & BA4               \\ \hline
+        25          & V10          & A6               & BA6               \\ \hline
+        26          & T8           & WE               & BWE               \\ \hline
+        27          & N8           & INT              & P0.22             \\ \hline
+        28          & V8           & RESET\_IN        & RESET\_IN         \\
+        \hline
+    \end{tabular}
+    \caption{Address data bus between the FPGA and AMR7}
+\end{table}
