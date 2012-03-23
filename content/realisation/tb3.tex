@@ -15,7 +15,15 @@ Overview of the what work is put into which time boxes.
 		\item Schematic
 		\item Printed circuit board
 		\item Mount component
-		\item Test board
+		\item Power Switch Test
+		\item Further Implementation
+	\end{itemize}
+	\item{Webserver Communication}
+	\begin{itemize}
+		\item Data Flow
+		\item PHP
+		\item Setting the Server
+		\item Further implementations
 	\end{itemize}
 	\item Host controller
 	\begin{itemize}
@@ -30,13 +38,68 @@ Overview of the what work is put into which time boxes.
 \end{description}
 
 \subsection{Power switch}
+Power switch module have to be able to switch the power direction so a battery fully charged can be used to power other modules or systems.
+\subsubsection{Schematics}
+
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=1.0\textwidth,page=1]{images/ps_schematics.pdf}
+		\caption{Schematic of the switch interface}
+	\end{centering}
+\end{figure}
+
+\subsubsection{Printed circuit board}
+
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=1.0\textwidth,page=1]{images/ps_layout.pdf}
+		\caption{Schematic of the switch interface}
+	\end{centering}
+\end{figure}
+
+\subsubsection{Mount component}
+
+\begin{figure}[H]
+	\begin{centering}
+		%\includegraphics[width=1.0\textwidth,page=1]{images/ps_schematics.pdf}
+		%\caption{Schematic of the switch interface}
+		\missingfigure{Photo of the PS device}
+	\end{centering}
+\end{figure}
+
+\subsubsection{Power Switch Test}
+To test our circuit a load is applied on the module side and a source of 12V in the power-line connection. In a second scenario the opposite is done where a load is connected to the power-line and a source of 12V to the module side.
+With this configuration is possible to test the current flow in both directions using the switch component of this circuit.
+\paragraph{Test overview}
+\textbf{Scenario 1:}
+\begin{figure}[H]
+	\begin{centering}
+		\includegraphics[width=0.7\textwidth,page=1]{images/scenario1.pdf}
+		\caption{Current flow from the power-line to the module (fan)}
+	\end{centering}
+\end{figure}
+\textbf{Scenario 2:}
+\begin{figure}[H]
+	\begin{centering}
+		\includegraphics[width=0.7\textwidth,page=1]{images/scenario2.pdf}
+		\caption{Current flow from the module to the power-line (fan)}
+	\end{centering}
+\end{figure}
+\subsubsection{Further Implementation}
 \begin{itemize}
-	\item Schematic
-	\item Printed circuit board
-	\item Mount component
-	\item Test board
+	\item The power switch module does not work as expected, some tests have still to be made in order to get the expected result.
+	\item A current sensor is going to be add to each switching port ( 10 ports ), so if there is a high current the port can be shutdown and with the current measurements is possible to verify the efficiency as a green system.
+	\item The module will connect to a main board with a card edge connection, so it will be easier to substitute in case of a malfunction and keep the housing free of many wires.
 \end{itemize}
 
+
+\subsection{Webserver Communication}
+\begin{itemize}
+	\item Data Flow
+	\item PHP
+	\item Setting the Server
+	\item Further implementation
+\end{itemize}
 
 
 \subsection{Host controller}
