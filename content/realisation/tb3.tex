@@ -11,6 +11,11 @@ Overview of the what work is put into which time boxes.
 
 \subsubsection{Work to be done in this time box}
 \begin{itemize}
+	\item Device driver
+	\begin{itemize}
+		\item Create a device driver framework from the scull example and the device drivers included in the distribution. 
+		\item Convert the ADC driver into a device driver.
+	\end{itemize}
 	\item Power switch
 	\begin{itemize}
 		\item Schematic
@@ -30,9 +35,145 @@ Overview of the what work is put into which time boxes.
 	\item[Host controller] is made in the FPGA, and is responsible for the communication between the Spartan6 and the ARM7, it shall be made with wishbone master interface 
 \end{description}
 
-\subsection{Power switch}
+\subsection{Device driver skeleton - Dennis}
+The goal is to create a simple framework for creating device drivers for the LPC2478 platform. To do so, the scull example provided is used together with sample code provided with the uClinux distribution. The framework is tested by converting an ADC driver (running on the bare metal) into a device driver. Down below code snippets from the ADC is extracted an commented. 
+\p The module registration is found in the \textit{file\_operations} structure:
+\begin{lstlisting}[language=c]
+static struct file_operations adc_fops = {
+  .owner   = THIS_MODULE,
+  .read    = adc_read,
+  .open    = adc_open,
+  //.write   = none,
+  .release = adc_close,
+};
+\end{lstlisting}
 
-\subsection{Host controller}
+The structure contains pointer values to the given functions, where these functions can be accessed from user space by:
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+			Events		& User Functions & Kernel Functions \\ \hline
+			Load Module 	& insmod	& module\_init()		 \\ 
+			Open		& fopen	& file\_operations: open	 \\ 
+			Read		& fread	& file\_operations: read	 \\ 
+			Write			& fwrite 	& file\_operations: write	 \\ 
+			Close		& fclose 	& file\_operations: release\\ 
+			Remove		& rmmod 	& module\_exit()		 \\
+		\hline
+	\end{tabular}
+	\caption{Function event table.}
+\end{table}
+Loading and removing a module is not included in the file operation structure, but declared aside as pointers to the two functions used:
+\begin{lstlisting}[language=c]
+// Define init and exit functions
+module_init(adc_mod_init);
+module_exit(adc_mod_exit);
+\end{lstlisting}
+
+In the init function several different things are done:
+\begin{itemize}
+	\item Setting up the registers (copy from the \textit{bare metal} driver file).
+	\item Registration of the device (no need for dynamic numbering, so the major number is a static number not used by other drivers.)
+	\item Allocating the char driver and adding it to the environment.
+\end{itemize}
+
+Code pieces from setting up the ADC:
+
+\begin{lstlisting}[language=c]
+//Register the device
+	dev = MKDEV(adc_major, adc_minor);
+	result = register_chrdev_region(dev, NUM_ADC_DEVICES, "adc");
+//Allocate and add the adc device.
+	adc_cdev = cdev_alloc();
+	cdev_init(adc_cdev, &adc_fops);
+	adc_cdev->owner = THIS_MODULE;
+	adc_cdev->ops   = &adc_fops;
+
+	result = cdev_add(adc_cdev, dev, NUM_ADC_DEVICES);
+	
+static void adcInit(void){
+	volatile u32 tmp = 0;
+	m_reg_bfs(PCONP, (1 << 12)); //Power on ADC
+	m_reg_write(AD0CR, 0);
+	m_reg_write(AD0CR,
+			(4<<8)			|	//set clock division factor
+			(0<<17)			|	//CLKS  = 0, 11 clocks = 10-bit result
+			(1<<21)			|	//PDN   = 1, ADC is active
+			(1<<24));			//start a conversion
+	}
+\end{lstlisting}
+The exit function undoes the steps done in the initialization function.
+\p Before reading the ADC channels, the channel shall be opened for reading. In the ADC code the pins are pin function are setup to be of type ADC. As the pins belongs to different PINSEL registers, a if else statement is used to set the right registers.
+\begin{lstlisting}[language=c]
+// inside the function: 
+static int adc_open(struct inode* inode,  struct file* file){
+
+// Check if the channel has been verified
+if(chRefCnt[channel] == 0){
+	file->private_data = (void *) channel;
+	if(channel >= 0 && channel <=3)
+		m_reg_bfs(PINSEL1, enable_bits[channel]);
+	else if(channel > 3 && channel < 6)
+		m_reg_bfs(PINSEL3, enable_bits[channel]);
+	else if(channel >= 6 && channel < 8)
+		m_reg_bfs(PINSEL0, enable_bits[channel]);
+}
+chRefCnt[channel]++;
+\end{lstlisting}
+When finish reading, the file is closed again and the opposite operation is performed (deselect the ADC function for the proper IO pin).
+\p When reading the ADC, the result retrieved is converted from decimal into a string before it is returned to the user. Reading and writing to and from the CPU registers is done through the kernel space functions \textit{m\_reg\_read} and \textit{m\_reg\_write}. So the register writes and reads in the driver file for the ADC is performed as parameters sent to these functions:
+\begin{lstlisting}[language=c]
+//start conversion now (for selected channel)
+m_reg_write(AD0CR, ((1 << channel) | (1 << 24)));
+
+//wait til done
+while ((m_reg_read(AD0GDR) & (1<<31)) == 0);
+
+//get result from global register and adjust to 10-bit integer
+result = (m_reg_read(AD0GDR) >> 6) & 0x3FF;
+\end{lstlisting}
+
+\subsubsection{Testing the driver - Dennis \& Paulo}
+To proper test the driver, a small user space program has been written. The program opens the device, reads it and closes it again.
+The augment sent to the program selects which channel should be read (ad0, ad1, ad2 etc.).
+
+\begin{lstlisting}[language=c]
+#define ADC "/dev/adc"
+	
+	//Format string to "Analog value"
+	//Ex 1023 -> 3.30
+void stringFormat(int value){
+	char str[10];
+	if((value%100)>9)
+		sprintf(str, "%i.%i",value/100,value%100);
+ 	else
+ 		sprintf(str, "%i.0%i",value/100,value%100);
+ 		
+	printf("%s\n",str);
+}
+
+int main(int argc, char *argv[]) {
+	FILE *fp;
+	char read[10];
+
+	if ((fp = fopen(strcat(ADC,argv[1]),"r"))==NULL){
+		printf("Cannot open file.\n");
+		exit(0);
+	}
+	
+	fread(read,1,10,fp);
+	stringFormat(atoi(read)*330/1023);
+	fclose(fp);
+	return 0;
+}
+\end{lstlisting}
+
+
+
+\subsection{Power switch - Paulo}
+
+\subsection{Host coWriting device drivers in Linux: A brief tutorialntroller - Theis}
 The host controller is a part in the Spartan6 that controls the parts in the Spartan6 with command from the ARM7 that have connection to the host controller block.
 \begin{figure}[H]
 	\begin{centering}
@@ -122,3 +263,4 @@ When the master wishbone wants to write to the slave, it present valid address a
 On the second raising clock edge the slave decode the input and set the acknowledge bit high in response to the SEL\_O. It also prepares to latch data from the master. The master monitors the acknowledge bit and prepare to terminate the cycle.
 
 On the last raising clock edge the slave latches the data, the master set the STB\_O and CYC\_O to zero to end the cycle and the phase, the slave set the acknowledge bit low again as response to STB\_O.
+
