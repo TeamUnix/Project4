@@ -209,11 +209,9 @@ When the master wishbone wants to write to the slave, it present valid address a
 On the second raising clock edge the slave decode the input and set the acknowledge bit high in response to the SEL\_O. It also prepares to latch data from the master. The master monitors the acknowledge bit and prepare to terminate the cycle.
 
 On the last raising clock edge the slave latches the data, the master set the STB\_O and CYC\_O to zero to end the cycle and the phase, the slave set the acknowledge bit low again as response to STB\_O.
-<<<<<<< HEAD
-=======
+
 \subsection{Post deployment}
 Spend a short time evaluating the just-closed timebox. What went well? Why did it go well? What caused problems? Can they be prevented in the future? And how can they be prevented?
 \subsubsection{Power switch}
 \subsubsection{Host Controller}
 The host controller work in theory but still needs to be tested in practice. The handed out code, was well commented to give a good overview. This made it easier to make the code for CPUinterface.
->>>>>>> origin/master
