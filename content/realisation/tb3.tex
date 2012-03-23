@@ -43,6 +43,9 @@ Overview of the what work is put into which time boxes.
 
 \subsection{Power switch}
 Power switch module have to be able to switch the power direction. A battery after fully charged can be used to power other modules or systems.
+
+The power switch module have to be able to switch the power direction so for instance a battery fully charged can be used to power other modules or systems but also to protect the different modules connected to the hub.
+
 \subsubsection{Schematics}
 
 \begin{figure}[H]
@@ -56,7 +59,7 @@ Power switch module have to be able to switch the power direction. A battery aft
 
 \begin{figure}[H]
 	\begin{centering}
-		 \includegraphics[width=1.0\textwidth,page=1]{images/ps_layout.pdf}
+		 \includegraphics[width=0.7\textwidth,page=1]{images/ps_layout.pdf}
 		\caption{Schematic of the switch interface}
 	\end{centering}
 \end{figure}
@@ -78,21 +81,21 @@ With this configuration is possible to test the current flow in both directions 
 \textbf{Scenario 1:}
 \begin{figure}[H]
 	\begin{centering}
-		\includegraphics[width=0.7\textwidth,page=1]{images/scenario1.pdf}
+		\includegraphics[width=0.6\textwidth,page=1]{images/scenario1.pdf}
 		\caption{Current flow from the power-line to the module (fan)}
 	\end{centering}
 \end{figure}
 \textbf{Scenario 2:}
 \begin{figure}[H]
 	\begin{centering}
-		\includegraphics[width=0.7\textwidth,page=1]{images/scenario2.pdf}
+		\includegraphics[width=0.6\textwidth,page=1]{images/scenario2.pdf}
 		\caption{Current flow from the module to the power-line (fan)}
 	\end{centering}
 \end{figure}
 \subsubsection{Further Implementation}
 \begin{itemize}
-	\item The power switch module does not work as expected, some tests have still to be made in order to get the expected result.
-	\item A current sensor is going to be add to each switching port ( 10 ports ), so if there is a high current the port can be shutdown and with the current measurements is possible to verify the efficiency as a green system.
+	\item The power switch module does not work as expected, unfortunately current is also flowing in the opposite direction. Further tests have to be made in order to find a solution for the problem.
+	\item A current sensor shall be add to each switching port ( 10 ports ), to surveillance the connected modules and react if a high or to low current if seen. From the measurements it is also possible to verify the efficiency of the green system.
 	\item The module will connect to a main board with a card edge connection, so it will be easier to substitute in case of a malfunction and keep the housing free of many wires.
 \end{itemize}
 
@@ -348,13 +351,7 @@ int main(int argc, char *argv[]) {
 }
 \end{lstlisting}
 
-\subsection{Power switch - Paulo}
-
-\subsection{Host coWriting device drivers in Linux: A brief tutorialntroller - Theis}
-The host controller is a part in the Spartan6 that controls the parts in the Spartan6 with command from the ARM7 that have connection to the host controller block.
-
-
-\subsection{Host controller}
+\subsection{Host controller - Theis}
 The host controller takes commands from the ARM7, and controlling blocks in the Spartan6. This controller is made in hardware and implemented in the Spartan6.
 \begin{figure}[H]
 	\begin{centering}
@@ -412,7 +409,7 @@ process (Clk,Rst)
 		end if;
 end process;
 \end{lstlisting}
-The block is synchronous with the clock and have an asynchronous reset. If the reset is pressed everything is set to zero to tell the master wishbone to not do anything. When the chip select is high, it tells the block that the ARM7 want to communicate with the Spartan6. After chip select is activated, the block check if the ARM7 want to read or write data from or to the Spartan6. If the ARM7 wants to read data, the interface block route the data from master wishbone to the data vector on the EMC. Else if the ARM7 wants to write data, the data vector on the EMC is routed to the data input for the master wishbone. In any case of read or write the read and write output from the EMC is routed to the master wishbone. The address input from the EMC is routed as soon as the chip select is activated. If the chip select is not active everything is routed to zero, to secure that the master wishbone do not write any data. The data output to the EMC is tri-stated in the wrapper code if the chip select is not active, to not disturb other communication on the EMC bus.
+The block is synchronous with the clock and have an asynchronous reset. If the reset is pressed everything is set to zero to tell the master wishbone to not do anything. When the chip select is high, it tells the block that the ARM7 want to communicate with the Spartan6. After chip select is activated, the block checks if the ARM7 want to read or write data from or to the Spartan6. If the ARM7 wants to read data, the interface block routes the data from master wishbone to the data vector on the EMC. Otherwise if the ARM7 wants to write data, the data vector on the EMC is routed to the data input for the master wishbone. In any case of read or write the read and write output from the EMC is routed to the master wishbone. The address input from the EMC is routed as soon as the chip select is activated. If the chip select is not active, everything is set to zero, to secure that the master wishbone do not write any data. The data output to the EMC is tri-stated in the wrapper code if the chip select is not active, to not disturb other communication on the EMC bus.
 \paragraph{Test bench}
 The test bench is made to test if the host controller is responding correct to different signals, image of the test bench signals is shown below.
 \begin{figure}[H]
@@ -422,10 +419,9 @@ The test bench is made to test if the host controller is responding correct to d
 		%\missingfigure{host controller diagram}
 	\end{centering}
 \end{figure}
-The test bench shows that after the reset state and when the chip select is active, a write cycle is made,to address "0x03" and the data that is written is "0x03". After the write there is made a read cycle on address "0x03" and the data read is uninitialized, this is because the master wishbone do not get any data from slave, so it is not possible to send any valid data to the ARM7, so the uninitialized indicate so far that the read cycle works. And after the chip select deactivate the data is equal to the data from the AMR7.
+The test bench shows that after the reset state and when the chip select is active, a write cycle is made,to address "0x03" and the data that is written is "0x03". After the write, a read cycle on address "0x03" and the data read is uninitialized, this is because the master wishbone do not get any data from slave, so it is not possible to send any valid data to the ARM7, so the uninitialized indicate so far that the read cycle works. And after the chip select deactivate the data is equal to the data from the AMR7.
 \subsubsection{Wishbone}
-
-Wishbone is a computer bus for integrated circuit communication. It sets up some standard communication rules to use when designing IP cores. This make it easy to reuse code on different hardware and in different systems. The wishbone bus is a logic bus, this means that there is no rules for voltage levels, it only works with ones and zeros. In this project the wishbone is used as illustrated on the picture below.
+Wishbone is a computer bus for integrated circuit communication. It sets up some standard communication rules to use when designing IP cores. This makes it easy to reuse code on different hardware and in different systems. The wishbone bus is a logic bus, this means that there is no rules for voltage levels, it only works with ones and zeros. In this project the wishbone is used as illustrated on the picture below.
 \begin{figure}[H]
 	\begin{centering}
 		 \includegraphics[width=0.8\textwidth]{images/typical_usage.png}
@@ -441,10 +437,9 @@ The EMC on the ARM7 is controlling the wishbone master, which is controlling all
 		%\missingfigure{host controller diagram}
 	\end{centering}
 \end{figure}
-When a single read cycle is started, the master wishbone presents a valid address, on the address register, it set the write enable to zero to show that this is a read cycle, the SEL\_O is set, to show where on the data input it expect the data to be read, it also sets the CYC\_O and STB\_O high to indicate the start of a cycle and a phase.
+When a single read cycle is started, the master wishbone presents a valid address, on the address register, it sets the write enable to zero to show that this is a read cycle, the SEL\_O is set, to show where on the data input it expect the data to be read, it also sets the CYC\_O and STB\_O high to indicate the start of a cycle and a phase.
 
-
-On the next raising clock edge, the slave decode the input and set the acknowledge bit high in response to the SEL\_O. It also presents valid data on the slave data output. The master monitors the acknowledge and prepares to latch data.
+On the next raising clock edge, the slave decodes the input and sets the acknowledge bit high in response to the SEL\_O. It also presents valid data on the slave data output. The master monitors the acknowledge and prepares to latch data.
 
 
 On the third raising clock edge the master wishbone latches the data, and set the STB\_O and CYC\_O to zero to end the cycle and the phase, the slave set the acknowledge bit low again as response to STB\_O.\\
