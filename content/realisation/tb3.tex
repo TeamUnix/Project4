@@ -41,7 +41,20 @@
 	\item[Host controller] is made in the FPGA, and is responsible for the communication between the Spartan6 and the ARM7, it shall be made with wishbone master interface 
 \end{description}
 
-\subsection{Power switch}
+\subsubsection{Time planning}
+\begin{table}[H]
+\centering
+	\begin{tabular}{|l|c|c|c|c|}
+		\hline
+		~			& Power Switch	& Web server	& Host Controller 	& Device Driver\\ \hline
+		Estimation	& 8				& 4			& 8				& 10\\
+		Actual		& 10				& 6			& 12				& 13\\
+		\hline
+	\end{tabular}
+	\caption{Estimation and actual time used on the project}
+\end{table}
+
+\subsection{Power switch - Paulo}
 Power switch module have to be able to switch the power direction. A battery after fully charged can be used to power other modules or systems.
 
 The power switch module have to be able to switch the power direction so for instance a battery fully charged can be used to power other modules or systems but also to protect the different modules connected to the hub.
@@ -50,7 +63,7 @@ The power switch module have to be able to switch the power direction so for ins
 
 \begin{figure}[H]
 	\begin{centering}
-		 \includegraphics[width=1.0\textwidth,page=1]{images/ps_schematics.pdf}
+		 \includegraphics[width=0.8\textwidth,page=1]{images/ps_schematics.pdf}
 		\caption{Schematic of the switch interface}
 	\end{centering}
 \end{figure}
@@ -100,7 +113,7 @@ With this configuration is possible to test the current flow in both directions 
 \end{itemize}
 
 
-\subsection{Webserver Communication}
+\subsection{Webserver Communication - Paulo}
 
 \subsubsection{Data Flow}
 In the implementation of this system the user is able in an interactive way to command the power-switch. With this example is possible to send any command to the uClinux distribution running on the ARM7.
@@ -124,7 +137,7 @@ The server was set on the development environment and can be access at 10.1.18.2
 The PHP code creates a socket and connects to the ARM7 commander application, a TCP server listening to port 5555. The command is send to this application and then send to the shell, executing the application led from embedded artists:
 
 Connection: connect.php
-
+\\
 \begin{lstlisting}[language=php]
 <?php
 	
@@ -205,7 +218,7 @@ function sendRequest(str){
 }
 \end{lstlisting}
 
-\subsection{Further Implementations}
+\subsubsection{Further Implementations}
 \begin{itemize}
 	\item Implement the user interface generated in the Interactive Design sessions.
 	\item Both direction communication is to be implemented, so the data can be retrieved from the board to the user.
@@ -453,21 +466,17 @@ When the master wishbone wants to write to the slave, it present valid address a
 On the second raising clock edge the slave decode the input and set the acknowledge bit high in response to the SEL\_O. It also prepares to latch data from the master. The master monitors the acknowledge bit and prepare to terminate the cycle.
 
 On the last raising clock edge the slave latches the data, the master set the STB\_O and CYC\_O to zero to end the cycle and the phase, the slave set the acknowledge bit low again as response to STB\_O.
-
-\subsection{Post deployment}
-Spend a short time evaluating the just-closed timebox. What went well? Why did it go well? What caused problems? Can they be prevented in the future? And how can they be prevented?
-\subsubsection{Power switch}
-\subsubsection{Host Controller}
+\subsubsection{Further Implementation}
 The host controller work in theory but still needs to be tested in practice. The handed out code, was well commented to give a good overview. This made it easier to make the code for CPUinterface.
 
-\subsection{Time Spend}
-- Power Switch 
-\\Estimation: 8h 	Actual: 10h\\
-- Web server 
-\\Estimation: 4h 	Actual: 6h\\
-- Host Controller
-\\Estimation: 8h 	Actual: 12h\\
-- Device Driver 
-\\Estimation: 10h 	Actual: 13h\\
-
+\subsection{Post deployment}
+A short evaluation of the time box. The time plan has almost been on track, only a few extra hours have been used. 
+\subsubsection{Power switch}
+Unfortunately the power switch implementation does not work as expected. Fixes for how to solve the problem shall be investigated and possible an alternative method found. 
+\subsubsection{Host Controller}
+The controller is running on test-bench level and needs now to be physically implemented in the FPGA. 
+\subsubsection{Webserver Communication}
+The web server is up and running and a small script to communicate with the ARM board has been made. 
+\subsubsection{Device driver}
+A device driver for the ADC is running, this framework will further on be used to implement the external memory controller. 
 
