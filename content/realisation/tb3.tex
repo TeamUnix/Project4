@@ -26,7 +26,6 @@ Overview of the what work is put into which time boxes.
 	\item{Webserver Communication}
 	\begin{itemize}
 		\item Data Flow
-		\item PHP
 		\item Setting the Server
 		\item Further implementations
 	\end{itemize}
@@ -43,7 +42,7 @@ Overview of the what work is put into which time boxes.
 \end{description}
 
 \subsection{Power switch}
-Power switch module have to be able to switch the power direction so a battery fully charged can be used to power other modules or systems.
+Power switch module have to be able to switch the power direction. A battery after fully charged can be used to power other modules or systems.
 \subsubsection{Schematics}
 
 \begin{figure}[H]
@@ -101,9 +100,118 @@ With this configuration is possible to test the current flow in both directions 
 \subsection{Webserver Communication}
 \begin{itemize}
 	\item Data Flow
-	\item PHP
 	\item Setting the Server
 	\item Further implementation
+\end{itemize}
+
+\subsubsection{Data Flow}
+In the implementation of this system the user should be able in an interactive way to command the power-switch. With this example is possible to send any command to the uClinux distribution running on the ARM7.
+a webpage was made with 4 check lists, each one corsesponding to each LED on the board and on click the LED are switched on and off.
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=1.0\textwidth,page=1]{images/dataflowPHP.pdf}
+		\caption{Data Flow between user and ARM 7}
+	\end{centering}
+\end{figure}
+
+\subsubsection{Setting the Server}
+The server was set on the development environment and can be access at 10.1.18.223, no online stays is given from the board. This webpage is used as verification of the development process with a low level interaction. 
+\begin{figure}[H]
+	\begin{centering}
+		 \includegraphics[width=0.4\textwidth,page=1]{images/website.png}
+		\caption{Low level web interface}
+	\end{centering}
+\end{figure}
+
+The PHP code creates a socket and connects to the ARM7 commander application, a TCP server listening to port 5555. The command is send to this application and then send to the bash, executing the application led from embedded artists:
+
+Connection: connect.php
+
+\begin{lstlisting}[language=php]
+<?php
+	
+	function con(){
+	
+		require_once("globals.php");
+		
+		if ($_SESSION['socket']=socket_create(AF_INET, SOCK_STREAM, SOL_TCP)){
+			echo "Socket created <br>";
+		}
+	
+		if (socket_connect($_SESSION['socket'],$device_ip,$device_port)){
+			echo "Connection stablished<br>";	
+		} else {
+			exit (socket_strerror(socket_last_error()));
+		}
+		echo socket_read($socket,1024)."<br>";	
+	}    
+?>
+\end{lstlisting}
+
+Command Handler: cmd.php
+
+\begin{lstlisting}[language=php]
+<?php
+	
+	session_start();
+	
+	include("connect.php");
+	
+	con();
+		
+	//Construct command
+	$str = $_POST["cmd"];
+	
+	socket_write($_SESSION['socket'],$str);
+	
+	echo socket_read($_SESSION['socket'],1024);
+	
+	socket_close($_SESSION['socket']);
+	
+	$_SESSION["alive"]=false;
+
+?>
+\end{lstlisting}
+
+Global Setting such as device IP and Port, the device IP will in further implementation be stored in the MYSQL file since the DHCP will be activated on the board so we can have connection to the board even when a dynamic ip address is being given.
+
+globals.php
+
+\begin{lstlisting}[language=php]
+<?php
+	
+	//$device_ip = "127.0.0.1";
+	$device_ip = "10.42.26.130";
+	$device_port = 5555;
+	
+?>
+\end{lstlisting}
+
+The use of AJAX(Asynchronous Javascript And XML), allows the interface to be more dynamic and don't have to reload each time some action is taken, this is made in background by the XMLHttpRequest(). The code can be seen bellow, this use the method post to send variables and values.
+
+\begin{lstlisting}[language=c]
+function sendRequest(str){
+	var req;
+	if(window.XMLHttpRequest){
+		req	= new XMLHttpRequest();
+	} else {
+		req = ActiveXObject("Microsoft.XMLHTTP");	
+	}
+
+	req.open("POST","cmd.php",false);
+	req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	
+	req.send("cmd="+str);
+	alert(req.responseText);
+
+}
+\end{lstlisting}
+
+\subsection{Further Implementations}
+\begin{itemize}
+	\item Implement the user interface generated in the Interactive Design sessions.
+	\item Both directions communication is to be implemented, so the data can be retrieved from the board to the user.
+	\item Website should just be able to work when the board is on-line otherwise block the user interface and send warning to administrator.
 \end{itemize}
 
 \subsection{Device driver skeleton - Dennis}
