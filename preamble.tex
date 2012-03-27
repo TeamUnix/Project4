@@ -1,7 +1,7 @@
 \documentclass[10pt,a4paper]{report}
 \usepackage[latin1]{inputenc}
 \usepackage[english]{babel}
-\usepackage{amsmath}
+%\usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -14,8 +14,24 @@
 \usepackage{subfig}
 \usepackage{titlesec}
 \usepackage{todonotes}
-\usepackage{hyperref}
-%\usepackage[bottom]{footmisc}		%When this is added, all footnotes refers to page1 :(
+\usepackage{pdfpages}										% include pdf-doc with the command (page number) \includepdf[pages=]{fil.pdf}	
+\usepackage{url}													% Til at sætte urler op med. Virker sammen med hyperref
+
+\flushbottom  %makes all pages equal size
+
+
+% ¤¤ Visuelle referencer ¤¤ %
+\usepackage{hyperref}			 		% Giver mulighed for at ens referencer bliver til klikbare hyperlinks. .. [colorlinks]{..}
+%\usepackage[hypertex]{hyperref}			 	% Giver mulighed for at ens referencer bliver til klikbare hyperlinks. .. [colorlinks]{..}
+\hypersetup{linkbordercolor=cyan}
+
+\hypersetup{pdfborder = 0}							% Fjerner ramme omkring links i fx indholsfotegnelsen og ved kildehenvisninger ¤¤
+\hypersetup{														%	Opsætning af hyperlinks
+    colorlinks = false,
+    linkcolor = black,
+    anchorcolor = black,
+    citecolor = black
+}
 
 
 %Code
@@ -28,9 +44,9 @@
 \usepackage{listings}
 
 \lstset{ %
-  basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+  basicstyle=\scriptsize\ttfamily,       % the size of the fonts that are used for the code
   numbers=left,                   % where to put the line-numbers
-  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  numberstyle=\scriptsize\tiny\color{gray},  % the style that is used for the line-numbers
   stepnumber=1,                   % the step between two line-numbers. If it's 1, each line 
                                   % will be numbered
   numbersep=5pt,                  % how far the line-numbers are from the code
@@ -65,12 +81,17 @@
 \textheight		22.0cm
 
 \pagestyle{fancy}
-\lhead{EnergyHub}
+
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+
+\lhead{\thesection}
 \chead{Pro4}
 \rhead{\thepage\ of \pageref{LastPage}}
+
 \lfoot{Theis Christensen\\Paulo Fontes\\Dennis Madsen}
 \cfoot{Team3}
 \rfoot{\today}
+
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 
@@ -78,7 +99,14 @@
 
 \titlespacing*{\chapter}{0pt}{-50pt}{20pt}
 \titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
-\renewcommand \thechapter{\Roman{chapter}}
+%\renewcommand \thechapter{\Roman{chapter}}
 
 \newcommand{\p}{\\[0.3cm]}
 \renewcommand*\thesection{\arabic{section}}
+
+
+
+\usepackage{amsmath}
+\numberwithin{equation}{section}	%reset equation counter in every section
+\numberwithin{figure}{section}		%reset figure counter in every section
+\numberwithin{table}{section}		%reset table counter in every section
