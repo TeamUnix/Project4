@@ -38,25 +38,19 @@ end WBS_switches;
 
 architecture RTL of WBS_switches is
 
-			--signal Q				: std_logic_vector(7 downto 0);
-
 begin
 
 --!  Concurrent assignments
 	err_o				<=	'0';
 	rty_o				<=	'0';
-	--dat_o(7 downto 0)	<=	Q;
-	--Q					<=	sw;
 	ack_o				<=	stb_i and cyc_i;  --! asynhronous cycle termination is OK here.
 	
 --!  Processes                                             --
---! Wishbone write to Q register
 	Reg : process(clk_i)
 		begin
 			if(clk_i'event and clk_i = '1') then
 				if (rst_i = '1') then
 					dat_o <= Revision_c;          --! Revision readable at reset
-					--dat_o	<=	(others => '0'); 
 				else
 					if ((cyc_i and stb_i and not we_i) = '1') then
 						case adr_i is
@@ -68,7 +62,7 @@ begin
 						end case;
 						
 					else
-						--Q <= Q;
+						dat_o <= dat_o;
 					end if;
 				end if;
 			end if;
