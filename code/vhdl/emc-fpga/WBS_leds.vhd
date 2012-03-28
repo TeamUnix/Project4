@@ -37,16 +37,18 @@ end WBS_leds;
 
 architecture RTL of WBS_leds is
 
-			signal Q				: std_logic_vector(7 downto 0);
+	signal Q				: std_logic_vector(7 downto 0);
 
 begin
 
---!  Concurrent assignments
-	err_o <= '0';
-	rty_o <= '0';
+--  Concurrent assignments
+--	Wishbone cycle acknowledge
+	err_o <= '0';	--error signal
+	rty_o <= '0';	--retry signal
+	ack_o <= stb_i and cyc_i;  --! asynhronous cycle termination is OK here.
+--	Data
 	dat_o(7 downto 0) <= Q;
 	leds <= Q;
-	ack_o <= stb_i and cyc_i;  --! asynhronous cycle termination is OK here.
 
 --!  Processes                                             --
 --! Wishbone write to Q register

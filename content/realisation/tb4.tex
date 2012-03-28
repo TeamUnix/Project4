@@ -518,40 +518,198 @@ The SQL syntax is going to be explain for only one table since the other tables 
 
 
 \subsection{Physical interface - Theis}
-%			intro
-%			
-%					verification specification
-%					deployment specification
-%					
-%			Analysis
-%	
-%	                Refactored block diagram
-%	                Refactored class diagram
-%	                Detailed use cases
-%	                User interface specification
-%	                System interface specification
-%	                Dimensioning specification 
-%	
-%	        Design
-%	
-%	                UML/SysML deployment view(s)
-%	                Mechanical specifications and dimensioning
-%	                HW module specification per block
-%	                UML SW deployment view
-%	                Class specification
-%	                Refactored class diagram
-%	                Use case scenarios specifications
-%	                Sequence diagrams 
-%	
-%	        Implementation
-%	
-%	                Mechanical drawings with details explained
-%	                Electronic diagrams with details explained
-%	                Source code with details explained
-%	                Description of integration 
-%	
-%	        Verification
-%	
-%	                Module tests
-%	                Integration tests
-%	                Acceptance test
+The interface shall be made to fulfil the requirements \textit{NF-1.5}\footnote{Requirement is found in table 3.2 in EPRO 3 project energy-hub} and \textit{B-1.2}\footnote{Requirement is found in table 3.4 in EPRO 3 project energy-hub}.\\
+\begin{table}[H]
+\centering
+	\begin{tabular}{|p{1.2cm}|p{2.3cm}|p{6cm}|p{6cm}|}
+	\hline
+	ID		& Requirement	& Description															& Comments\\\hline
+	NF-1.5	& HW Interface	& 1 start button for the hub. 10 buttons to each start a module.		& This is shown with 8 switches on the Spartan 6 board\\\hline
+	B-1.2	& Physical		& 1 diode showing when a module is off and one showing when it is on.	& This is shown with 8 LEDs on the Spartan 6 board\\\hline
+	\end{tabular}
+\end{table}
+
+\subsubsection{Analysis}
+The physical interface is where the user interact directly with the hub, it is placed on the hub cabinet. It shall be possible for the user to start the hub and modules. There shall also be an indication of the hub and module status.\\
+For turning on module there shall be a switch for each module and one for turning on the hub. To indicate the status there shall be a LED for every module and one to indicate the hub status.\\
+The interface is made on the Spartan6 and is communicating with the ARM7 through the external memory controller in the ARM7 and using a wishbone interface on the Spartan6.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/analysis_phy_interface.png}
+		\caption{User-system interface interaction}
+	\end{centering}
+\end{figure}
+\subsubsection{Design}
+The physical interface is made with 8 switches and 8 LEDs, and is controlled through the Spartan 6. The block diagram below shows how the interface is made inside the Spartan 6, with the wishbone interface to the master, the master wishbone is discussed in Time box 3 section 3.5.3.
+\begin{figure}[H]
+	\begin{centering}
+			%\missingfigure{Updated timebox figure}
+			\includegraphics[width=0.7\textwidth]{images/Design_HWmodule.png}
+			\caption{Block diagram for the interface in the Spartan 6}
+	\end{centering}
+\end{figure}
+\subsubsection{Implementation}
+The implementation is made in the Spartan 6 board. There is 8 LEDs and 8 switches on board, that is used for the interface. The blocks is written in VHDL.
+\paragraph{LED interface}
+The LEDs is controlled with the LED block in the Spartan 6, and it is able to send and receive data with a wishbone interface. The data output is the status of the 8 LEDs, the data input is used to turn on and off the LEDs.\\\\
+In the code below, the entity of the LED controller is shown, the wishbone interface is defined from line 5 to line 16, these lines is common for all wishbone slaves. In line 19 the output for the 8 LEDs is defined as a 8 bit vector.
+\begin{lstlisting}[language=VHDL]
+...
+entity WBS_leds is
+	port	(
+			--! Wishbone Slave interface
+			--Input
+			clk_i			: in		std_logic;		--! Clock input from SYSCON
+			rst_i			: in		std_logic;		--! Reset for Wishbone interface
+			cyc_i			: in		std_logic;		--! cycle input, asserted when cycle is in progress
+			stb_i			: in		std_logic;		--! Strobe input, similar to Chip Select
+			we_i			: in		std_logic;		--! Write Enable: High=WR, Low=RD
+			dat_i			: in		wb_dat_typ;		--! data from host
+			adr_i			: in		wb_lad_typ;		--! Low address input
+			--Ouput
+			ack_o			: out		std_logic;		--! Slave acknowledge output, asserted after sucessful cycle
+			err_o			: out		std_logic;		--! Error output, abnormal cycle termination
+			rty_o			: out		std_logic;		--! Retry output, slave not ready
+			dat_o			: out		wb_dat_typ;		--! data to host
+			---------------------------------
+			--! Output port
+			leds			: out		std_logic_vector(7 downto 0)
+			);
+end WBS_leds;
+...
+\end{lstlisting}
+Here the slave is responding the master, the error and retry signal is not supported in this slave, they are assigned with zeros, the acknowledge bit is set high if the strobe and cycle is assigned by the master. The Q signal is assigned to the LEDs and the data output. If the master reads data, it will get the status of the LEDs.
+\begin{lstlisting}[language=VHDL]
+...
+	signal Q				: std_logic_vector(7 downto 0);
+
+begin
+
+--  Concurrent assignments
+--	Wishbone cycle acknowledge
+	err_o <= '0';	--error signal
+	rty_o <= '0';	--retry signal
+	ack_o <= stb_i and cyc_i;  --! asynchronous cycle termination is OK here.
+--	Data
+	dat_o(7 downto 0) <= Q;
+	leds <= Q;
+...
+\end{lstlisting}
+In the code below the writing to the LEDs is made. If the cycle, strobe and the write enable inputs is high, the master wants to write data to this slave, then the process checks the address that the slave is sending data to. To write data to the LEDs the address has to be five zeros, then the code will assign Q with the data input from the master.
+\begin{lstlisting}[language=VHDL]
+...
+--!  Processes                                             --
+--! Wishbone write to Q register
+	Reg : process(clk_i)
+		begin
+			if(clk_i'event and clk_i = '1') then
+				if (rst_i = '1') then
+					Q <= Revision_c(7 downto 0);          --! Revision readable at reset 
+				else
+					if ((cyc_i and stb_i and we_i) = '1') then
+						case adr_i is
+							when A_WBO_REG1 =>
+								Q	<= dat_i(7 downto 0);
+							when others =>
+							--Ack_o <= '0'; 
+						end case;
+						
+					else
+						Q <= Q;
+					end if;
+				end if;
+			end if;
+	end process Reg;
+...
+\end{lstlisting}
+\paragraph{Switch interface}
+The switches is read from the switches block through wishbone interface in the Spartan 6. This block is read only, and the data output is the status of the 8 switches.\\\\
+The wishbone part of the code i common to the entity code in the LED block. For the switches an input vector is made with 8 bit.
+\begin{lstlisting}[language=VHDL]
+...
+entity WBS_switches is
+	port	(
+			--! Wishbone Slave interface
+			--Input
+			clk_i			: in		std_logic;		--! Clock input from SYSCON
+			rst_i			: in		std_logic;		--! Reset for Wishbone interface
+			cyc_i			: in		std_logic;		--! cycle input, asserted when cycle is in progress
+			stb_i			: in		std_logic;		--! Strobe input, similar to Chip Select
+			we_i			: in		std_logic;		--! Write Enable: High=WR, Low=RD
+			dat_i			: in		wb_dat_typ;		--! data from host
+			adr_i			: in		wb_lad_typ;		--! Low address input
+			--Ouput
+			ack_o			: out		std_logic;		--! Slave acknowledge output, asserted after sucessful cycle
+			err_o			: out		std_logic;		--! Error output, abnormal cycle termination
+			rty_o			: out		std_logic;		--! Retry output, slave not ready
+			dat_o			: out		wb_dat_typ;		--! data to host
+			-------------------------------------------------
+			--! Intput port
+			sw				:in			std_logic_vector(7 downto 0)
+			);
+end WBS_switches;
+...
+\end{lstlisting}
+The acknowledge bit for the master is set here with the high strobe and cycle input.
+\begin{lstlisting}[language=VHDL]
+...
+--  Concurrent assignments
+--	Wishbone cycle acknowledge
+	err_o <= '0';	--error signal
+	rty_o <= '0';	--retry signal
+	ack_o <= stb_i and cyc_i;  --! asynhronous cycle termination is OK here.
+...
+\end{lstlisting}
+In the code below, the switches status is written to the master wishbone. The process write the switches status to the lowest 8 bit in the data string and fill the rest with zeros, if the cycle and strobe input are high and the write enable is low to indicate that the master wants to read data.
+\begin{lstlisting}[language=VHDL]
+...
+--!  Processes                                             --
+	Reg : process(clk_i)
+		begin
+			if(clk_i'event and clk_i = '1') then
+				if (rst_i = '1') then
+					dat_o <= Revision_c;          --! Revision readable at reset
+				else
+					if ((cyc_i and stb_i and not we_i) = '1') then
+						case adr_i is
+							when A_WBO_REG1 =>
+								dat_o(7 downto 0)	<= sw;
+								dat_o(15 downto 8)	<= (others => '0');
+							when others =>
+							--Ack_o <= '0'; 
+						end case;
+						
+					else
+						dat_o <= dat_o;
+					end if;
+				end if;
+			end if;
+	end process Reg;
+...
+\end{lstlisting}
+The rest of the code is made by Morten Opprud Jakobsen, and is not in the scope of this section.
+\subsubsection{Verification}
+The verification is made on the computer by simulating a test bench for writing to the LEDs and reading from the switches, and a test program on the ARM7 is made, to read the switches and write the status to the LEDs. The test with the ARM7 was recorded and is available through this link \url{http://www.youtube.com/watch?v=3MUK6qbg0Rk}
+\paragraph{Read switches}
+In the start of the test, \textit{reset} is active and the switch status is set. before a read cycle is assigned the \textit{address} is assigned, then the \textit{chip select} goes low, then \textit{read (output enable)}. The test shows that the data is tri-stated until the \textit{read} goes low, and one clock cycle after, the status on \textit{switch} is loaded into \textit{data}.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/tb_wb_read.png}
+		\caption{Test bench simulation of read}
+	\end{centering}
+\end{figure}
+\paragraph{Write to LEDs}
+In the write test, \textit{leds} is uninitialized and \textit{reset} is active, before a write cycle is assigned the \textit{address} and \textit{data} is assigned, then the \textit{chip select} goes low, then \textit{write (write enable)}. The test show that one clock cycle after \textit{write} goes low the \textit{data} is loaded onto the \textit{Leds}.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/tb_wb_write.png}
+		\caption{Test bench simulation of write}
+	\end{centering}
+\end{figure}
+\subsubsection{Conclusion}
+The test verify that the implementation of the interface design is working properly. The switches block is not completely finished, right now to register changes in the switches the ARM7 shall read the status to often, to prevent this an interrupt function is to be implemented, in that way the ARM7 is only reading the status when the switches changes. The interrupt function is not on the scope of this time box.
+\subsection{Deployment}
+%			Customers signature for acceptance 

@@ -54,7 +54,7 @@ begin
 
 ---- ADD HERE !!!!!!!!!!!!!
 
-process (Clk,Rst)
+wishbone_routing : process (Clk,Rst)
 begin  
 	if Rst = '1' then
 		Wr_o		<= '0';
@@ -87,7 +87,7 @@ begin
 			CpuD_o	<= (others => '0');
       end if;
    end if;
-end process;
+end process wishbone_routing;
 
 
 
