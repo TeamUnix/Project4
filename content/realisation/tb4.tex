@@ -505,5 +505,7 @@ In the write test, \textit{leds} is uninitialized and \textit{reset} is active, 
 		\caption{Test bench simulation of write}
 	\end{centering}
 \end{figure}
+\subsubsection{Conclusion}
+The test verify that the implementation of the interface design is working properly. The switches block is not completely finished, right now to register changes in the switches the ARM7 shall read the status to often, to prevent this an interrupt function is to be implemented, in that way the ARM7 is only reading the status when the switches changes. The interrupt function is not on the scope of this time box.
 \subsection{Deployment}
 %			Customers signature for acceptance 
