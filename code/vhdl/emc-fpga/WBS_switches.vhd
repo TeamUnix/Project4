@@ -38,7 +38,7 @@ end WBS_switches;
 
 architecture RTL of WBS_switches is
 
-			signal Q				: std_logic_vector(7 downto 0);
+			--signal Q				: std_logic_vector(7 downto 0);
 
 begin
 
@@ -46,7 +46,7 @@ begin
 	err_o				<=	'0';
 	rty_o				<=	'0';
 	--dat_o(7 downto 0)	<=	Q;
-	Q					<=	sw;
+	--Q					<=	sw;
 	ack_o				<=	stb_i and cyc_i;  --! asynhronous cycle termination is OK here.
 	
 --!  Processes                                             --
@@ -55,18 +55,20 @@ begin
 		begin
 			if(clk_i'event and clk_i = '1') then
 				if (rst_i = '1') then
-					dat_o <= Revision_c;          --! Revision readable at reset 
+					dat_o <= Revision_c;          --! Revision readable at reset
+					--dat_o	<=	(others => '0'); 
 				else
 					if ((cyc_i and stb_i and not we_i) = '1') then
 						case adr_i is
 							when A_WBO_REG1 =>
-								dat_o(7 downto 0)	<= Q;
+								dat_o(7 downto 0)	<= sw;
+								dat_o(15 downto 8)	<= (others => '0');
 							when others =>
 							--Ack_o <= '0'; 
 						end case;
 						
 					else
-						Q <= Q;
+						--Q <= Q;
 					end if;
 				end if;
 			end if;

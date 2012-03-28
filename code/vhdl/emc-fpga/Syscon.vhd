@@ -41,13 +41,13 @@ begin
 --! Input 12. MHz, output 44.2368 MHz
 	DCM_Sys : DCM
 	generic map (
-		CLKFX_DIVIDE				=> 1,													-- Can be any integer from 1 to 32
-		CLKFX_MULTIPLY				=> 4)													-- Can be any integer from 1 to 32
+		CLKFX_DIVIDE				=> 1,												-- Can be any integer from 1 to 32
+		CLKFX_MULTIPLY				=> 4)												-- Can be any integer from 1 to 32
 	port map	(
-				CLK0					=> clk_s,											-- 0 degree DCM CLK ouptput
-				CLKFX					=> clk_r,											-- DCM CLK synthesis out (M/D)
-				CLKFB					=> clk_s,											-- DCM clock feedback
-				CLKIN					=> clk_i,											-- Clock input (from IBUFG, BUFG or DCM)
+				CLK0				=> clk_s,											-- 0 degree DCM CLK ouptput
+				CLKFX				=> clk_r,											-- DCM CLK synthesis out (M/D)
+				CLKFB				=> clk_s,											-- DCM clock feedback
+				CLKIN				=> clk_i,											-- Clock input (from IBUFG, BUFG or DCM)
 				RST					=> '0'												-- DCM asynchronous reset input
 				);
 
