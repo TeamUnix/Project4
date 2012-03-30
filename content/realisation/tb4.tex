@@ -16,7 +16,8 @@
 	\end{itemize}
 	\item Database
 	\begin{itemize}
-		\item \todo[inline]{edit what you like and bake a cake}
+		\item	Database design and implementation
+		\item	Webserver implementation
 	\end{itemize}
 	\item Physical interface
 	\begin{itemize}
@@ -28,7 +29,7 @@
 \paragraph{Description:}
 \begin{description}
 	\item[Power line module] \todo[inline]{edit here Dennis}
-	\item[Database] \todo[inline]{edit here Jesus}
+	\item[Database] stores the measurements retrieved my the modules in a efficient way.
 	\item[Physical interface] is the light indication and the switches that shall be on the physical hub interface
 \end{description}
 \subsubsection{Time planning}
@@ -94,10 +95,6 @@ A LAMP ( Linux Apache MySQL PHP ) web server is implemented at the development e
 For an easy and fast verification and development of the database a phpMyAdmin web application is installed at the server.
 The verifications can be found at the end of this section.
 
-%			Deployment specification
-\subsubsection{Deployment specification}
-\missingfigure{Have no idea what this should be}
-
 %		Analysis
 %	
 %	                Refactored block diagram
@@ -145,8 +142,8 @@ In a deeper analysis of the information system for the power energy hub, some te
 The design of the database as part of its development is fundamental for a overview of the system, this is done with the use of data sets and data models. With data sets a detailed description of each table in the 
 
 \lineparagraph{Data sets}
-From the system information analysis a basic tabular structure is designed for a better understanding and low level overview of the database, this is called data set structure.
-\\\\
+From the system information analysis a basic tabular structure is designed for a better understanding and low level overview of the database, this is called data set structure.\\
+
 TYPE(ID\_TYPE, TYPE);
 
 \begin{table}[H]
@@ -183,8 +180,8 @@ MODULES(ID\_MODULE, UNIQUE\_ID, ID\_TYPE, ID\_STATUS, NAME);
 		NAME & The name of the module for example, Solar Panel, wind turbine, battery. \\\hline
 	\end{tabular}
 \end{table}
-As a requirement the database have to store the measurement  from different modules, the common and minimal measurements needed from the modules are current and voltage. So a log data set is created.
-\\\\
+As a requirement the database have to store the measurement  from different modules, the common and minimal measurements needed from the modules are current and voltage. So a log data set is created.\\
+
 LOGS(ID\_LOG, ID\_MODULE, DATE\_TIME, PORT, CURRENT, VOLTAGE);
 
 \begin{table}[H]
@@ -202,7 +199,7 @@ LOGS(ID\_LOG, ID\_MODULE, DATE\_TIME, PORT, CURRENT, VOLTAGE);
 
 At this point the database can initialise a new module or identified if the module where connected before, change the status for each module and add new measurements for each module. ( Verification 1, 2 and 3 )
 
-Measurements are add to the database every \todo{Time between measurements}, which in a non-stop system database size could be a problem, to avoid this situation a wrapper data set is created. This will store an average of values between a time span for each module, allowing the customer either to erase the values from the log or export them out from the database. Crucial data can be lost in this step for example the port history in case of troubleshooting, and precise date and time which would not allow the precise plot of data. 
+Measurements are add to the database constantly, which in a non-stop system database size could be a problem, to avoid this situation a wrapper data set is created. This will store an average of values between a time span for each module, allowing the customer either to erase the values from the log or export them out from the database. Crucial data can be lost in this step for example the port history in case of troubleshooting, and precise date and time which would not allow the precise plot of data.\\
 
 WRAPPER(ID\_WRAP, ID\_MODULE, DATE\_FROM, DATE\_TO, AVG\_CURRENT, AVG\_VOLTAGE);
 
@@ -223,25 +220,25 @@ The system is now able to decrease the amount of space needed using a time span 
 
 During the verification process some problems related to the flexibility of the database were found:
 	\begin{itemize}
-		\item Problem 1: The Photovoltaic and Wind Turbine modules have more measurements to be stored then only current and voltage, for example velocity and direction of the wind, sun position, etc.
-		\item \todo{Meeting with martin anytime this week to talk about the database structure}
-	\end{itemize}
+		\item Problem 1: The Photovoltaic and Wind Turbine modules have more measurements to be stored than only current and voltage, for example velocity and direction of the wind, sun position, etc.
+ 	\end{itemize}
 
 \paragraph{Problem 1}
-In the design of this database it was assumed that all the modules would only save to the database the current and voltage. But during the verification process, the designed database was not flexible enough by the type of measurements being restrict to only current and voltage.
+In the design of this database it was assumed that all the modules would only send to the database the current and voltage. But during the verification process, the designed database was not flexible enough by the type of measurements being restrict to only current and voltage.
 
 	\begin{itemize}
 		\item How to make the database more flexible so it would allow inserting different measurements for different modules?
 	\end{itemize}
 
-Different approaches were made:
+Two different approaches were made:
 	
 	\begin{itemize}
 		\item Option 1: Create a new table for each new module that have extra measurements and add the ID\_EXTRA to the logs table.
 		\item Option 2: Give different unique ids to the sensors and relate them to their modules, so the log will store the sensor measurement.
 	\end{itemize}
 
-Option 1 is not consistent since when a new module is connected a new table have to be created for that module with the needed measurement units.\\
+Option 1 is not consistent, when a new module is connected a new table have to be created for that module with the needed measurement units.\\
+
 Option 2 is the most reliable and the implemented one. A table Units and Sensors were created:\\
 
 SENSOR(ID\_SENSOR, ID\_MODULE, ID\_UNITS);
@@ -267,7 +264,7 @@ UNITS(ID\_UNIT, UNIT);
 	\end{tabular}
 \end{table}
 
-In table wrapper and logs the ID\_MODULE was replaced with ID\_SENSOR. The database becomes more flexible since at anytime a module with new unknown sensors can be add and a sensor can be added to a existent module and the values will always be saved and retrieved to the user with the appropriat measurement units.
+In table wrapper and logs the ID\_MODULE was replaced with ID\_SENSOR. The database becomes more flexible since at anytime a module with new an unknown sensor can be add. A new sensor can now be add to a existent module and the values will always be saved and retrieved to the user with the appropriate measurement units.
 
 \lineparagraph{Data Model}
 Data model is a high-level overview of the database structure. At this stage data sets are translated to a logic structure with the relationship between tables.
@@ -288,7 +285,7 @@ Data model is a high-level overview of the database structure. At this stage dat
 %	                Source code with details explained
 %	                Description of integration 
 %	
-\todo{White space after a code box is toooooo big.}
+
 \subsubsection{Implementation}
 Using the development environment virtual machine with the linux distribution CENTOS, a AMP ( Apache MySQL PHP ) web server is implemented, this way the web application phpMyAdmin is installed which simplifies the implementation of the database.
 
@@ -530,15 +527,6 @@ Tables are populated in the beginning with initial values known values. PHP scri
 		9 & Database created & Ok \\\hline
 		10 & Tables created & Ok \\\hline
 		11 & Tables populated & Ok \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
 	\end{tabular}
 \end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
