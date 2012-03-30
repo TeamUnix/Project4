@@ -16,7 +16,7 @@
 	\end{itemize}
 	\item Database
 	\begin{itemize}
-		\item \todo[author=Jesus, inline]{edit what you like and bake a cake}
+		\item \todo[inline]{edit what you like and bake a cake}
 	\end{itemize}
 	\item Physical interface
 	\begin{itemize}
@@ -27,8 +27,8 @@
 \end{itemize}
 \paragraph{Description:}
 \begin{description}
-	\item[Power line module] \todo[author=Dennis, inline]{edit here Dennis}
-	\item[Database] \todo[author=Jesus, inline]{edit here Jesus}
+	\item[Power line module] \todo[inline]{edit here Dennis}
+	\item[Database] \todo[inline]{edit here Jesus}
 	\item[Physical interface] is the light indication and the switches that shall be on the physical hub interface
 \end{description}
 \subsubsection{Time planning}
@@ -85,12 +85,12 @@
 \subsection{Database - Paulo}
 %		Intro
 
-Each module of the system has sensors and data to be stored and shown to the user. As such, data have to be stored in a convenient and consistent way. A SQL database ( MySQL) is used. All data stored have to be present in a web interface the integration between this type of data base and a server-side scripting ( PHP ) keeps the development faster and completely open source.
+Each module in the system have sensors which send data to be stored and shown to the user. As such, data have to be stored in a convenient and consistent way. A MySQL database is used. All data stored have to be present in a web interface the integration between this type of data base and a server-side scripting ( PHP ) keeps the development faster and completely open source.
 A database have to be consistent, flexible and efficient so no data is lost or repeated when a value is send to it.
 %
 %			Verification specification
 \subsubsection{Verification specification}
-A LAMP ( Linux Apache MySQL PHP ) web server is implemented at the development environment used to build the uClinux image. This use a linux distribution Centos virtual machine in which the web server was built ( how to build the web server explanation further in this documentation ).
+A LAMP ( Linux Apache MySQL PHP ) web server is implemented at the development environment used to build the uClinux image. This use a linux distribution CENTOS virtual machine in which the web server was built ( how to build the web server explanation further in this documentation ).
 For an easy and fast verification and development of the database a phpMyAdmin web application was installed at the server.
 The verifications can be found at the end of this section.
 
@@ -107,7 +107,7 @@ The verifications can be found at the end of this section.
 %	                System interface specification
 %	                Dimensioning specification 
 \subsubsection{Analysis}
-To develop a database, data models are generated from the requirements and system information analysis, this is an abstract way of presenting the data to be stored.
+The analysis of the system information and requirements is fundamental to the development of a database. 
 \paragraph{Requirements}
 	\begin{itemize}
 		\item Jan is looking at the web interface for the energy hub. From where he can see the status for each modules connected to it
@@ -142,10 +142,10 @@ In a deeper analysis of the information system for the power energy hub, some te
 %	                Sequence diagrams 
 %	
 \subsubsection{Design}
+The design of the database as part of its development is fundamental for a overview of the system, this is done with the use of data sets and data models. With data sets a detailed description of each table in the 
 
-\paragraph{Data sets}
-
-From the system information analysis a basic tabular structure is designed for a better understanding and overview of the data, this is called data set structure.
+\lineparagraph{Data sets}
+From the system information analysis a basic tabular structure is designed for a better understanding and low level overview of the database, this is called data set structure.
 \\\\
 TYPE(ID\_TYPE, TYPE);
 
@@ -191,7 +191,7 @@ LOGS(ID\_LOG, ID\_MODULE, DATE\_TIME, PORT, CURRENT, VOLTAGE);
 \centering
 	\begin{tabular}{| p{2cm} | p{10cm} |}
 		\hline
-		ID\_LOG & Auto increment integer, a new id number is generated every time an measurement is add. \\\hline
+		ID\_LOG & Auto increment integer, a new id number is generated every time a measurement is add. \\\hline
 		ID\_MODULE & This is a foreigner key for the table modules, this allow the system to know from which module correspond the measurement .\\\hline
 		DATE\_TIME & Date and time of the measurement is saved so it can be plotted or in case of a lower efficiency a detailed history can analysed. \\\hline
 		PORT & Defines in which port or the energy hub the module is connected in the time of the measurement. \\\hline
@@ -208,7 +208,7 @@ WRAPPER(ID\_WRAP, ID\_MODULE, DATE\_FROM, DATE\_TO, AVG\_CURRENT, AVG\_VOLTAGE);
 
 \begin{table}[H]
 \centering
-	\begin{tabular}{| p{2cm} | p{10cm} |}
+	\begin{tabular}{| l | p{10cm} |}
 		\hline
 		ID\_WRAP & Auto increment integer, a new id number is generated every time an wrap is needed. \\\hline
 		ID\_MODULE & This is a foreigner key for the table modules, this allow the system to know from which module correspond the values .\\\hline
@@ -241,9 +241,9 @@ Different approaches were made:
 		\item Option 2: Give different unique ids to the sensors and relate them to their modules, so the log will store the sensor measurement.
 	\end{itemize}
 
-Option 1 was not consistent since that every time a new module was connected a new table had to be created for that module with the needed measurement units.\\\\
+Option 1 is not consistent since when a new module is connected a new table have to be created for that module with the needed measurement units.\\
 Option 2 is the most reliable and the implemented one. A table Units and Sensors were created:\\
-\\
+
 SENSOR(ID\_SENSOR, ID\_MODULE, ID\_UNITS);
 
 \begin{table}[H]
@@ -269,14 +269,14 @@ UNITS(ID\_UNIT, UNIT);
 
 In table wrapper and logs the ID\_MODULE was replaced with ID\_SENSOR. The database becomes more flexible since at anytime a module with new unknown sensors can be add and a sensor can be added to a existent module and the values will always be saved and retrieved to the user with the appropriat measurement units.
 
-\paragraph{Data Model}
-
+\lineparagraph{Data Model}
+Data model is a high-level overview of the database structure. At this stage data sets are translated to a logic structure with the relationship between tables.
 
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Updated timebox figure}
 		\includegraphics[width=1.0\textwidth]{images/db_structure.pdf}
-		\caption{Data Model}
+		\caption{Data Model Structure}
 	\end{centering}
 \end{figure}
 
@@ -288,7 +288,198 @@ In table wrapper and logs the ID\_MODULE was replaced with ID\_SENSOR. The datab
 %	                Source code with details explained
 %	                Description of integration 
 %	
+\todo{White space after a code box is toooooo big.}
 \subsubsection{Implementation}
+Using the development environment virtual machine with the linux distribution CENTOS, a AMP ( Apache MySQL PHP ) web server is implemented, this way the web application phpMyAdmin is installed which simplifies the implementation of the database.
+
+\lineparagraph{Webserver Implementation}
+A LAMP ( Linux Apache MySQL PHP ) web server is implemented, this is explains step by step how to implement this kind of web server on a linux CENTOS OS.
+\begin{itemize}
+% Apache Install		
+		\item Installing Apache and bring the server up.\\
+			Install daemon that is going to handle HTTP requests on port 80. ( Apache )
+			\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+				# yum install httpd
+			\end{lstlisting}
+			Start Apache in background.
+			\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+				# /etc/init.d/httpd start
+			\end{lstlisting}			
+			Testing the web server. ( Verification 5 )
+			\begin{figure}[H]
+				\begin{centering}
+					%\missingfigure{Webserver first page}
+					\includegraphics[width=1.0\textwidth]{images/first_web.png}
+					\caption{First page apache server running}
+				\end{centering}
+			\end{figure}
+% MySQL Install			
+		\item Installing MySQL and bringing the server up\\
+			Install MySQL server and client.
+			\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+				# yum install mysql-server mysql
+			\end{lstlisting}
+			Start MySQL server in background.
+			\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+				# /etc/init.d/mysqld start
+			\end{lstlisting}
+			Testing the MySQL server ( Verification 6 )
+			\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+				# mysql
+			\end{lstlisting}
+			Server up and running when the follow response is given.
+			\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+				Welcome to the MySQL monitor.  Commands end with ; or \g.
+				Your MySQL connection id is 12
+				Server version: 5.0.95 Source distribution
+
+				Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
+
+				Oracle is a registered trademark of Oracle Corporation and/or its
+				affiliates. Other names may be trademarks of their respective
+				owners.
+
+				Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+				mysql> 
+			\end{lstlisting}
+			At this moment the database is set with username root and an empty password. For security reasons a password is set for the MySQL server.\\\\
+			Changing MySQL root password
+			\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+				mysql> USE mysql;
+				mysql> UPDATE user SET Password=PASSWORD('new password') WHERE user='root';
+				mysql> FLUSH PRIVILEGES;
+			\end{lstlisting}
+			With the instruction 'USE mysql' the database directory mysql is open, 'UPDATE user SET Password=PASSWORD ('new password') WHERE user='root';' the password for the user 'root' is updated to the desired one. 'FLUSH PRIVILEGES' erases the privileges in cache and reloads the privileges in the MySQL server.
+% PHP Install
+		\item Installing PHP \\
+		Install PHP scripting language and necessary modules for MySQL server.
+		\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+			# yum install php php-mysql
+		\end{lstlisting}
+			php: scripting language compiler\\
+			php-mysql: mysql functions to be called from a PHP script\\
+		\\
+		Testing PHP by creating a file in the web server documents root. /var/www/html/test.php. ( Verification 7 )
+		\begin{lstlisting}[language=php, stepnumber=0, tabsize=1]
+			//test.php
+			<?php
+				// Shows the in use PHP configuration file.
+				phpinfo();
+			?>
+		\end{lstlisting}
+		Accessing in the web browser to the web server ip address http://10.1.18.223/test.php
+		\begin{figure}[H]
+			\begin{centering}
+				%\missingfigure{PHP info web page on the browser}
+				\includegraphics[width=1.0\textwidth]{images/php_info.png}
+				\caption{test.php - PHP configuration file}
+			\end{centering}
+		\end{figure}
+% PhpMyAdmin Install
+		\item Installing phpMyAdmin\\
+		phpMyAdmin is a free web based MySQL database administration environment, without this tool the development of a MySQL database have to be made using the command line, it has become a fundamental tool for most web masters.
+		\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+			# yum install phpmyadmin
+		\end{lstlisting}
+		The Apache have to be restarted so it can assume the symbolic link to phpMyAdmin tool.
+		\begin{lstlisting}[language=c, stepnumber=0, tabsize=1]
+			# /etc/init.d/httpd restart
+		\end{lstlisting}
+		Testing phpMyAdmin by pointing in the web browser to the address http://10.1.18.223/phpmyadmin. ( Verification 8 )
+		\begin{figure}[H]
+			\begin{centering}
+				%\missingfigure{PHPmyadmin figure}
+				\includegraphics[width=1.0\textwidth]{images/phpmyadmin.png}
+				\caption{phpMyAdmin front page}
+			\end{centering}
+		\end{figure}
+
+\end{itemize}
+
+\lineparagraph{Database Implementation}
+The final step of the database development is the physical implementation. The tool phpMyAdmin is used to implement the database at the MySQL server the code blocks generated by this tools are described bellow. 
+\\
+The following blocks of code create the database and tables in it.
+% Create database directory
+\lineparagraph{Database}
+To create tables that can be used to store data, a database directory have to be created.
+		\begin{lstlisting}[language=sql, stepnumber=0, tabsize=1]
+			CREATE DATABASE `powersystem`;
+		\end{lstlisting}
+		With the database directory created, the tables can now be created inside this directory.
+% Create tables
+\lineparagraph{Tables}
+The SQL syntax is going to be explain for only one table since the other tables will follow the same syntax just using different names.\\
+		MODULES
+		\begin{lstlisting}[language=sql, stepnumber=0, tabsize=1]
+			CREATE TABLE `powersystem`.`MODULES` (
+				`ID_MODULE` INT NOT NULL AUTO_INCREMENT ,
+				`UNIQUE_ID` INT NOT NULL ,
+				`ID_TYPE` TINYINT NOT NULL ,
+				`ID_STATUS` TINYINT NOT NULL ,
+				`NAME` VARCHAR( 50 ) NOT NULL ,
+				PRIMARY KEY ( `ID_MODULE` , `UNIQUE_ID` )
+			) 
+		\end{lstlisting}
+		This block of code will create the table MODULES in the database directory 'powersystem' with the columns ID\_MODULE and UNIQUE\_ID as primary key for this table. Primary keys are columns where one and only one value is allowed, in this table UNIQUE\_ID is important to exist only once. 
+		ID\_TYPE and ID\_STATUS are foreigner keys form table TYPES and STATUS and NAME is the name of the module as explained in the analysis phase.
+		TYPES
+		\begin{lstlisting}[language=sql, stepnumber=0, tabsize=1]
+			CREATE TABLE `powersystem`.`TYPES` (
+			`ID_TYPE` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`TYPES` VARCHAR( 50 ) NOT NULL
+			)
+		\end{lstlisting}
+		STATUS
+		\begin{lstlisting}[language=sql, stepnumber=0, tabsize=1]
+			CREATE TABLE `powersystem`.`STATUS` (
+			`ID_STATUS` INT NOT NULL  AUTO_INCREMENT,
+			`STATUS` VARCHAR( 50 ) NOT NULL ,
+			PRIMARY KEY ( `ID_STATUS` )
+			)
+		\end{lstlisting}	
+		SENSORS
+		\begin{lstlisting}[language=sql, stepnumber=0, tabsize=1]
+			CREATE TABLE `powersystem`.`SENSORS` (
+			`ID_MODULE` INT NOT NULL AUTO_INCREMENT ,
+			`ID_SENSOR` INT NOT NULL ,
+			`ID_UNITS` INT NOT NULL ,
+			PRIMARY KEY ( `ID_MODULE` , `ID_SENSOR` )
+			)
+		\end{lstlisting}
+		UNITS
+		\begin{lstlisting}[language=sql, stepnumber=0, tabsize=1]
+			CREATE TABLE `powersystem`.`UNITS` (
+			`ID_UNIT` INT NOT NULL ,
+			`UNIT` VARCHAR( 50 ) NOT NULL ,
+			PRIMARY KEY ( `ID_UNIT` )
+			)
+		\end{lstlisting}
+		WRAPPER
+		\begin{lstlisting}[language=sql, stepnumber=0, tabsize=1]
+			CREATE TABLE `powersystem`.`WRAPPER` (
+			`ID_WRAP` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`DATE_FROM` DATETIME NOT NULL ,
+			`DATE_TO` DATETIME NOT NULL ,
+			`ID_SENSOR` INT NOT NULL ,
+			`VALUE` FLOAT NOT NULL
+			)
+		\end{lstlisting}
+		LOGS
+		\begin{lstlisting}[language=sql, stepnumber=0, tabsize=1]
+			CREATE TABLE `powersystem`.`LOGS` (
+			`ID_LOG` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+			`ID_SENSOR` INT NOT NULL ,
+			`DATE_TIME` DATETIME NOT NULL ,
+			`HUB_PORT` INT NOT NULL ,
+			`VALUE` FLOAT NOT NULL
+			)
+		\end{lstlisting}
+	
+% Populate Tables
+\lineparagraph{Populate Tables}
+
 
 %	        Verification
 %	
@@ -305,6 +496,17 @@ In table wrapper and logs the ID\_MODULE was replaced with ID\_SENSOR. The datab
 		2 & Change the status for each module & ~ \\\hline
 		3 & Add new measurements for each module & ~ \\\hline
 		4 & Decrease the database size using a time span and average values. & ~ \\\hline
+		5 & Web server running and accessible & Ok \\\hline
+		6 & MySQL server running and accessible) & Ok \\\hline
+		7 & PHP script language testing & Ok \\\hline
+		8 & phpMyAdmin tool installed and running & Ok \\\hline
+		2 & Change the status for each module & ~ \\\hline
+		2 & Change the status for each module & ~ \\\hline
+		2 & Change the status for each module & ~ \\\hline
+		2 & Change the status for each module & ~ \\\hline
+		2 & Change the status for each module & ~ \\\hline
+		2 & Change the status for each module & ~ \\\hline
+		2 & Change the status for each module & ~ \\\hline
 		2 & Change the status for each module & ~ \\\hline
 		2 & Change the status for each module & ~ \\\hline
 		2 & Change the status for each module & ~ \\\hline
@@ -312,6 +514,8 @@ In table wrapper and logs the ID\_MODULE was replaced with ID\_SENSOR. The datab
 		2 & Change the status for each module & ~ \\\hline
 	\end{tabular}
 \end{table}
+
+
 
 \subsection{Physical interface - Theis}
 The interface shall be made to fulfil the requirements \textit{NF-1.5}\footnote{Requirement is found in table 3.2 in EPRO 3 project energy-hub} and \textit{B-1.2}\footnote{Requirement is found in table 3.4 in EPRO 3 project energy-hub}.\\
