@@ -201,7 +201,8 @@ LOGS(ID\_LOG, ID\_MODULE, DATE\_TIME, PORT, CURRENT, VOLTAGE);
 
 At this point the database can initialise a new module or identified if the module where connected before, change the status for each module and add new measurements for each module. ( Verification 1, 2 and 3 )
 
-Measurements are add to the database every \todo{Time between measurements}constantly, which in a non-stop system database size could be a problem, to avoid this situation a wrapper data set is created. This will store an average of values between a time span for each module, allowing the customer either to erase the values from the log or export them out from the database. Crucial data can be lost in this step for example the port history in case of troubl\\eshooting, and precise date and time which would not allow the precise plot of data. 
+Measurements are add to the database constantly, which in a non-stop system database size could be a problem, to avoid this situation a wrapper data set is created. This will store an average of values between a time span for each module, allowing the customer either to erase the values from the log or export them out from the database. Crucial data can be lost in this step for example the port history in case of troubleshooting, and precise date and time which would not allow the precise plot of data.\\
+
 
 WRAPPER(ID\_WRAP, ID\_MODULE, DATE\_FROM, DATE\_TO, AVG\_CURRENT, AVG\_VOLTAGE);
 
