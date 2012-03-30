@@ -95,10 +95,6 @@ A LAMP ( Linux Apache MySQL PHP ) web server is implemented at the development e
 For an easy and fast verification and development of the database a phpMyAdmin web application is installed at the server.
 The verifications can be found at the end of this section.
 
-%			Deployment specification
-\subsubsection{Deployment specification}
-\missingfigure{Have no idea what this should be}
-
 %		Analysis
 %	
 %	                Refactored block diagram
@@ -226,25 +222,24 @@ The system is now able to decrease the amount of space needed using a time span 
 
 During the verification process some problems related to the flexibility of the database were found:
 	\begin{itemize}
-		\item Problem 1: The Photovoltaic and Wind Turbine modules have more measurements to be stored thean only current and voltage, for example velocity and direction of the wind, sun position, etc.
-		\item \todo{Meeting with martin anytime this week to talk about the database structure}
+		\item Problem 1: The Photovoltaic and Wind Turbine modules have more measurements to be stored then only current and voltage, for example velocity and direction of the wind, sun position, etc.
  	\end{itemize}
 
 \paragraph{Problem 1}
-In the design of this database it was assumed that all the modules would only saveend to the database the current and voltage. But during the verification process, the designed database was not flexible enough by the type of measurements being restrict to only current and voltage.
+In the design of this database it was assumed that all the modules would only send to the database the current and voltage. But during the verification process, the designed database was not flexible enough by the type of measurements being restrict to only current and voltage.
 
 	\begin{itemize}
 		\item How to make the database more flexible so it would allow inserting different measurements for different modules?
 	\end{itemize}
 
-DTwo different approaches were made:
+Two different approaches were made:
 	
 	\begin{itemize}
 		\item Option 1: Create a new table for each new module that have extra measurements and add the ID\_EXTRA to the logs table.
 		\item Option 2: Give different unique ids to the sensors and relate them to their modules, so the log will store the sensor measurement.
 	\end{itemize}
 
-Option 1 is not consistent since, when a new module is connected a new table have to be created for that module with the needed measurement units.\\
+Option 1 is not consistent, when a new module is connected a new table have to be created for that module with the needed measurement units.\\
 
 Option 2 is the most reliable and the implemented one. A table Units and Sensors were created:\\
 
@@ -271,7 +266,8 @@ UNITS(ID\_UNIT, UNIT);
 	\end{tabular}
 \end{table}
 
-In table wranow pper . A newand logs the ID\_MODULE was replaced with ID\_SENSOR. The database becomes emore flexible since at anytime a module with new an unknown sensors can be add and a sensor can be added to a existent module and the values will always be saved and retrieved to the user with the appropriat measurement units.
+In table wrapper and logs the ID\_MODULE was replaced with ID\_SENSOR. The database becomes more flexible since at anytime a module with new an unknown sensor can be add. A new sensor can now be add to a existent module and the values will always be saved and retrieved to the user with the appropriate measurement units.
+
 
 \lineparagraph{Data Model}
 Data model is a high-level overview of the database structure. At this stage data sets are translated to a logic structure with the relationship between tables.
@@ -292,7 +288,6 @@ Data model is a high-level overview of the database structure. At this stage dat
 %	                Source code with details explained
 %	                Description of integration 
 %	
-\todo{White space after a code box is toooooo big.}
 \subsubsection{Implementation}
 Using the development environment virtual machine with the linux distribution CENTOS, a AMP ( Apache MySQL PHP ) web server is implemented, this way the web application phpMyAdmin is installed which simplifies the implementation of the database.
 
@@ -534,15 +529,6 @@ Tables are populated in the beginning with initial values known values. PHP scri
 		9 & Database created & Ok \\\hline
 		10 & Tables created & Ok \\\hline
 		11 & Tables populated & Ok \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
-		2 & Change the status for each module & ~ \\\hline
 	\end{tabular}
 \end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
