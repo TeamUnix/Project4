@@ -41,9 +41,9 @@ package def_pkg is
   constant Num_s:         integer := 4;  --! Number of slaves  connected to the Intercon
   constant Num_m:         integer := 1;  --! Number of masters connected to the Intercon
   constant Datawidth:     integer := 16; --! Number of bits in datainterface
-  constant AddrRange:     integer := 7; --! Number of bits in Address space (was 16)
-  constant LAddrRange:    integer := 5;  --! Number of bits in Low Address space, which connects to slaves
-  constant HAddrRange:    integer := 2;  --! Number of bits in High Address space, used for decoding in Intercon
+  constant AddrRange:     integer := 7;  --! Number of bits in Address space (was 16)
+  constant LAddrRange:    integer := 4;  --! Number of bits in Low Address space, which connects to slaves
+  constant HAddrRange:    integer := 3;  --! Number of bits in High Address space, used for decoding in Intercon
   constant Num_bytes:     integer := 2;  --! Number of databytes
   constant tga_width:     integer := 1;  --! Number of bits in Address Tags
   constant tgc_width:     integer := 1;  --! Number of bits in Cycle Tags
@@ -81,15 +81,20 @@ package def_pkg is
   constant Low :  std_logic := '0';
   constant High: std_logic:= '1';
 
+--! Wishbone slave constants
+  constant IRQ_REG_WBS 	: integer := 1;
+  constant LED_WBS 		: integer := 2;
+  constant SWITCH_WBS	: integer := 3;
+  constant ADC_WBS		: integer := 4;
+
 --! High Address constants
-  constant BA_WBS_irq_reg	:	wb_had_typ	:= "00";  --! 0x00 Base addresses for slave 1
-  constant BA_WBS_switches	:	wb_had_typ	:= "01";  --! 0x00 Base addresses for slave 2
-  constant BA_WBS_adcs		:	wb_had_typ	:= "10";  --! 0x00 Base addresses for slave 3
-  constant BA_WBS_leds		:	wb_had_typ	:= "11";  --! 0x00 Base addresses for slave 4
+  constant BA_WBS_1		:	wb_had_typ	:= "000";  --! 0x00 Base addresses for IRQ register
+  constant BA_WBS_2		:	wb_had_typ	:= "001";  --! 0x00 Base addresses for LEDs
+  constant BA_WBS_3		:	wb_had_typ	:= "010";  --! 0x00 Base addresses for Switches
+  constant BA_WBS_4		:	wb_had_typ	:= "011";  --! 0x00 Base addresses for Analog to digital converter
 
 --! Low Address constants (Memory map) 
-  --! Serial SPI port addresses	
-  constant A_WBO_REG1:       	wb_lad_typ := "00000"; -- 0x0
-  constant A_WBO_REG2:          wb_lad_typ := "00001"; -- 0x2
+  constant WBS_REG1:       	wb_lad_typ := "0000"; -- 0x0
+  constant WBS_REG2:        wb_lad_typ := "0001"; -- 0x2
 
 end def_pkg; 

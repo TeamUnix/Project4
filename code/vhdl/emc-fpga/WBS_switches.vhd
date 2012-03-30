@@ -54,7 +54,7 @@ begin
 				else
 					if ((cyc_i and stb_i and not we_i) = '1') then
 						case adr_i is
-							when A_WBO_REG1 =>
+							when WBS_REG1 =>
 								dat_o(7 downto 0)	<= sw;
 								dat_o(15 downto 8)	<= (others => '0');
 							when others =>

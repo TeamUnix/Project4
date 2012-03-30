@@ -160,14 +160,14 @@ begin
 -- 					clk_i  => clk_o,
 -- 					rst_i  => rst_o,
 -- 					cyc_i  => cyc_i,
--- 					stb_i  => stb_i(1),
+-- 					stb_i  => stb_i(IRQ_REG_WBS),
 -- 					we_i   => we_i,
 -- 					dat_i  => s_dat_i,
 -- 					adr_i  => adr_i,
--- 					ack_o  => ack_o(1),
--- 					err_o  => err_o(1),
--- 					rty_o  => rty_o(1),
--- 					dat_o  => s_dat_o(1)
+-- 					ack_o  => ack_o(IRQ_REG_WBS),
+-- 					err_o  => err_o(IRQ_REG_WBS),
+-- 					rty_o  => rty_o(IRQ_REG_WBS),
+-- 					dat_o  => s_dat_o(IRQ_REG_WBS)
 -- 					);
 					
 	switches : entity work.WBS_switches(RTL)
@@ -175,14 +175,14 @@ begin
 					clk_i  => clk_o,
 					rst_i  => rst_o,
 					cyc_i  => cyc_i,
-					stb_i  => stb_i(2),
+					stb_i  => stb_i(SWITCH_WBS),
 					we_i   => we_i,
 					dat_i  => s_dat_i,
 					adr_i  => adr_i,
-					ack_o  => ack_o(2),
-					err_o  => err_o(2),
-					rty_o  => rty_o(2),
-					dat_o  => s_dat_o(2),
+					ack_o  => ack_o(SWITCH_WBS),
+					err_o  => err_o(SWITCH_WBS),
+					rty_o  => rty_o(SWITCH_WBS),
+					dat_o  => s_dat_o(SWITCH_WBS),
 					sw	   => switch
 					);
 	
@@ -191,14 +191,14 @@ begin
 -- 					clk_i  => clk_o,
 -- 					rst_i  => rst_o,
 -- 					cyc_i  => cyc_i,
--- 					stb_i  => stb_i(3),
+-- 					stb_i  => stb_i(ADC_WBS),
 -- 					we_i   => we_i,
 -- 					dat_i  => s_dat_i,
 -- 					adr_i  => adr_i,
--- 					ack_o  => ack_o(3),
--- 					err_o  => err_o(3),
--- 					rty_o  => rty_o(3),
--- 					dat_o  => s_dat_o(3)
+-- 					ack_o  => ack_o(ADC_WBS),
+-- 					err_o  => err_o(ADC_WBS),
+-- 					rty_o  => rty_o(ADC_WBS),
+-- 					dat_o  => s_dat_o(ADC_WBS)
 -- 					);
 	
 	leds : entity work.WBS_leds(RTL)
@@ -206,14 +206,14 @@ begin
 					clk_i  => clk_o,
 					rst_i  => rst_o,
 					cyc_i  => cyc_i,
-					stb_i  => stb_i(4),
+					stb_i  => stb_i(LED_WBS),
 					we_i   => we_i,
 					dat_i  => s_dat_i,
 					adr_i  => adr_i,
-					ack_o  => ack_o(4),
-					err_o  => err_o(4),
-					rty_o  => rty_o(4),
-					dat_o  => s_dat_o(4),
+					ack_o  => ack_o(LED_WBS),
+					err_o  => err_o(LED_WBS),
+					rty_o  => rty_o(LED_WBS),
+					dat_o  => s_dat_o(LED_WBS),
 					leds => s_led
 					);
 
