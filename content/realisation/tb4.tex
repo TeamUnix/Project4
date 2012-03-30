@@ -677,9 +677,9 @@ The interface shall be made to fulfil the requirements \textit{NF-1.5}\footnote{
 \end{table}
 
 \subsubsection{Analysis}
-The physical interface is where the user interact directly with the hub, it is placed on the hub cabinet. It shall be possible for the user to start the hub and modules. There shall also be an indication of the hub and module status.\\
-For turning on module there shall be a switch for each module and one for turning on the hub. To indicate the status there shall be a LED for every module and one to indicate the hub status.\\
-The interface is made on the Spartan6 and is communicating with the ARM7 through the external memory controller in the ARM7 and using a wishbone interface on the Spartan6.
+The physical interface is where the user interact directly with the hub, it is placed on the hub cabinet. It shall be possible for the user to start the hub and modules from here. There shall also be an indication of the hub and module status.\\
+For turning on a module there shall be a switch for each module, and one for turning on the hub. To indicate the status there shall be a LED for every module and one to indicate the hub status.\\
+The interface is made on the Spartan6 with an internal wishbone interface, and it is communicating with the ARM7 through the external memory controller in the ARM7.
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Updated timebox figure}
@@ -697,7 +697,7 @@ The physical interface is made with 8 switches and 8 LEDs, and is controlled thr
 	\end{centering}
 \end{figure}
 \subsubsection{Implementation}
-The implementation is made in the Spartan 6 board. There is 8 LEDs and 8 switches on board, that is used for the interface. The blocks is written in VHDL.
+The implementation is made in the Spartan 6 board. There is 8 LEDs and 8 switches located on the development board, that is used for the interface. The interface is written in VHDL and loaded on to the Spartan 6 FPGA.
 \paragraph{LED interface}
 The LEDs is controlled with the LED block in the Spartan 6, and it is able to send and receive data with a wishbone interface. The data output is the status of the 8 LEDs, the data input is used to turn on and off the LEDs.\\\\
 In the code below, the entity of the LED controller is shown, the wishbone interface is defined from line 5 to line 16, these lines is common for all wishbone slaves. In line 19 the output for the 8 LEDs is defined as a 8 bit vector.
@@ -859,4 +859,11 @@ In the write test, \textit{leds} is uninitialized and \textit{reset} is active, 
 \subsubsection{Conclusion}
 The test verify that the implementation of the interface design is working properly. The switches block is not completely finished, right now to register changes in the switches the ARM7 shall read the status to often, to prevent this an interrupt function is to be implemented, in that way the ARM7 is only reading the status when the switches changes. The interrupt function is not on the scope of this time box.
 \subsection{Deployment}
-%			Customers signature for acceptance 
+\paragraph{Driver}
+	%which versions of the prototype the customer will get
+	%with what functionality.	
+\paragraph{Database}
+	%which versions of the prototype the customer will get
+	%with what functionality.	
+\paragraph{Physical interface}
+	The physical interface delivered for this time box is revision 0.01.5, this version can send data from switches and receive data to turn on and off the LEDs.
