@@ -131,11 +131,11 @@ begin
 	Slave_sel : process (adr_s)
 		begin
 			case adr_s(AddrRange-1 downto AddrRange-HAddrRange) is
-				when BA_WBS_irq_reg		=> s <= 1;
-				when BA_WBS_switches	=> s <= 2;
-				when BA_WBS_adcs		=> s <= 3;
-				when BA_WBS_leds		=> s <= 4;
-				when others				=> s <= 0; --! Slave 0 is reserved for dummy addressing, when the address is not valid
+				when BA_WBS_1		=> s <= 1;
+				when BA_WBS_2		=> s <= 2;
+				when BA_WBS_3		=> s <= 3;
+				when BA_WBS_4		=> s <= 4;
+				when others			=> s <= 0; --! Slave 0 is reserved for dummy addressing, when the address is not valid
 			end case;
 	end process Slave_sel;
 

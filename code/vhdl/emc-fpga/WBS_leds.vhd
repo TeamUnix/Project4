@@ -60,7 +60,7 @@ begin
 				else
 					if ((cyc_i and stb_i and we_i) = '1') then
 						case adr_i is
-							when A_WBO_REG1 =>
+							when WBS_REG1 =>
 								Q	<= dat_i(7 downto 0);
 							when others =>
 							--Ack_o <= '0'; 
