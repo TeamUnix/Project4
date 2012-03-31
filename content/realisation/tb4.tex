@@ -12,7 +12,7 @@
 \begin{itemize}
 	\item Driver
 	\begin{itemize}
-		\item \todo[inline]{edit here Dennis}
+		\item UART and EMC bare-metal drivers.
 	\end{itemize}
 	\item Database
 	\begin{itemize}
@@ -28,7 +28,7 @@
 \end{itemize}
 \paragraph{Description:}
 \begin{description}
-	\item[Driver] \todo[inline]{edit here Dennis}
+	\item[Driver] UART driver to run on the bare-metal of the ARM7 to verify the PLC module. EMC bare metal test code to verify the code implemented in the FPGA.
 	\item[Database] stores the measurements retrieved my the modules in a efficient way.
 	\item[Physical interface] is the light indication and the switches that shall be on the physical hub interface
 \end{description}
@@ -47,10 +47,9 @@
 \end{table}
 \subsection{Driver - Dennis}
 %			intro
-%			
 %					verification specification
 %					deployment specification
-%					
+In order to implement the UART and the EMC (external memory controller) as a device driver in the linux kernel, it is easy to verify the initialization, read and write functions by making a small driver which runs on the bare metal of the CPU. 
 %			Analysis
 %	
 %	                Refactored block diagram
@@ -59,9 +58,8 @@
 %	                User interface specification
 %	                System interface specification
 %	                Dimensioning specification 
-%	
+\subsubsection{Design}
 %	        Design
-%	
 %	                UML/SysML deployment view(s)
 %	                Mechanical specifications and dimensioning
 %	                HW module specification per block
@@ -70,19 +68,178 @@
 %	                Refactored class diagram
 %	                Use case scenarios specifications
 %	                Sequence diagrams 
-%	
+No diagrams are made, as the drivers is only implemented with a init, write and a read function. 
+
+\subsubsection{Implementation}
 %	        Implementation
-%	
 %	                Mechanical drawings with details explained
 %	                Electronic diagrams with details explained
 %	                Source code with details explained
 %	                Description of integration 
-%	
+
+\paragraph{External Memory controller initialization}\textbf{ }\\
+From the framework.c file, the initialization of the EMC is already made, as the controller is already setup and uses by external NOR flash (CS0, 4MByte in size, address 0x80000000-0x80FFFFFF) and a NAND flash (CS1, 128MByte in size, address 0x81000000-0x81FFFFFF).
+\begin{lstlisting}[language=c]
+// In the lowLevelInit function
+...
+		// Enable EMC
+	EMC_CTRL = 0x00000001;
+		// Turn on the EMC (power up)
+	PCONP |= 0x00000800;
+		// Enable p2.14 as Chip Select2.
+	PINSEL4 = 0x10000000;
+		// Data pins setup (D0-D15, 16 bit) 
+	PINSEL6 = 0x55555555;
+		// Address pins setup (A0-A15, 16 bit). Note, only A1-A7 is routed to the FPGA.
+	PINSEL8 = 0x55555555;
+		// OE, WE + pins used by the two flash devices setup (BLS, cs0, cs1, A16-A19).
+	PINSEL9 = 0x50555555; 
+		// Select 16 bit data width 
+	EMC_STA_CFG2 = 0x00000081;
+		
+		//Timing registers
+	EMC_STA_WAITWEN2  = 0x2;
+	EMC_STA_WAITOEN2  = 0x1;
+	EMC_STA_WAITRD2   = 0x03;
+	EMC_STA_WAITPAGE2 = 0x1f;
+	EMC_STA_WAITWR2   = 0x1f;
+	EMC_STA_WAITTURN2 = 0xf;
+	
+\end{lstlisting}
+
+\subparagraph{Reading a value}\textbf{ }\\
+To read a value from a register in the FPGA, the correct address for CS2 range can be read as if it was just a variable read.
+\begin{lstlisting}[language=c]
+#define EXT_HW_BASE_ADDR	0x82000000
+#define HW_SW_REG     (*(volatile unsigned short *)(EXT_HW_BASE_ADDR + 64))
+
+...
+	// Reading the FPGA's switch register
+Sval = HW_SW_REG;
+\end{lstlisting}
+To print the read value as a binary value, a simple function has been made, which goes through all 16 bits in the string, checks if they are 0 or 1 and prints it out. 
+\begin{lstlisting}[language=c]
+	// Write out the read 16 bit value on binary form.
+bin_prnt_byte(Sval);
+
+void bin_prnt_byte(short x){
+   int n;
+   for(n=0; n<16; n++){
+      if((x & 0x8000) !=0){	//Verify if MSB is high or low and print result
+         rprintf("1");
+      }
+      else{
+         rprintf("0");
+      }
+      if(n==3 || n==7 || n==11){
+         rprintf(" "); /* insert a space between nibbles */
+      }
+      x = x<<1;	//Shift value one to the left
+   }
+   rprintf("\n\r");
+}
+\end{lstlisting}
+
+\subparagraph{Writing a value}\textbf{ }\\
+Writing a value to the FPGA is equal to reading a value. When a define of the wanted address is made, writing to this address automatically sets CS2, WR, the address pins and reads the data. 
+\begin{lstlisting}[language=c]
+#define EXT_HW_BASE_ADDR	0x82000000
+#define HW_LED_REG    (*(volatile unsigned short *)(EXT_HW_BASE_ADDR + 192))
+
+...
+	// Writing to the FPGA's diode register
+	HW_LED_REG = Sval;
+\end{lstlisting}
+
+\paragraph{Initializing the UART}\textbf{ }\\
+Initialization of UART2 used to communicate with the PLC module. 
+\begin{lstlisting}[language=c]
+...
+	// Calling the init UART2 and set Baud rate 9600. 
+	initUart(UART2, B9600(Fpclk), UART_8N1);
+...
+	
+void initUart(unsigned char uart, unsigned short div_factor, unsigned char mode){
+	switch (uart){
+	...
+		case UART2:
+		//enable UART pins in GPIO (P0.10 = TxD0, P0.11 = RxD0)
+		PINSEL0 |= ((1 << 20) | (1 << 22));
+
+		//set the bit rate = set uart clock (pclk) divisionfactor
+		U2LCR = 0x80; //enable divisor latches (DLAB bit set, bit 7)
+		U2DLL = (unsigned char) div_factor; //write division factor LSB
+		U2DLM = (unsigned char) (div_factor >> 8); //write division factor MSB
+
+		//set transmissiion and fifo mode
+		U2LCR = (mode & ~0x80); //DLAB bit (bit 7) must be reset
+		break;
+	...
+	}
+}
+\end{lstlisting}
+
+\subparagraph{UART write}\textbf{ }\\
+Put a character in the transmit buffer and wait for it to end transmission before returning.
+\begin{lstlisting}[language=c]
+int sendchar(unsigned char uart, int ch){
+	int count = 0;
+	switch (uart){
+	...
+		case UART2:
+		if(ch == '\n'){
+			while(!(U2LSR & 0x20));
+			U2THR = '\r';
+		}
+		while(!(U2LSR & 0x20));
+		return (U2THR = ch);
+		break;
+	...
+	}
+}
+\end{lstlisting}
+
+\subparagraph{UART read}\textbf{ }\\
+Read the buffer and return the value. 
+\begin{lstlisting}[language=c]
+int getkey(unsigned char uart){
+	switch (uart){
+	...
+		case UART2:
+		return (U2RBR);
+		break;
+	...
+	}
+}
+\end{lstlisting}
+
+\subparagraph{UART main function}\textbf{ }\\
+The main function in the small UART program checks UART2 (PLC module) and UART0 (connected to the PC). If a character is received from the PC, the character is sent to the power line. The power line has a default loop back function, so when a character is sent to the power line it is looped back to UART2. When something is received on UART2, it is sent to the PC, and printed.
+\begin{lstlisting}[language=c]
+...
+	while(1){
+		if((U0LSR & 0x1) > 0){		// If UART0 buffer is not empty
+			c = getkey(UART0);		// Read the buffer
+			sendchar(UART2, c);	// Send the character to UART2
+		}
+		if((U2LSR & 0x1) > 0){		// If UART2 buffer is not empty
+			c = getkey(UART2);		// Read the buffer
+			sendchar(UART0, c);	// Send the character to UART0
+		}
+	}
+...
+\end{lstlisting}
+
+
+\subsubsection{Verification}
 %	        Verification
-%	
 %	                Module tests
 %	                Integration tests
 %	                Acceptance test
+\paragraph{UART verification}
+The UART code has been verified by connecting it to the power line line module, sending a character and receiving the same character again on the PC. Full documentation can be found in the \textit{EPRO 3 \& 4 PLC - Hardware Interface} document.
+\paragraph{EMC verification}
+Together with the Physical Interface code this driver has been verified. When the center button on the ARM board is pressed, the register containing information about the switches on the FPGA board is read, whereafter this value is sent to the register in the FPGA that updates the diodes next to the switches. A video have been uploaded to youtube showing the verification of both the EMC driver and the Physical interface driver in the FPGA\footnote{\url{http://www.youtube.com/watch?v=3MUK6qbg0Rk}}
 \subsection{Database - Paulo}
 %		Intro
 
@@ -850,7 +1007,7 @@ In the write test, \textit{leds} is uninitialized and \textit{reset} is active, 
 \subsubsection{Conclusion}
 The test verify that the implementation of the interface design is working properly. The switches block is not completely finished, right now to register changes in the switches the ARM7 shall read the status to often, to prevent this an interrupt function is to be implemented, in that way the ARM7 is only reading the status when the switches changes. The interrupt function is not on the scope of this time box.
 \subsection{Deployment}
-\paragraph{Driver}
+%\paragraph{Driver}
 	%which versions of the prototype the customer will get
 	%with what functionality.	
 \paragraph{Database}
