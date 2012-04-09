@@ -125,11 +125,23 @@
 %                Acceptance test 
 
 \subsection{Interrupt register - Theis}
-
+The interrupt register is made to tune performance by limiting read statements the ARM7 is doing from the Spartan 6. The interrupt register is not by itself fulfilling any requirements, but it is tuning the following: \textit{NF-1.5}\footnote{Requirement is found in table 3.2 in EPRO 3 project energy-hub} and \textit{B-3}\footnote{Requirement is found in table 3.4 in EPRO 3 project energy-hub}
+\begin{table}[H]
+\centering
+	\begin{tabular}{|p{1.2cm}|p{2.3cm}|p{6cm}|p{6cm}|}
+	\hline
+	ID		& Requirement		& Description																& Comments\\\hline
+	NF-1.5	& HW Interface		& 1 start button for the hub. 10 buttons to each start a module.			& It is only reading if the buttons state changes\\\hline
+	B-3		& Errors			& Humidity and Temperature sensor will be placed inside the system housing	& The Spartan 6 interrupts if one of the following is happening\\\hline
+	B-3.1	& Humidity			& If the humidity is above the maximum level 70\%, the system shuts down	& ARM7 only read on interrupt\\\hline
+	B-3.2	& Temperature High	& If the temperature is higher than 55 degrees, the system shuts down		& ARM7 only read on interrupt\\\hline
+	B-3.3	& Temperature Low	& If the temperature is below 0 degrees, the system shuts down				& ARM7 only read on interrupt\\\hline
+	\end{tabular}
+\end{table}
 %			Intro
 %					verification specification
 %					deployment specification
-%
+\subsubsection{Analysis}
 %			Analysis
 %
 %                Refactored block diagram
@@ -139,6 +151,7 @@
 %                System interface specification
 %                Dimensioning specification 
 %
+\subsubsection{Design}
 %        Design
 %
 %                UML/SysML deployment view(s)
@@ -150,6 +163,7 @@
 %                Use case scenarios specifications
 %                Sequence diagrams
 %
+\subsubsection{Implementation}
 %        Implementation
 %
 %                Mechanical drawings with details explained
@@ -157,8 +171,23 @@
 %                Source code with details explained
 %                Description of integration 
 %
+\subsubsection{Verification}
 %        Verification
 %
 %                Module tests
 %                Integration tests
-%                Acceptance test 
+%                Acceptance test
+\subsubsection{Conclusion}
+
+
+
+\subsection{Deployment}
+\paragraph{Something}
+	%which versions of the prototype the customer will get
+	%with what functionality.	
+\paragraph{Some other thing}
+	%which versions of the prototype the customer will get
+	%with what functionality.
+\paragraph{Interrupt register}
+	%which versions of the prototype the customer will get
+	%with what functionality.
