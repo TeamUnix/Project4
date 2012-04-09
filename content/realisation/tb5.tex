@@ -14,10 +14,16 @@
 	\begin{itemize}
 		\item some sub something
 	\end{itemize}
-	\item Some other thing
+	\item Web Server
 	\begin{itemize}
-		\item some sub thing for other thing
+		\item Web Services
+		\item Further improvements
 	\end{itemize}
+	\item Power Switch redesign
+	\begin{itemize}
+		\item Improvements
+		\item Simulation
+		\item Redesign
 	\item Interrupt register
 	\begin{itemize}
 		\item Wishbone slave interface
@@ -40,7 +46,7 @@
 		~			& Some thing	& some other thing	& Interrupt Register\\ \hline
 		Estimation	& xx			& xx				& 15				\\
 		Actual		& xx			& xx				& xx				\\
-		Developer	& Dennis		& Paulo				& Theis				\\
+		Developer	& Dennis		& Paulo			& Theis				\\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -84,14 +90,15 @@
 %                Module tests
 %                Integration tests
 %                Acceptance test 
-
-\subsection{Some other thing - Jesus}
-
-%			Intro
-%					verification specification
-%					deployment specification
+\subsection{Power Switch redesign}
+%	Intro
 %
-%			Analysis
+%		verification specification
+%		deployment specification
+%
+\subsubsection{Analysis}
+%
+%	Analysis
 %
 %                Refactored block diagram
 %                Refactored class diagram
@@ -100,7 +107,9 @@
 %                System interface specification
 %                Dimensioning specification 
 %
-%        Design
+\subsubsection{Design}
+%
+%	Design
 %
 %                UML/SysML deployment view(s)
 %                Mechanical specifications and dimensioning
@@ -111,18 +120,71 @@
 %                Use case scenarios specifications
 %                Sequence diagrams
 %
-%        Implementation
+\subsubsection{Implementation}
+%
+%	Implementation
 %
 %                Mechanical drawings with details explained
 %                Electronic diagrams with details explained
 %                Source code with details explained
 %                Description of integration 
+\subsubsection{Verification}
 %
-%        Verification
+%	Verification
 %
 %                Module tests
 %                Integration tests
 %                Acceptance test 
+
+
+\subsection{Web Server - Paulo}
+The web server is responsible for the communication between the embedded device the user and database. 
+%	Intro
+%
+%		verification specification
+%		deployment specification
+%
+\subsubsection{Analysis}
+%
+%	Analysis
+%
+%                Refactored block diagram
+%                Refactored class diagram
+%                Detailed use cases
+%                User interface specification
+%                System interface specification
+%                Dimensioning specification 
+%
+\subsubsection{Design}
+%
+%	Design
+%
+%                UML/SysML deployment view(s)
+%                Mechanical specifications and dimensioning
+%                HW module specification per block
+%                UML SW deployment view
+%                Class specification
+%                Refactored class diagram
+%                Use case scenarios specifications
+%                Sequence diagrams
+%
+\subsubsection{Implementation}
+%
+%	Implementation
+%
+%                Mechanical drawings with details explained
+%                Electronic diagrams with details explained
+%                Source code with details explained
+%                Description of integration 
+\subsubsection{Verification}
+%
+%	Verification
+%
+%                Module tests
+%                Integration tests
+%                Acceptance test 
+
+
 
 \subsection{Interrupt register - Theis}
 The interrupt register is made to tune performance by limiting the number of read statements the ARM7 is doing, in order to read from the Spartan 6. The interrupt register is not by itself fulfilling any requirements, but it is tuning the following: \textit{NF-1.5}\footnote{Requirement is found in table 3.2 in EPRO 3 project energy-hub} and \textit{B-3}\footnote{Requirement is found in table 3.4 in EPRO 3 project energy-hub}
