@@ -62,7 +62,7 @@ begin
 						end case;
 						
 					else
-						dat_o <= dat_o;
+						--dat_o <= dat_o;
 					end if;
 				end if;
 			end if;
