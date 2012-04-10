@@ -262,7 +262,7 @@ The verifications can be found at the end of this section.
 %	                Dimensioning specification 
 \subsubsection{Analysis}
 The analysis of the system information and requirements is fundamental to the development of a database. 
-\paragraph{Requirements}
+\paragraph{Use Cases}
 	\begin{itemize}
 		\item Jan is looking at the web interface for the energy hub. From where he can see the status for each modules connected to it
 in a graphically way.
@@ -271,7 +271,7 @@ to start, stop or see a more detailed overview of each module.
 		\item Jan arrives at the university in the morning and an email was send to him reporting a failure in the green energy system, he login to the administrator web interface, and he can see what the problem might be, and if it's possible to solve it directly on the interface.
 	\end{itemize}
 
-From this requirements given by the customer the relevant information for the database development is filtered:
+From this use cases given by the customer the relevant information for the database development is filtered:
 	\begin{itemize}
 		\item The status of each module have to be show.
 		\item A detailed overview of each module such as current production (Voltage, Current, Power, etc.), efficiency of the module, etc.
@@ -361,13 +361,13 @@ At this point the database can initialise a new module or identified if the modu
 Measurements are add to the database constantly, which in a non-stop system database size could be a problem, to avoid this situation a wrapper data set is created. This will store an average of values between a time span for each module, allowing the customer either to erase the values from the log or export them out from the database. Crucial data can be lost in this step for example the port history in case of troubleshooting, and precise date and time which would not allow the precise plot of data.\\
 
 
-WRAPPER(ID\_WRAP, ID\_MODULE, DATE\_FROM, DATE\_TO, AVG\_CURRENT, AVG\_VOLTAGE);
+AGGREGATE(ID\_WRAP, ID\_MODULE, DATE\_FROM, DATE\_TO, AVG\_CURRENT, AVG\_VOLTAGE);
 
 \begin{table}[H]
 \centering
 	\begin{tabular}{| l | p{10cm} |}
 		\hline
-		ID\_WRAP & Auto increment integer, a new id number is generated every time an wrap is needed. \\\hline
+		ID\_AGGREGATE & Auto increment integer, a new id number is generated every time an wrap is needed. \\\hline
 		ID\_MODULE & This is a foreigner key for the table modules, this allow the system to know from which module correspond the values .\\\hline
 		DATE\_FROM & Date and time of the time span start. \\\hline
 		DATE\_TO & Date and time of the time span end. \\\hline
