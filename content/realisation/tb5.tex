@@ -14,9 +14,16 @@
 	\begin{itemize}
 		\item some sub something
 	\end{itemize}
-	\item Some other thing
+	\item Web Server
 	\begin{itemize}
-		\item some sub thing for other thing
+		\item Web Services
+		\item Further improvements
+	\end{itemize}
+	\item Power Switch redesign
+	\begin{itemize}
+		\item Improvements
+		\item Simulation
+		\item Redesign
 	\end{itemize}
 	\item Interrupt register
 	\begin{itemize}
@@ -40,7 +47,7 @@
 		~			& Some thing	& some other thing	& Interrupt Register\\ \hline
 		Estimation	& xx			& xx				& 15				\\
 		Actual		& xx			& xx				& xx				\\
-		Developer	& Dennis		& Paulo				& Theis				\\
+		Developer	& Dennis		& Paulo			& Theis				\\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -84,14 +91,15 @@
 %                Module tests
 %                Integration tests
 %                Acceptance test 
-
-\subsection{Some other thing - Jesus}
-
-%			Intro
-%					verification specification
-%					deployment specification
+\subsection{Power Switch redesign}
+%	Intro
 %
-%			Analysis
+%		verification specification
+%		deployment specification
+%
+\subsubsection{Analysis}
+%
+%	Analysis
 %
 %                Refactored block diagram
 %                Refactored class diagram
@@ -100,7 +108,9 @@
 %                System interface specification
 %                Dimensioning specification 
 %
-%        Design
+\subsubsection{Design}
+%
+%	Design
 %
 %                UML/SysML deployment view(s)
 %                Mechanical specifications and dimensioning
@@ -111,21 +121,74 @@
 %                Use case scenarios specifications
 %                Sequence diagrams
 %
-%        Implementation
+\subsubsection{Implementation}
+%
+%	Implementation
 %
 %                Mechanical drawings with details explained
 %                Electronic diagrams with details explained
 %                Source code with details explained
 %                Description of integration 
+\subsubsection{Verification}
 %
-%        Verification
+%	Verification
 %
 %                Module tests
 %                Integration tests
 %                Acceptance test 
 
+
+\subsection{Web Server - Paulo}
+The web server is responsible for the communication between the embedded device the user and database. 
+%	Intro
+%
+%		verification specification
+%		deployment specification
+%
+\subsubsection{Analysis}
+%
+%	Analysis
+%
+%                Refactored block diagram
+%                Refactored class diagram
+%                Detailed use cases
+%                User interface specification
+%                System interface specification
+%                Dimensioning specification 
+%
+\subsubsection{Design}
+%
+%	Design
+%
+%                UML/SysML deployment view(s)
+%                Mechanical specifications and dimensioning
+%                HW module specification per block
+%                UML SW deployment view
+%                Class specification
+%                Refactored class diagram
+%                Use case scenarios specifications
+%                Sequence diagrams
+%
+\subsubsection{Implementation}
+%
+%	Implementation
+%
+%                Mechanical drawings with details explained
+%                Electronic diagrams with details explained
+%                Source code with details explained
+%                Description of integration 
+\subsubsection{Verification}
+%
+%	Verification
+%
+%                Module tests
+%                Integration tests
+%                Acceptance test 
+
+
+
 \subsection{Interrupt register - Theis}
-The interrupt register is made to tune performance by limiting read statements the ARM7 is doing from the Spartan 6. The interrupt register is not by itself fulfilling any requirements, but it is tuning the following: \textit{NF-1.5}\footnote{Requirement is found in table 3.2 in EPRO 3 project energy-hub} and \textit{B-3}\footnote{Requirement is found in table 3.4 in EPRO 3 project energy-hub}
+The interrupt register is made to tune performance by limiting the number of read statements the ARM7 is doing, in order to read from the Spartan 6. The interrupt register is not by itself fulfilling any requirements, but it is tuning the following: \textit{NF-1.5}\footnote{Requirement is found in table 3.2 in EPRO 3 project energy-hub} and \textit{B-3}\footnote{Requirement is found in table 3.4 in EPRO 3 project energy-hub}
 \begin{table}[H]
 \centering
 	\begin{tabular}{|p{1.2cm}|p{2.3cm}|p{6cm}|p{6cm}|}
@@ -142,6 +205,15 @@ The interrupt register is made to tune performance by limiting read statements t
 %					verification specification
 %					deployment specification
 \subsubsection{Analysis}
+The purpose of the interrupt register is to limiting the number of readings the ARM7 is making from the Spartan 6. There is one interrupt pin routed from the AMR7 to the Spartan 6, but there is two blocks in the Spartan 6 that makes data for the ARM7. These blocks are the switch input block and the analog to digital converter\footnote{ADC} block. One way to use the interrupt is to allow the switch block to interrupt when a user interact with the system, and then read the ADC with a specific time interval. But to avoid to many unnecessary readings of the ADC, the interrupt register is the only block that is allow to interrupt the ARM7, the interrupt register gets interrupt signals from the ADC and the switch blocks, the register is arranging the interrupt, and when the ARM7 is interrupted, it reads data from the register to find out which block it should read.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/tb5_modules_design.png}
+		\caption{Module design with IRQ register}
+	\end{centering}
+\end{figure}
+When a block sends an interrupt to the IRQ\footnote{Interrupt Request} register, it locates the interrupt and put the address to the block on to a FIFO\footnote{First In First Out}, and sends an interrupt to the ARM7, then the AMR7 read the FIFO to get the address on the interrupting block, in that way the ARM7 knows where to read next.
 %			Analysis
 %
 %                Refactored block diagram
@@ -152,6 +224,26 @@ The interrupt register is made to tune performance by limiting read statements t
 %                Dimensioning specification 
 %
 \subsubsection{Design}
+The purpose of the interrupt register is to make interrupt functionality on several block with only one interrupt pin to the ARM7. The interrupt register shall be optimized to wishbone use. The interrupt register without wishbone has to inputs, a vector of size N\footnote{N = number of blocks that is allow to interrupt} and an array that is N bit high and AddrRange\footnote{Wishbone address range} bit wide. The output is the IRQ pin to the ARM7 and a data vector equal to the wishbone data width. This is shown in the figure below.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/tb5_irq_reg_nowb.png}
+		\caption{IRQ register without wishbone}
+	\end{centering}
+\end{figure}
+When a block needs to make an interrupt, it puts the wishbone address onto the input array to the IRQ register, and then sets the interrupt output high to tell the IRQ register that there is a valid address that needs to be read. The IRQ register save the address and interrupt the ARM7. When an interrupt occurs on the ARM7, it read the IRQ register to get the address that it shall read next, in this way it takes two wishbone read cycles for the ARM7 to get the right data, but the ARM7 is only reading if the Spartan 6 have valid data to read, instead of make reading with specific interval. The IRQ register save the interrupt in a FIFO in case interrupt is made faster than the ARM7 can read.\\
+\paragraph{Interrupt output}
+The interrupt output is set every time the FIFO gets data and the earlier state was empty. This mean that the interrupt is set low when the FIFO gets the first data, if the FIFO gets more data and have not been emptied the IRQ is set high, and first set low again when the FIFO has been emptied.
+\paragraph{Data output}
+The data output is equal to the wishbone data width, in this case it is 16 bit, and the address is 7 bit. The seven lowest data bits is used for the address to the block that sends the interrupt, the rest of the bits is used to tell the ARM7 how many spaces that is filled in the FIFO. In this way the ARM7 know when it is reading the last interrupt, and shall stop reading.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.55\textwidth]{images/tb5_irq_reg_data_o.png}
+		\caption{IRQ register data output}
+	\end{centering}
+\end{figure}
 %        Design
 %
 %                UML/SysML deployment view(s)
