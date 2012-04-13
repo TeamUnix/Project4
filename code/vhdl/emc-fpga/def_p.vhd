@@ -94,7 +94,7 @@ package def_pkg is
   constant BA_WBS_4		:	wb_had_typ	:= "011";  --! 0x00 Base addresses for Analog to digital converter
 
 --! Low Address constants (Memory map) 
-  constant WBS_REG1:       	wb_lad_typ := "0000"; -- 0x0
+  constant WBS_REG1:        wb_lad_typ := "0000"; -- 0x0
   constant WBS_REG2:        wb_lad_typ := "0001"; -- 0x2
 
 end def_pkg; 
