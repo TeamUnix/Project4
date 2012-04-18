@@ -40,6 +40,7 @@ package def_pkg is
 --! Wishbone Constants and types
   constant Num_s:         integer := 4;  --! Number of slaves  connected to the Intercon
   constant Num_m:         integer := 1;  --! Number of masters connected to the Intercon
+  constant Num_irqs:	  integer := 2;	 --! Number of IRQ slaves
   constant Datawidth:     integer := 16; --! Number of bits in datainterface
   constant AddrRange:     integer := 7;  --! Number of bits in Address space (was 16)
   constant LAddrRange:    integer := 4;  --! Number of bits in Low Address space, which connects to slaves
@@ -73,6 +74,9 @@ package def_pkg is
 
   --type wb_s_dat_typ is    array (Num_s downto 0) of wb_dat_typ;
   type wb_s_dat_typ is    array (natural range <>) of wb_dat_typ;
+--  type wb_irqs_dat_typ is    array (Num_irqs-1 downto 0) of wb_adr_typ;
+  type wb_irqs_dat_typ is    array (2 downto 0) of std_logic_vector (6 downto 0);
+
 
   constant cti_classic:   wb_cti_typ := "000";
 

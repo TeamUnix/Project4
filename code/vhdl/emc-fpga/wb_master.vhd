@@ -55,11 +55,11 @@ architecture RTL of WB_Master is
 --! Signal Declarations
 			type   wb_cycle_typ is     (Idle,wb_write, wb_read, wait_end);
 			signal nx_cyc_o		: std_logic;
-			signal cyc_o_s			: std_logic;
+			signal cyc_o_s		: std_logic;
 			signal nx_stb_o		: std_logic;
-			signal nx_we_o			: std_logic;
-			signal we_o_s			: std_logic;
-			signal dat_o_s			: wb_dat_typ;
+			signal nx_we_o		: std_logic;
+			signal we_o_s		: std_logic;
+			signal dat_o_s		: wb_dat_typ;
 			signal cs_wb_cycle	: wb_cycle_typ;
 			signal nx_wb_cycle	: wb_cycle_typ;
 
