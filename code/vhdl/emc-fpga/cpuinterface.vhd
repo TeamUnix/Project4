@@ -42,17 +42,10 @@ entity CpuInterface is
 end CpuInterface ;
 
 architecture RTL of CpuInterface is
----- ADD HERE !!!!!!!!!!!!!
 
 
 begin
 
---------------------------------------------------------------------------------
---                         Synchronize input signals                          --
---------------------------------------------------------------------------------
-
-
----- ADD HERE !!!!!!!!!!!!!
 
 wishbone_routing : process (Clk,Rst)
 begin  
