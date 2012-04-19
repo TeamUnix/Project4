@@ -19,7 +19,7 @@
 		\item Web Services
 		\item Further improvements
 	\end{itemize}
-	\item Power Switch redesign
+	\item Power Switch module redesign
 	\begin{itemize}
 		\item Improvements
 		\item Simulation
@@ -92,12 +92,55 @@
 %                Integration tests
 %                Acceptance test 
 \subsection{Power Switch redesign}
+The prototype made in time box 3 for the power switch module didn't work as expected. New analyses and contact with Linear Technologies revealed that the IC being used (LTC...) is not the adequate component in this functionality.
 %	Intro
 %
 %		verification specification
 %		deployment specification
 %
+\todo{Requirements}
+
 \subsubsection{Analysis}
+
+\paragraph{Power switch control}
+One of the problems found on the first prototype was that the LTC... device don't have a control pin to turn the MOSFETs on/off, this device will work only as an ideal diode, making it a good application for photovoltaic harvesting method.
+In contact with Linear Technologies an explanation the goals for this module was given and a new device was suggested, the LTC.....
+
+\todo{Emails with Linear Technologies}
+
+This device as a higher and lower threshold voltage which can shut-down the device for security reasons and a shut-down pin turns on/off two MOSFET connect back to back.
+
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.5\textwidth]{images/ltc4365.png}
+		\caption{LTC4365 application notes.}
+	\end{centering}
+\end{figure}
+In this application the shut-down pin is always high which makes the device open the MOSFETS if Vin is between the under voltage and over voltage reference voltages
+
+Linear Technologies have a simulator for them devices, the LTSpiceIV, is a free software that can be downloaded from the web site.
+Is necessary to define the over and under voltage, this is found in the requirements where \todo{Get voltage range from the requirements}.
+
+\todo{Show a bunch of calculations for the over and under voltage.}
+
+\todo{LTC Simulations}
+
+\todo{Full module simulation}
+
+\paragraph{Current Sensors}
+
+Being part of a green energy system, a current sensor is implemented in this power switch module. The measurement of current allows the system to calculate the efficiency of each module connected to its ports. The current measurements are shown to the user at the web interface.
+
+The sensor used is a hall effect linear current sensor from Allegro, the ACS756SCA-050B, a bidirectional hall effect sensor with range from -50A to +50A. The device output an analogue signal.
+
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.5\textwidth]{images/current_sensor.png}
+		\caption{ACS756SCA Typical aplication}
+	\end{centering}
+\end{figure}
 %
 %	Analysis
 %
@@ -139,7 +182,7 @@
 
 
 \subsection{Web Server - Paulo}
-The web server is responsible for the communication between the embedded device the user and database. 
+
 %	Intro
 %
 %		verification specification
