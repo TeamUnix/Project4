@@ -21,7 +21,8 @@ end irq_input;
 
 architecture RTL of irq_input is
 
-
+	signal check1 : std_logic;
+	signal check2 : std_logic;
 
 begin
 
@@ -30,14 +31,20 @@ begin
 			if	(reset = '1') then
 				w_data	<= (others=>'0');
 				wr_o	<= '0';
+				check1	<= '0';
+				check2	<= '0';
 			elsif	(clk'event and clk='1') then
 				if	(fifo_full = '0') then
-					if	(irq_i(0) = '1') then
+					if	(irq_i(0) = '1' and check1 = '0') then
 						w_data	<= add_i(0);
 						wr_o	<= '1';
-					elsif	(irq_i(1) = '1') then
+						check1	<= '1';
+					elsif	(irq_i(1) = '1' and check2 = '0') then
 						w_data	<= add_i(1);
 						wr_o	<= '1';
+						check2	<= '1';
+					else
+						wr_o	<= '0';
 					end if;
 				end if;
 			end if;
