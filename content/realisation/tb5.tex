@@ -50,23 +50,32 @@
 \end{table}
 
 \subsection{Power Switch redesign}
-The prototype made in time box 3 for the power switch module didn't work as expected. New analyses and contact with Linear Technologies revealed that the IC being used (LTC...) is not the adequate component in this functionality.
+The prototype made in time box 3 for the power switch module didn't work as expected. New analyses and contact with Linear Technologies revealed that the IC being used (LTC...) is not the adequate device for this functionality.
+
+\lineparagraph{Verification}
+\begin{itemize}
+	\item The system is able to switch the voltage as input or output.
+	\item Over voltage and under voltage are keep as set in common requirements ( 30V $ \pm10\% $)
+	\item Measurement of the current sensor for calculation of efficiency and security. ( Max 30A )
+	\item Create test-bench for 4 PCB modules. ( Fast prototyping using the mBed )
+	\item Test Power Line Communication, using development boards from Yamar and mBed.
+\end{itemize}
 %	Intro
 %
 %		verification specification
 %		deployment specification
 %
 \todo{Requirements}
-
+\begin{itemize}
+	\item Voltage input to the Energy hub should be at 30V $ \pm10\% $
+	\item Ampere input to the Energy hub should be max 30A.
+	\item Power-line communication is used, for communication between the different devices and the hub.
+\end{itemize}
 \subsubsection{Analysis}
 
-\paragraph{Power switch control}
-One of the problems found on the first prototype was that the LTC... device don't have a control pin to turn the MOSFETs on/off, this device will work only as an ideal diode, making it a good application for photovoltaic harvesting method.
-In contact with Linear Technologies an explanation the goals for this module was given and a new device was suggested, the LTC.....
-
-\todo{Emails with Linear Technologies}
-
-This device as a higher and lower threshold voltage which can shut-down the device for security reasons and a shut-down pin turns on/off two MOSFET connect back to back.
+\lineparagraph{Power switch control}
+One of the problems found on the first prototype was that the LTC4357 device don't have a control pin to turn the MOSFETs on/off, this device will work only as an ideal diode, making it a good application for photovoltaic harvesting method.
+In contact with Linear Technologies a new device was suggested, the LTC4365, this device is a N-Channel MOSFET controller that protects the load using a higher and lower threshold voltage which can shut-down the supply and a shut-down pin drives the MOSFET gate high or low.
 
 \begin{figure}[H]
 	\begin{centering}
@@ -75,18 +84,55 @@ This device as a higher and lower threshold voltage which can shut-down the devi
 		\caption{LTC4365 application notes.}
 	\end{centering}
 \end{figure}
-In this application the shut-down pin is always high which makes the device open the MOSFETS if Vin is between the under voltage and over voltage reference voltages
+In this application the shut-down pin is always high which makes the device open the MOSFETS if Vin is between the under voltage and over voltage reference voltages.
 
 Linear Technologies have a simulator for them devices, the LTSpiceIV, is a free software that can be downloaded from the web site.
-Is necessary to define the over and under voltage, this is found in the requirements where \todo{Get voltage range from the requirements}.
+Is necessary to define the over and under voltage threshold, this is found in the common requirements at LINK.\\
+\\
+Common requirements:\\\\
+$V_{in} = 30V$ \\
+$Offset = \pm 10\% $\\
+\\
+From the datasheet:\\\\
+$ I_{UV} = 10nA $ \\
+$ V_{OS} = 3mV $\\
+\\
+$V_{OSUV}$:maximum tolerable offset (error)\\
+$I_{UV}$:worst case scenario current leakage.\\
+\\
+Under voltage requirement:\\\\
+$ U_V=30V-(30*10\%)=27V $\\
+\\
+Over voltage requirement:\\\\
+$ O_V=30V+(30*10\%)=33V $\\
+\\
+For working conditions of the device the bellow equation have to be true:\\\\
+$ R_3+R_4=V_{OSUV}/I_{UV} $\\
+\\
+Using the formulas given in the datasheet to calculate the value of the 2 resistive dividers:\\\\
+$ R_2 = 2*\frac{3mV}{10nA}*(27V-0.5V) = 15.9M\Omega $ Approximate 16M $\Omega $\\ 
+\\
+$ R_4 = \frac{\frac{V_{OSIU}}{I{UV}}+R_3}{2*O_V} = 246.97k\Omega $ Approximate 250k $\Omega $\\ 
+\\
+$ R_3 = \frac{V_{OSUV}}{I_{UV}}-R_1 = 50k\Omega $\\
+\\
 
-\todo{Show a bunch of calculations for the over and under voltage.}
+\lineparagraph{Simulations}
+Using LTSpice to simulate the behaviour of the LTC4365 with the required values for the power switch system.
+
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.9\textwidth]{images/tb5_LTC_simu1.png}
+		\caption{Schematics for the device LTC4365}
+	\end{centering}
+\end{figure}
+
+In the schematics a basic circuit is draw, with a NPN transistor to drive the shut-down pin high and low. Two N-channel MOSFETs are connected back to back to  stop the voltage from passing to the output when the device is shut down. The device will work as an ideal diode.
 
 \todo{LTC Simulations}
 
-\todo{Full module simulation}
-
-\paragraph{Current Sensors}
+\lineparagraph{Current Sensors}
 
 Being part of a green energy system, a current sensor is implemented in this power switch module. The measurement of current allows the system to calculate the efficiency of each module connected to its ports. The current measurements are shown to the user at the web interface.
 
