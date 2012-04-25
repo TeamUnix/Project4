@@ -43,7 +43,7 @@
 		~			& Some thing	& some other thing	& Interrupt Register\\ \hline
 		Estimation	& xx			& xx				& 15				\\
 		Actual		& xx			& xx				& xx				\\
-		Developer	& Dennis		& Paulo			& Theis				\\
+		Developer	& Dennis		& Paulo				& Theis				\\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -281,9 +281,9 @@ The purpose of the interrupt register is to make interrupt functionality on seve
 \end{figure}
 When a block needs to make an interrupt, it puts the wishbone address onto the input array to the IRQ register, and then sets the interrupt output high to tell the IRQ register that there is a valid address that needs to be read. The IRQ register save the address and interrupt the ARM7. When an interrupt occurs on the ARM7, it read the IRQ register to get the address that it shall read next, in this way it takes two wishbone read cycles for the ARM7 to get the right data, but the ARM7 is only reading if the Spartan 6 have valid data to read, instead of make reading with specific interval. The IRQ register save the interrupt in a FIFO in case interrupt is made faster than the ARM7 can read.\\
 \paragraph{Interrupt output}
-The interrupt output is set every time the FIFO gets data and the earlier state was empty. This mean that the interrupt is set low when the FIFO gets the first data, if the FIFO gets more data and have not been emptied the IRQ is set high, and first set low again when the FIFO has been emptied.
+The interrupt output is set low as long a the FIFO is not empty, to tell the ARM7 to keep on reading till the FIFO is empty and sets the IRQ high again.
 \paragraph{Data output}
-The data output is equal to the wishbone data width, in this case it is 16 bit, and the address is 7 bit. The seven lowest data bits is used for the address to the block that sends the interrupt, the rest of the bits is used to tell the ARM7 how many spaces that is filled in the FIFO. In this way the ARM7 know when it is reading the last interrupt, and shall stop reading.
+The data output is equal to the wishbone data width, in this case it is 16 bit, and the address is 7 bit. The seven lowest data bits is used for the address to the block that sends the interrupt, the rest of the bits can be used for extra data from the IRQ register.
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Updated timebox figure}
@@ -303,6 +303,237 @@ The data output is equal to the wishbone data width, in this case it is 16 bit, 
 %                Sequence diagrams
 %
 \subsubsection{Implementation}
+A block diagram for the interrupt register is shown below. It consist of three block for handling the interrupt, a input block which handled the input and write data to the FIFO. The FIFO act like memory for the interrupt data, and sends a interrupt to the ARM7. The output block takes input from the wishbone and handle the data to the wishbone, form the FIFO.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1\textwidth]{images/irq_reg_block_dia.png}
+		\caption{Block diagram for the IRQ register}
+	\end{centering}
+\end{figure}
+
+\paragraph{FIFO - First In First Out}
+The FIFO buffer is where the interrupt data is stored before they a read. The input block write data into it, and the output block read data out of it. The FIFO is necessary if the Spartan6 make interrupt faster than the ARM7 can read them. The figure below shows how the First In First Out principle is working.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.6\textwidth]{images/tb5_fifo.png}
+		\caption{Conceptual diagram of a FIFO buffer}
+	\end{centering}
+\end{figure}
+The FIFO buffer code is from the book \textit{FPGA Prototyping by VHDL Examples - Listing 4.20}
+\begin{lstlisting}[language=VHDL]
+...
+--=====================================
+------------- CODE HERE ---------------
+--=====================================
+...
+\end{lstlisting}
+\paragraph{IRQ input}
+The input block gets data and interrupt input from every block with interrupt permissions in the system. The purpose of the block is to handle which block is interrupting and which data that have to be written to the FIFO in order to be handle by the ARM7 in the right way. Below the state diagram of the input block is shown. The purpose of a state digram is to make the coding easier.\\
+When in IDLE the FIFO write is set low, the interrupt inputs is check, if non of them is high the interrupt counter is set low, to enable new interrupts. If a interrupt is high the state is change to IRQx, where the data output to the FIFO is set to the data from the interrupting source, after that is checks if it is the first time this data is written to the FIFO, if that is the case, the data is written to the FIFO and the returns to IDLE. 
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.9\textwidth]{images/tb5_irq_input_state.png}
+		\caption{State diagram for input}
+	\end{centering}
+\end{figure}
+In the code below the states are defined, this is easily done from the state diagram, the signals that can have the different states a value is also defined here.
+\begin{lstlisting}[language=VHDL]
+...
+	--Types
+	type state_type is	(
+								IDLE,
+								IRQ1,
+								IRQ1_W,
+								IRQ2,
+								IRQ2_W
+								);
+	--Signals
+	signal state_reg		: state_type;
+	signal state_next		: state_type;
+	signal irq_1				: std_logic		:=	'0';
+	signal irq_2				: std_logic		:=	'0';
+...
+\end{lstlisting}
+This code is where the states are set, if reset is active the state is set to IDLE else the state is set to state\_next.
+\begin{lstlisting}[language=VHDL]
+...
+	-- state register
+	process(Clk, Reset)
+	begin
+		if	(reset = '1') then
+			state_reg		<= IDLE;
+		elsif (Clk'event and Clk='1') then
+			state_reg		<= state_next;
+		end if;
+	end process;
+...
+\end{lstlisting}
+This is the part of the code where the state digram is implemented. A case statement is made with the state value as input. First the IDLE state is defined, here wr is set low, then it check if there is a interrupt, if that is the case then it sets the state to IRQx which sets the data and then check if it is first time the data is written else it just sets the state to IDLE, if it is first time the state is set to IRQx\_W where it write the data into the FIFO.
+\begin{lstlisting}[language=VHDL]
+...
+	-- next state/output logic
+	process(state_reg, irq_i, add_1, add_2, full, irq_1, irq_2)
+	begin
+		state_next		<= state_reg;
+		--wr					<= '0';
+		case state_reg is
+		-- Idle state -------------------------------------------
+			when IDLE =>
+				wr		<= '0';
+				if(irq_i(0) = '1') then
+					state_next		<= IRQ1;
+				elsif(irq_i(1) = '1') then
+					irq_1					<= '0';
+					state_next		<= IRQ2;
+				else
+					irq_1		<= '0';
+					irq_2		<= '0';
+				end if;
+		-- IRQ1 state -------------------------------------------
+			when IRQ1 =>
+				w_data				<= add_1;
+				state_next		<= IRQ1_W;
+
+			when IRQ1_W =>
+
+				state_next		<= IDLE;
+				if((not full and not irq_1) = '1') then
+					wr			<= '1';
+					irq_1		<= '1';
+				end if;
+		-- IRQ2 state -------------------------------------------
+			when IRQ2 =>
+				w_data				<= add_2;
+				state_next		<= IRQ2_W;
+
+			when IRQ2_W =>
+
+				state_next		<= IDLE;
+				if((not full and not irq_2) = '1') then
+					wr			<= '1';
+					irq_2		<= '1';
+				end if;
+		end case;
+	end process;
+...
+\end{lstlisting}
+
+\paragraph{IRQ output}
+The output block is reading the data out of the FIFO and present them for the wishbone. It gets a read input from the wishbone, when the ARM7 wants to read data from the register. The main purpose of the block is to make sure that the wishbone read the write data, and it is only reading once from the FIFO.\\
+A state diagram for the output block is shown below. In the IDLE state rd is set low, then et check if the wishbone wants to read, else it reset the read counter, if the wishbone wants to read, the IDLE state checks if it is the first time by checking the read counter, if it is the first time the rd is set high to get the next data from the FIFO, and the read counter is set to one.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.55\textwidth]{images/tb5_irq_output_state.png}
+		\caption{State diagram for output}
+	\end{centering}
+\end{figure}
+Here the states is defined plus the read counter.
+\begin{lstlisting}[language=VHDL]
+...
+	--Types
+	type state_type is	(
+											IDLE,
+											READ_O,
+											RSET
+											);
+	--Signals
+	signal state_reg		: state_type;
+	signal state_next		: state_type;
+	signal read_wb			: std_logic;
+...
+\end{lstlisting}
+The lower bits in the data\_o is set to the data from the FIFO, the other bits is set to zero. In the process the next state is loaded.
+\begin{lstlisting}[language=VHDL]
+...
+	data_o(Datawidth-1 downto AddrRange)	<= (others => '0');
+	data_o(AddrRange-1 downto 0)					<= r_data;
+
+	-- state register
+	process(Clk, Reset)
+	begin
+		if	(reset = '1') then
+			state_reg		<= IDLE;
+		elsif (Clk'event and Clk='1') then
+			state_reg		<= state_next;
+		end if;
+	end process;
+...
+\end{lstlisting}
+Below the state actions is defined following the state diagram. The rd is set low in IDLE and the wishbone read is checked. In READ the read counter is set to one and rd is set high to read data out of the FIFO.
+\begin{lstlisting}[language=VHDL]
+...
+	-- next state/output logic
+	process(state_reg, read_i, r_data, read_wb)
+	begin
+		state_next	<= state_reg;
+		rd					<= '0';
+		read_wb			<= read_wb;
+		case state_reg is
+		-- Idle state -----------------------------------------------------
+			when IDLE =>
+				rd		<= '0';
+				if	(read_i = '1') then
+					if	(read_wb = '0') then
+						state_next		<= READ_O;
+					else
+						state_next		<= IDLE;
+					end if;
+				else
+					state_next		<= RSET;
+				end if;
+		-- READ_O state ---------------------------------------------------
+			when READ_O =>
+				state_next		<= IDLE;
+				read_wb				<= '1';
+				rd						<= '1';
+		-- RSET state -----------------------------------------------------
+			when RSET =>
+				state_next	<= IDLE;
+				read_wb			<= '0';
+		end case;
+	end process;
+...
+\end{lstlisting}
+
+\paragraph{Wishbone interface}
+In order to use the interrupt register in the system, is shall be implemented as a wishbone slave, with a wishbone interface, this is done in the code below. The error and retry bit i set to zero, the acknowledge bit i set then the strobe input and the cycle input is high. In the process a synchronous reset is made. If the reset is inactive, it checks if the strobe and cycle input is high and the write enable is low, the meaning is to check if the wishbone wants to read or write. This module is a read only so it is not reacting on a write statement. If the wishbone wants to read, the data output is set and a read to the output block is set high, when the wishbone determinates the read cycle the data output is set to zero and the read statement for the output block is set low again.
+\begin{lstlisting}[language=VHDL]
+...
+-- =================================================
+-- WishBone logic
+-- =================================================
+	--  Concurrent assignments
+	--	Wishbone cycle acknowledge
+	err_o <= '0';	--error signal
+	rty_o <= '0';	--retry signal
+	ack_o <= stb_i and cyc_i;  --! asynchronous cycle termination is OK here.
+	--Wishbone read
+	data_output	:	process(clk_i)
+	begin
+		if(clk_i'event and clk_i = '1') then
+			if(rst_i = '1') then
+				dat_o <= (others => '0');
+			else
+				if((cyc_i and stb_i and not we_i) = '1') then
+					case adr_i is
+						when WBS_REG1 =>
+							dat_o		<= data_o;
+							read_i	<= '1';
+						when others =>
+					end case;
+				else
+				dat_o		<= (others => '0');
+				read_i	<= '0';
+				end if;
+			end if;
+		end if;			
+	end process;
+...
+\end{lstlisting}
 %        Implementation
 %
 %                Mechanical drawings with details explained
@@ -311,6 +542,14 @@ The data output is equal to the wishbone data width, in this case it is 16 bit, 
 %                Description of integration 
 %
 \subsubsection{Verification}
+TEST BENCH
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/tb5_irq_reg_testbench.png}
+		\caption{Test bench for the interrupt register}
+	\end{centering}
+\end{figure}
 %        Verification
 %
 %                Module tests

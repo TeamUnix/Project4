@@ -4,52 +4,50 @@ library IEEE;
 library work;
 	use work.def_pkg.all;
 
-
 entity irq_fifo is
-	generic(
-	W: natural:=4 -- number of address bits
-	);
-	
+	generic	(
+				W		:	natural	:=	4 -- number of address bits
+				);
 	port	(
 			--Input
-			clk						: in		std_logic;
-			reset					: in		std_logic;
-			rd						: in		std_logic;
-			wr						: in		std_logic;
-			w_data					: in		std_logic_vector (AddrRange-1 downto 0);
+			Clk			: in		std_logic;
+			Reset			: in		std_logic;
+			rd				: in		std_logic;
+			wr				: in		std_logic;
+			w_data		: in		std_logic_vector (AddrRange-1 downto 0);
 			--Output
-			empty					: out		std_logic;
-			full					: out		std_logic;
-			r_data					: out		std_logic_vector (AddrRange-1 downto 0)
+			empty			: out		std_logic;
+			full			: out		std_logic;
+			r_data		: out		std_logic_vector (AddrRange-1 downto 0)
 			);
 end irq_fifo;
 
 architecture RTL of irq_fifo is
-			--Types
-			type	reg_file_type is array (2**W-1 downto 0) of std_logic_vector(AddrRange-1 downto 0);
-			--Signals
-			signal	array_reg		: reg_file_type;
-			signal	w_ptr_reg		: std_logic_vector(W-1 downto 0);
-			signal	w_ptr_next		: std_logic_vector(W-1 downto 0);
-			signal	w_ptr_succ		: std_logic_vector(W-1 downto 0);
-			signal	r_ptr_reg		: std_logic_vector(W-1 downto 0);
-			signal	r_ptr_next		: std_logic_vector(W-1 downto 0);
-			signal	r_ptr_succ		: std_logic_vector(W-1 downto 0);
-			signal	full_reg		: std_logic;
-			signal	empty_reg		: std_logic;
-			signal	full_next		: std_logic;
-			signal	empty_next		: std_logic;
-			signal	wr_op			: std_logic_vector(1 downto 0);
-			signal	wr_en			: std_logic;
+	--Types
+	type		reg_file_type is array (2**W-1 downto 0) of std_logic_vector(AddrRange-1 downto 0);
+	--Signals
+	signal		array_reg		: reg_file_type;
+	signal		w_ptr_reg		: std_logic_vector(W-1 downto 0);
+	signal		w_ptr_next		: std_logic_vector(W-1 downto 0);
+	signal		w_ptr_succ		: std_logic_vector(W-1 downto 0);
+	signal		r_ptr_reg		: std_logic_vector(W-1 downto 0);
+	signal		r_ptr_next		: std_logic_vector(W-1 downto 0);
+	signal		r_ptr_succ		: std_logic_vector(W-1 downto 0);
+	signal		full_reg			: std_logic;
+	signal		empty_reg		: std_logic;
+	signal		full_next		: std_logic;
+	signal		empty_next		: std_logic;
+	signal		wr_op				: std_logic_vector(1 downto 0);
+	signal		wr_en				: std_logic;
 begin
    --=================================================
    -- register file
    --=================================================
-	fifo : process(clk,reset)
+	fifo : process(Clk,Reset)
 		begin
-			if	(reset='1') then
+			if	(Reset='1') then
 				array_reg <= (others=>(others=>'0'));
-			elsif	(clk'event and clk='1') then
+			elsif	(Clk'event and Clk='1') then
 					if	wr_en='1' then
 						array_reg(to_integer(unsigned(w_ptr_reg))) <= w_data;
 				end if;
@@ -64,14 +62,14 @@ begin
    -- fifo control logic
    --=================================================
    -- register for read and write pointers
-	fifo_control : process(clk,reset)
+	fifo_control : process(Clk,Reset)
 		begin
-			if		(reset='1') then
+			if		(Reset='1') then
 					w_ptr_reg <= (others=>'0');
 					r_ptr_reg <= (others=>'0');
 					full_reg <= '0';
 					empty_reg <= '1';
-			elsif	(clk'event and clk='1') then
+			elsif	(Clk'event and Clk='1') then
 					w_ptr_reg <= w_ptr_next;
 					r_ptr_reg <= r_ptr_next;
 					full_reg <= full_next;
@@ -118,5 +116,5 @@ begin
 
    -- output
    full		<= full_reg;
-   empty	<= empty_reg;
+   empty		<= empty_reg;
 end RTL;
