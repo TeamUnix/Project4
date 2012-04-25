@@ -24,20 +24,20 @@ entity CpuInterface is
 
 	port	(
 			--Input
-			Clk					: in     std_logic;												-- Clock signal synchronous to CPU signals
-			Rst					: in     std_logic;												-- Asynchronous Reset
-			CpuRd_i				: in     std_logic;												-- CPU Read strobe
-			CpuWr_i				: in     std_logic;												-- CPU Write strobe
-			CpuCs_i				: in     std_logic;												-- CPU Chip Select
-			D_i					: in     std_logic_vector ( DataWidth-1 downto 0 );	-- Data bus from application
-			CpuA_i				: in     std_logic_vector ( AddrWidth-1 downto 0 );	-- CPU Address Input
-			CpuD_i				: in     std_logic_vector ( DataWidth-1 downto 0 );	-- CPU Data Input
+			Clk			: in     std_logic;												-- Clock signal synchronous to CPU signals
+			Rst			: in     std_logic;												-- Asynchronous Reset
+			CpuRd_i		: in     std_logic;												-- CPU Read strobe
+			CpuWr_i		: in     std_logic;												-- CPU Write strobe
+			CpuCs_i		: in     std_logic;												-- CPU Chip Select
+			D_i			: in     std_logic_vector ( DataWidth-1 downto 0 );	-- Data bus from application
+			CpuA_i		: in     std_logic_vector ( AddrWidth-1 downto 0 );	-- CPU Address Input
+			CpuD_i		: in     std_logic_vector ( DataWidth-1 downto 0 );	-- CPU Data Input
 			--Output
-			Wr_o					: out    std_logic;												-- Write strobe (single clock) to application
-			Rd_o					: out    std_logic;												-- Read strobe (single clock) to application
-			A_o					: out    std_logic_vector ( AddrWidth-1 downto 0 );	-- Address bus to application 
-			D_o					: out    std_logic_vector ( DataWidth-1 downto 0 );	-- Data bus to application
-			CpuD_o				: out    std_logic_vector ( DataWidth-1 downto 0 )	-- CPU Data Output
+			Wr_o		: out    std_logic;												-- Write strobe (single clock) to application
+			Rd_o		: out    std_logic;												-- Read strobe (single clock) to application
+			A_o			: out    std_logic_vector ( AddrWidth-1 downto 0 );	-- Address bus to application 
+			D_o			: out    std_logic_vector ( DataWidth-1 downto 0 );	-- Data bus to application
+			CpuD_o		: out    std_logic_vector ( DataWidth-1 downto 0 )	-- CPU Data Output
 			);
 end CpuInterface ;
 

@@ -22,47 +22,47 @@ entity Intercon is
 	port	( 
 			--! General signals
 			--Input
-			clk_i					: in     std_logic;
-			rst_i					: in     std_logic;
+			clk_i		: in     std_logic;
+			rst_i		: in     std_logic;
 			--! Master(m) cycle control connections
 			--Input
-			cyc_i					: in     std_logic;
-			stb_i					: in     std_logic;
-			we_i					: in     std_logic;
-			adr_i					: in     wb_adr_typ;
-			cti_i					: in     wb_cti_typ;
+			cyc_i		: in     std_logic;
+			stb_i		: in     std_logic;
+			we_i		: in     std_logic;
+			adr_i		: in     wb_adr_typ;
+			cti_i		: in     wb_cti_typ;
 			--Output
-			err_o					: out    std_logic;
-			rty_o					: out    std_logic;
-			ack_o					: out    std_logic;
+			err_o		: out    std_logic;
+			rty_o		: out    std_logic;
+			ack_o		: out    std_logic;
 			--! Master data connections
 			--Input
-			m_dat_i				: in     wb_dat_typ;
+			m_dat_i		: in     wb_dat_typ;
 			--Output
-			m_dat_o				: out    wb_dat_typ;
+			m_dat_o		: out    wb_dat_typ;
 			--! Slave cycle control connections
 			--Input
-			ack_i					: in     wb_s_size;
-			err_i					: in     wb_s_size;
-			rty_i					: in     wb_s_size;
+			ack_i		: in     wb_s_size;
+			err_i		: in     wb_s_size;
+			rty_i		: in     wb_s_size;
 			--Output
-			we_o					: out    std_logic;
-			cyc_o					: out    std_logic;
-			adr_o					: out    wb_lad_typ;
-			cti_o					: out    wb_cti_typ;
-			stb_o					: out    wb_s_size;
+			we_o		: out    std_logic;
+			cyc_o		: out    std_logic;
+			adr_o		: out    wb_lad_typ;
+			cti_o		: out    wb_cti_typ;
+			stb_o		: out    wb_s_size;
 			--! Slave data connetions
 			--Input
-			s_dat_i				: in     wb_s_dat_typ;
+			s_dat_i		: in     wb_s_dat_typ;
 			--Output
-			s_dat_o				: out    wb_dat_typ
+			s_dat_o		: out    wb_dat_typ
 			);
 end Intercon ;
 
 architecture RTL of Intercon is
 
-			signal s				: integer range 0 to Num_s; -- Pointer to active slave
-			signal Timer_en	: boolean;
+			signal s			: integer range 0 to Num_s; -- Pointer to active slave
+			signal Timer_en		: boolean;
 			signal Timer		: int8;
 			signal err_s		: std_logic;
 			signal adr_s		: wb_adr_typ;
@@ -78,54 +78,54 @@ begin
 --! Process for Master return signals
 	ack_o_gen :process (s, ack_i)
 		begin
-			ack_o    <= '0';
+			ack_o	<= '0';
 			if (ack_i(s) = '1') then
-				ack_o<= '1';
+				ack_o	<= '1';
 			else
-				ack_o<= '0';
+				ack_o	<= '0';
 			end if;
 	end process ack_o_gen;
 
 	err_o_gen : process (s, err_i, err_s)
 		begin
-			err_o    <= '0';
+			err_o	<= '0';
 			if ((err_i(s) or err_s) = '1') then
-				err_o<= '1';
+				err_o	<= '1';
 			else
-				err_o<= '0';
+				err_o	<= '0';
 			end if;
 	end process err_o_gen;
 
 	rty_o_gen : process (s, rty_i)
 		begin
-			rty_o    <= '0';
-			rty_o <= rty_i(s);
+			rty_o	<= '0';
+			rty_o	<= rty_i(s);
 	end process rty_o_gen;
 
 	m_dat_o_gen : process (s, s_dat_i)
 		begin
-			m_dat_o <= (others => '0');
-			m_dat_o <= s_dat_i(s);
+			m_dat_o		<= (others => '0');
+			m_dat_o		<= s_dat_i(s);
 	end process m_dat_o_gen;
 
 	SlaveMux : process (s, stb_i)
 		begin
 			--! default values
 			--! Cycle control: Assign slave outputs
-			stb_o   <= (others => '0');
+			stb_o	<= (others => '0');
 			if (stb_i = '1') then
-				stb_o(s)<= '1';
+				stb_o(s)	<= '1';
 			else
-				stb_o(s)<= '0';
+				stb_o(s)	<= '0';
 			end if;
 	end process SlaveMux;
 
-	adr_o   <= adr_i(LAddrRange-1 downto 0);
+	adr_o	<= adr_i(LAddrRange-1 downto 0);
 	--had_o   <= adr_i(m)(AddrRange-1 downto LAddrRange);
-	cyc_o   <= cyc_i;
-	cti_o   <= cti_i;
-	we_o    <= we_i;
-	adr_s   <= adr_i;
+	cyc_o	<= cyc_i;
+	cti_o	<= cti_i;
+	we_o	<= we_i;
+	adr_s	<= adr_i;
   
 --! Slave select from the current addressS
 	Slave_sel : process (adr_s)
@@ -144,21 +144,21 @@ begin
 		begin
 			if (clk_i'event and clk_i = '1') then
 				if (rst_i = '1') then
-					err_s <= '0';
-					Timer_en <= false;
+					err_s		<= '0';
+					Timer_en	<= false;
 				else
 					if (stb_i = '1' and err_s = '0') then --! Start timer when master starts a cycle
-						Timer_en <= true;
+						Timer_en	<= true;
 					elsif (stb_i = '0') then
-						err_s <= '0';
-						Timer_en <= false;  --! Stop timer
+						err_s		<= '0';
+						Timer_en	<= false;  --! Stop timer
 					end if;
 					if (ack_i(s) = '1') then
-						Timer_en <= false;  --! Stop timer when an acknowledge is received
+						Timer_en	<= false;  --! Stop timer when an acknowledge is received
 					end if;
 					if (Timer = Timeout-1) then
-						err_s <= '1';
-						Timer_en <= false;  --! Stop timer
+						err_s		<= '1';
+						Timer_en	<= false;  --! Stop timer
 					end if;
 				end if;
 			end if;
@@ -168,12 +168,12 @@ begin
 		begin
 			if (clk_i'event and clk_i = '1') then
 				if (rst_i = '1') then
-					Timer <= 0;
+					Timer	<= 0;
 				else
 					if Timer_en then
-						Timer <= Timer + 1;
+						Timer	<= Timer + 1;
 					else
-						Timer <= 0;
+						Timer	<= 0;
 					end if;
 				end if;
 			end if;

@@ -40,7 +40,7 @@ package def_pkg is
 --! Wishbone Constants and types
   constant Num_s:         integer := 4;  --! Number of slaves  connected to the Intercon
   constant Num_m:         integer := 1;  --! Number of masters connected to the Intercon
-  constant Num_irqs:		  integer := 2;	 --! Number of IRQ slaves
+  constant Num_irqs:	  integer := 2;	 --! Number of IRQ slaves
   constant Datawidth:     integer := 16; --! Number of bits in datainterface
   constant AddrRange:     integer := 7;  --! Number of bits in Address space (was 16)
   constant LAddrRange:    integer := 4;  --! Number of bits in Low Address space, which connects to slaves
