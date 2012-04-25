@@ -40,10 +40,10 @@
 	\todo[inline]{Update time}
 	\begin{tabular}{|l|c|c|c|c|}
 		\hline
-		~			& Some thing	& some other thing	& Interrupt Register\\ \hline
-		Estimation	& xx			& xx				& 15				\\
-		Actual		& xx			& xx				& xx				\\
-		Developer	& Dennis		& Paulo				& Theis				\\
+		~			& Some thing	& PS redesign	& Interrupt Register \\ \hline
+		Estimation	& xx			& 17				& 15			 \\
+		Actual		& xx			& xx				& xx			 \\
+		Developer	& Dennis		& Paulo			& Theis				 \\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -52,27 +52,37 @@
 \subsection{Power Switch redesign}
 The prototype made in time box 3 for the power switch module didn't work as expected. New analyses and contact with Linear Technologies revealed that the IC being used (LTC...) is not the adequate device for this functionality.
 
+\lineparagraph{Requirements}
+\begin{itemize}
+	\item Voltage input to the Energy hub should be at 30V $ \pm10\% $
+	\item Ampere input to the Energy hub should be max 30A.
+	\item Power-line communication is used, for communication between the different devices and the hub.
+\end{itemize}
+
 \lineparagraph{Verification}
 \begin{itemize}
-	\item The system is able to switch the voltage as input or output.
-	\item Over voltage and under voltage are keep as set in common requirements ( 30V $ \pm10\% $)
-	\item Measurement of the current sensor for calculation of efficiency and security. ( Max 30A )
-	\item Create test-bench for 4 PCB modules. ( Fast prototyping using the mBed )
-	\item Test Power Line Communication, using development boards from Yamar and mBed.
+	\item The system is able to switch the voltage as input or output. ( Using a Multimeter on both POWERLINE and MODULE connection)
+	\item Over voltage and under voltage are keep as set in common requirements 30V $ \pm10\% $ ( Using a Multimeter on both POWERLINE and MODULE connection)
+	\item Measurement of the current sensor for calculation of efficiency and security, max 30A. ( Using a Multimeter on the current sensor output pin.)
+	\item Create test-bench for 4 PCB switching system. ( Fast prototyping using the mBed )
+	\item Test Power Line Communication through the switching system, using development boards from Yamar and mBed.
 \end{itemize}
 %	Intro
 %
 %		verification specification
 %		deployment specification
 %
-\todo{Requirements}
-\begin{itemize}
-	\item Voltage input to the Energy hub should be at 30V $ \pm10\% $
-	\item Ampere input to the Energy hub should be max 30A.
-	\item Power-line communication is used, for communication between the different devices and the hub.
-\end{itemize}
 \subsubsection{Analysis}
-
+%
+%	Analysis
+%
+%                Refactored block diagram
+%                Refactored class diagram
+%                Detailed use cases
+%                User interface specification
+%                System interface specification
+%                Dimensioning specification 
+%
 \lineparagraph{Power switch control}
 One of the problems found on the first prototype was that the LTC4357 device don't have a control pin to turn the MOSFETs on/off, this device will work only as an ideal diode, making it a good application for photovoltaic harvesting method.
 In contact with Linear Technologies a new device was suggested, the LTC4365, this device is a N-Channel MOSFET controller that protects the load using a higher and lower threshold voltage which can shut-down the supply and a shut-down pin drives the MOSFET gate high or low.
@@ -84,10 +94,9 @@ In contact with Linear Technologies a new device was suggested, the LTC4365, thi
 		\caption{LTC4365 application notes.}
 	\end{centering}
 \end{figure}
-In this application the shut-down pin is always high which makes the device open the MOSFETS if Vin is between the under voltage and over voltage reference voltages.
+In this application the shut-down pin is always high which makes the device open the MOSFETS if Vin is between the under voltage and over voltage threshold voltage.
 
-Linear Technologies have a simulator for them devices, the LTSpiceIV, is a free software that can be downloaded from the web site.
-Is necessary to define the over and under voltage threshold, this is found in the common requirements at LINK.\\
+Is necessary to define the over and under voltage threshold, this is found in the common requirements.\\
 \\
 Common requirements:\\\\
 $V_{in} = 30V$ \\
@@ -107,7 +116,7 @@ Over voltage requirement:\\\\
 $ O_V=30V+(30*10\%)=33V $\\
 \\
 For working conditions of the device the bellow equation have to be true:\\\\
-$ R_3+R_4=V_{OSUV}/I_{UV} $\\
+$ R_3+R_4=\frac{V_{OSUV}}{I_{UV}} $\\
 \\
 Using the formulas given in the datasheet to calculate the value of the 2 resistive dividers:\\\\
 $ R_2 = 2*\frac{3mV}{10nA}*(27V-0.5V) = 15.9M\Omega $ Approximate 16M $\Omega $\\ 
@@ -118,43 +127,78 @@ $ R_3 = \frac{V_{OSUV}}{I_{UV}}-R_1 = 50k\Omega $\\
 \\
 
 \lineparagraph{Simulations}
+Linear Technologies have a simulator for them devices, the LTSpiceIV, is a free software that can be downloaded from the web site.
 Using LTSpice to simulate the behaviour of the LTC4365 with the required values for the power switch system.
 
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Updated timebox figure}
-		\includegraphics[width=0.9\textwidth]{images/tb5_LTC_simu1.png}
+		\includegraphics[width=1\textwidth]{images/tb5_LTC_simu1.png}
 		\caption{Schematics for the device LTC4365}
 	\end{centering}
 \end{figure}
 
-In the schematics a basic circuit is draw, with a NPN transistor to drive the shut-down pin high and low. Two N-channel MOSFETs are connected back to back to  stop the voltage from passing to the output when the device is shut down. The device will work as an ideal diode.
+In the schematics a basic circuit is draw taken from the datasheet of the device, with a NPN transistor to drive the shut-down pin high and low. Two N-channel MOSFETs are connected back to back to  stop the voltage from passing to the load when the device is shut down. The system will work as power switching and ideal diode.
 
-\todo{LTC Simulations}
+\lineparagraph{Case Scenario 1 ( Producer device connected to the MODULE side )}
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1\textwidth]{images/tb5_LTC_case1.png}
+		\caption{Simulation case scenario 1}
+	\end{centering}
+\end{figure}
+In this case scenario the under voltage and over voltage can be tested along with the shut down pin. The simulation has a total time of 250ms, the system takes 10ms to stabilized at 30V which will stabilize the device at that voltage. At 65ms the NPN transistor is high, driven the input voltage to the shut down pin, with the shut down pin high the device will drive the gates for the two MOSFETs high and the current will flow through the MOSFETs from MODULE to POWERLINE as expected. 
+The voltage at the module at 80ms is changed to 24V, this will test the under voltage threshold value. From the calculations made in the analysis section, the device should sink the gates to ground when the voltage is under 27V, this happens with success at 75ms as it can be seen in the simulation above.
+To simulate over voltage protection, the MODULE (source) is set to 30V so the device can stabilize again. At 140ms the voltage is pull up to 40V, which the device should sink the gates of the MOSFETs when the voltage is 33V, this happens with success at 142ms.
+To test the control of the shut down pin, the voltage on the source side is set to 30V, getting the device to stabilize again. With the device in working conditions the NPN transistor is turned off at 220ms, the shut down pin is then pull down by a 10k$ \Omega $ resistor.\\
 
-\lineparagraph{Current Sensors}
+\lineparagraph{Case Scenario 2 ( Device off, no energy flow from MODULE to POWELINE and the other way around )}
+In the case scenario 1, there is no energy flowing when the device is off, is necessary now to simulate if the device is working as a diode, if no energy flows in the opposite direction. In this simulation the source and load positions are changed.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Case 2 Schematics changed}
+		\includegraphics[width=1\textwidth]{images/tb5_LTC_simu2sc.png}
+		\caption{Schematics for the device LTC4365 with Case scenario 2 specifications}
+	\end{centering}
+\end{figure}
 
-Being part of a green energy system, a current sensor is implemented in this power switch module. The measurement of current allows the system to calculate the efficiency of each module connected to its ports. The current measurements are shown to the user at the web interface.
+Being now the POWERLINE the source and the MODULE the load, this situation can occurs when a battery is fully charged and there is a different potential higher on the POWERLINE side. The device is going to insure that no energy flows in the opposite direction. This is successfully shown in the simulation bellow.
 
-The sensor used is a hall effect linear current sensor from Allegro, the ACS756SCA-050B, a bidirectional hall effect sensor with range from -50A to +50A. The device output an analogue signal.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Case 2 Simulation}
+		\includegraphics[width=1\textwidth]{images/tb5_LTC_simu2.png}
+		\caption{Simulation for case scenario 2}
+	\end{centering}
+\end{figure}
+
+The voltage at the source (POWERLINE) is kept at 30V, and at the load (MODULE) the voltage is around 0V (1mV), in this configuration the circuit is behaving as expected. When the device is off, and the energy flow in the opposite direction the system behave as a diode.
+
+\lineparagraph{Current Sensors}	
+
+Being part of a green energy system, a current sensor is implemented in this power switch system. The measurement of current allows the system to calculate the efficiency of each module connected to the switch port. The current measurements are shown to the user on the web interface.
+
+The sensor used is a hall effect linear current sensor from Allegro, the ACS756SCA-050B, a bidirectional hall effect sensor with range from -50A to +50A.
 
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Updated timebox figure}
 		\includegraphics[width=0.5\textwidth]{images/current_sensor.png}
-		\caption{ACS756SCA Typical aplication}
+		\caption{ACS756SCA Typical application}
 	\end{centering}
 \end{figure}
-%
-%	Analysis
-%
-%                Refactored block diagram
-%                Refactored class diagram
-%                Detailed use cases
-%                User interface specification
-%                System interface specification
-%                Dimensioning specification 
-%
+
+A test for this device is set on a bread board, the measurements are made using a voltmeter on the output pin. At a temperature of $ 24^\circ C $ the output increments approximated 40mV for each ampere this can be matched with the datasheet. Since we can have a meaningful measure with the factory ranges, theres is no need to amplify the signal.
+
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Current sensor set up.}
+		\includegraphics[width=0.40\textwidth]{images/tb5_CS_photo.png}
+		\caption{ACS756SCA-050 pins.}
+	\end{centering}
+\end{figure}
+
 \subsubsection{Design}
 %
 %	Design
@@ -168,6 +212,47 @@ The sensor used is a hall effect linear current sensor from Allegro, the ACS756S
 %                Use case scenarios specifications
 %                Sequence diagrams
 %
+The redesign of the power switch system required some more analysis since this is the main functionality of the energy hub. 
+\lineparagraph{Power Switch Overview}
+An overview of the system to be can be seen bellow.
+
+\begin{figure}[H]
+	\begin{centering}
+		\missingfigure{System Block Diagram}
+		%\includegraphics[width=0.40\textwidth]{images/tb5_CS_photo.png}
+		%\caption{ACS756SCA-050 pins.}
+	\end{centering}
+\end{figure}
+
+In this block diagram the connection between the different modules can be seen. The ARM7 controls the input and output pins of the power switch system, a device driver will be implemented for this functionality later on this project. 
+The CS_OUTPUT corresponds to the current sensor voltage output that goes from 0V(-50A) to 5V(50A), this is connected to one of the 8 ADCs implemented on the FPGA and retrieved to the core system (ARM7) through the EMC (External Memory Control) implementation.
+POWERLINE pin form all power switch systems are connected to the same track into the PLC module. This will work as a sniffer fro new communication arriving and to send communication to the modules connected to the energy hub.
+The module pin will is a connector for each module, in this prototype 4 ports are built, since there's no more than 4 modules in development.
+
+
+\lineparagraph{Schematics}
+Schematics of the power switch system bellow.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Current sensor set up.}
+		\includegraphics[width=1.0\textwidth]{images/PS_PCB.pdf}
+		\caption{Power switch system schematics.}
+	\end{centering}
+\end{figure}
+In this schematics the current sensor is add to the system a long with the new LTC4365 devices to control the two back to back N-channel MOSFETs. A NPN transistor is added between the $ V_{in} $ and the shut down pin, this will drive the pin to the input voltage or connect to ground, in case off power failure the power switch systems are disconnected since the shut down pin is pull down to ground through a 10K$ \Omega $ resistor.
+
+\lineparagraph{PCB layout}
+A layout is made using Altium Designer software version 10. This layout is a prototype so the components have more space between them for easier debugging and changes if necessary.
+\begin{figure}[H]
+	\begin{centering}
+		\missingfigure{PS layout image.}
+		%\includegraphics[width=1.0\textwidth]{images/PS_LAYOUT.pdf}
+		%\caption{Power switch system schematics.}
+	\end{centering}
+\end{figure}
+
+
+
 \subsubsection{Implementation}
 %
 %	Implementation
