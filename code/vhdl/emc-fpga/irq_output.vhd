@@ -45,7 +45,7 @@ begin
 	end process;
 
 	-- next state/output logic
-	process(state_reg, read_i, r_data, read_wb)
+	process(state_reg, read_i, read_wb)
 	begin
 		state_next		<= state_reg;
 		rd					<= '0';

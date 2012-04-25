@@ -19,49 +19,49 @@ library work;
 entity host is
 	port	(
 			--Input
-			Clk					: in     std_logic;									--! Clock signal synchronous to CPU signals
-			Rst					: in     std_logic;									--! Asynchronous Reset
-			CpuRd_i				: in     std_logic;									--! CPU Read strobe
-			CpuWr_i				: in     std_logic;									--! CPU Write strobe
-			CpuCs_i				: in     std_logic;									--! CPU Chip Select
-			clk_i					: in     std_logic;									--! WB clk input 
-			rst_i					: in     std_logic;									--! System reset input
-			ack_i					: in     std_logic;									--! ack signal from slaves
-			err_i					: in     std_logic;									--! error signal from slaves
-			rty_i					: in     std_logic;									--! retry signal from slaves
-			dat_i					: in     wb_dat_typ;									--! data from slaves
-			CpuA_i				: in     wb_adr_typ;									--! CPU Address Input
-			CpuD_i				: in     wb_dat_typ;									--! CPU Data Input
+			Clk			: in     std_logic;				--! Clock signal synchronous to CPU signals
+			Rst			: in     std_logic;				--! Asynchronous Reset
+			CpuRd_i		: in     std_logic;				--! CPU Read strobe
+			CpuWr_i		: in     std_logic;				--! CPU Write strobe
+			CpuCs_i		: in     std_logic;				--! CPU Chip Select
+			clk_i		: in     std_logic;				--! WB clk input 
+			rst_i		: in     std_logic;				--! System reset input
+			ack_i		: in     std_logic;				--! ack signal from slaves
+			err_i		: in     std_logic;				--! error signal from slaves
+			rty_i		: in     std_logic;				--! retry signal from slaves
+			dat_i		: in     wb_dat_typ;			--! data from slaves
+			CpuA_i		: in     wb_adr_typ;			--! CPU Address Input
+			CpuD_i		: in     wb_dat_typ;			--! CPU Data Input
 			--Output
-			stb_o					: out    std_logic;									--! WB strobe out 
-			cyc_o					: out    std_logic;									--! WB cycle out  
-			we_o					: out    std_logic;									--! write enable
-			adr_o					: out    wb_adr_typ;									--! address to slaves 
-			dat_o					: out    wb_dat_typ;									--! data to slaves 
-			cti_o					: out    wb_cti_typ;									--! @todo not used ? 
-			CpuD_o				: out    wb_dat_typ									--! CPU Data Output
+			stb_o		: out    std_logic;				--! WB strobe out 
+			cyc_o		: out    std_logic;				--! WB cycle out  
+			we_o		: out    std_logic;				--! write enable
+			adr_o		: out    wb_adr_typ;			--! address to slaves 
+			dat_o		: out    wb_dat_typ;			--! data to slaves 
+			cti_o		: out    wb_cti_typ;			--! @todo not used ? 
+			CpuD_o		: out    wb_dat_typ				--! CPU Data Output
 			);
 end host ;
 
-architecture struct of host is														--! Architecture declarations
+architecture struct of host is							--! Architecture declarations
 
 --! Internal signal declarations
-			signal A_o			: wb_adr_typ;											--! Address bus to application 
-			signal D_o 			: wb_dat_typ;											--! Data bus to application
-			signal D_i			: wb_dat_typ;											--! Data bus from application
-			signal Wr_o			: std_logic;											--! Write strobe (single clock) to application
-			signal Rd_o			: std_logic;											--! Read strobe (single clock) to application
-			signal Err			: std_logic;											--! Error for ?
-			signal RD_Ack		: std_logic;											--! Read acknowledge signal used between host and WB master
-			signal WR_Ack		: std_logic;											--! Write acknowledge signal used between host and WB master
+			signal A_o			: wb_adr_typ;			--! Address bus to application 
+			signal D_o 			: wb_dat_typ;			--! Data bus to application
+			signal D_i			: wb_dat_typ;			--! Data bus from application
+			signal Wr_o			: std_logic;			--! Write strobe (single clock) to application
+			signal Rd_o			: std_logic;			--! Read strobe (single clock) to application
+			signal Err			: std_logic;			--! Error for ?
+			signal RD_Ack		: std_logic;			--! Read acknowledge signal used between host and WB master
+			signal WR_Ack		: std_logic;			--! Write acknowledge signal used between host and WB master
 
 begin
 
 --! Instance and do port mappings.
 	CPU : entity work.CpuInterface
 		generic map	(
-						AddrWidth => AddrRange,											--! Width of Address bus
-						DataWidth => Datawidth											--! DataWidth of Databus in and out
+						AddrWidth => AddrRange,			--! Width of Address bus
+						DataWidth => Datawidth			--! DataWidth of Databus in and out
 						)
 		port map	(
 					--! System signals
