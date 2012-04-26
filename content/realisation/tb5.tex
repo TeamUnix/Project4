@@ -279,13 +279,13 @@ All the verifications for this board are changed to time box 6 since the PCB wil
 %                Acceptance test
 %%%%%%%%%%%%%%%%% Dennis Begin%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Platform setup - Dennis} 
-A virtual CentOS machine running on a machine at school has been assigned to each team in order to have a host machine where the boot loader (u-boot) can be compiled and modification to the uClinux kernel can be made. Unfortunately the kernel compiled started to kernel panic. After undoing the different things done (removing files from the rc file and removing different kernel modules) the kernel kept panicking. Instead of using any more time on the machine, another similar virtual machine has been created on a local machine. The virtual machine is running CentOS 5.8 (like the one assigned), fortunately no kernel panic have been detected after compiling the kernel on the "new" local machine. Another benefit by having a local machine up and running is flexibility as the Embedded Artist board should be connected to the schools network in order to access the tftp server where the board loads the kernel from throughout the development period. 
+A virtual CentOS machine running on a machine at school has been assigned to each team in order to have a host machine where the boot loader (u-boot) can be compiled and modifications to the uClinux kernel can be made. Unfortunately the kernel compiled started to kernel panic. After undoing the different things done (removing files from the rc file and removing different kernel modules) the kernel kept panicking. Instead of using any more time on the machine, another similar virtual machine has been created on a local machine. The virtual machine is running CentOS 5.8 (like the one assigned), fortunately no kernel panic have been detected after compiling the kernel on the "new" local machine. Another benefit by having a local machine up and running is the flexibility as the Embedded Artist board should be connected to the schools network in order to access the tftp server where the board loads the kernel from throughout the development period. Now a tftp server has been set up on the local machine where to the development board can be directly connected though an ethernet cable.
 \subsubsection{Network File system}
-In order to speed up development process of user space application to the board, a NFS server has been setup on the local host machine using the machintosh application \textit{NFS Manager}. The NFS disk is then mounted on the board by issuing the command: \\\textit{\#mount -o nolock,rsize=4096,wsize=4096 -t nfs 192.168.1.1:\/Users\/Shared\/nfs\_mount \/mnt\/nfs}, 
-\\which mounts the disk in \textit{\/mnt\/nfs}. When having the NFS server setup, there is no need to recompile the whole kernel when changes have been done to a kernel module or a user space application before it can be tester on the target. 
+In order to speed up the development process of user space applications and device drivers to the board, a NFS server has been setup on the local host machine using the machintosh application \textit{NFS Manager}. The NFS disk is then mounted on the board by issuing the command: \\\textit{\#mount -o nolock,rsize=4096,wsize=4096 -t nfs 192.168.1.1:/Users/Shared/nfs\_mount /mnt/nfs}, 
+\\which mounts the disk in \textit{/mnt/nfs}. When having the NFS server setup, there is no need to recompile the whole kernel when changes have been done to a kernel module or a user space application before it can be tested on the target. 
 
 \subsection{UART Device driver - Dennis} 
-As specified in the Technical platform section, the board used is LPC2478-32 from Embedded Artists. The on-board ARM processor is running uClinux, which is a Linux kernel for micro controllers without a memory management unit. In order to communicate with the UART hardware on the board a device driver has to be written, which is a piece of software that allows user-space applications in the kernel to interface with a hardware device (in this case the UART). The reason why implementing a UART driver, is to be able to communicate with the Power Line module which users UART interface. 
+As specified in the Technical platform section, the board used is LPC2478-32 from Embedded Artists. The on-board ARM processor is running uClinux, which is a Linux kernel for micro controllers without a memory management unit. In order to communicate with the UART hardware on the board a device driver has to be written, which is a piece of software that allows user-space applications in the kernel to interface with a hardware device (in this case the UART). The reason why implementing a UART driver, is to be able to communicate with the Power Line module which uses UART interface. 
 \begin{table}[H]
 \centering
 	\begin{tabular}{|p{1.2cm}|p{2.3cm}|p{6cm}|p{6cm}|}
@@ -311,8 +311,8 @@ The UART used for communication to the Power line module is UART2, however inste
 %                System interface specification
 %                Dimensioning specification 
 \subsubsection{Design}
-Before implementing the kernel module, it have to be thought through how to operator with the module from the user side of it. A small test program has been created in order to have some implementation guide lines, but also to have a verification script to all the time test against, to check if the module full files all the tests. 
-\p The script either opens the \/dev\/uart2 file and reads it, or opens it and writes the different commands available. After writing the file with one command, the content of the file is deleted (flushed) to prepare for a new operation. 
+Before implementing the kernel module, it has to be thought through how to operate with the module from the user side of it. A small test program has been created in order to have some implementation guide lines, but also to have a verification script to all the time test against, to check if the module fulfills all the tests. 
+\p The script either opens the /dev/uart2 file and reads it, or opens it and writes the different commands available. After writing the file with one command, the content of the file is deleted (flushed) to prepare for a new operation. 
 \begin{lstlisting}[language=c]
 #define UART "/dev/uart2"
 
@@ -383,7 +383,7 @@ Note that the first time a device is opened after reset the INIT and BAUD shall 
 %                Sequence diagrams
 \subsubsection{Implementation}
 %%%%%%%%%File Descriptor%%%%%%%%%%%%%%%
-As the device have to be able to both read and write, the file descriptor shall at minimum look like below with a open, close, read and write function. Further implementations is discussed in the conclusion section.
+As the device has to be able to both read and write, the file descriptor shall at minimum look like below with a open, close, read and write function. Further implementations is discussed in the conclusion section.
 \begin{lstlisting}[language=c]
 static struct file_operations uart_fops = {
 	.owner   = THIS_MODULE,
@@ -471,12 +471,13 @@ static int getCommand(const char __user* buf, size_t count, char** ppArg){
 
 
 %%%%%%%%%%%WRITE%%%%%%%%%%%%%%%%%
-When the command has been read by the \textit{getCommand} function, the remaining length of the string is measured where after a function is called according to the return value of \textit{getCommand}. The help function writes out the different options of writing the file to the user. The write command first checks if the user send a decimal or a hexadecimal value and then reads the value. Then the \textit{UART write busy flag} is checked to see verify that the \textit{write register} is empty. If the register is not empty a value is counted up and returns a \textit{end of file} value (0) if the register is still not empty, otherwise it puts the value given into the \textit{write register}. The baud rate setup and init functions are explained below.
+When the command has been read by the \textit{getCommand} function, the remaining length of the string is measured where after a function is called according to the return value of \textit{getCommand}. The help function writes out the different options of writing the file to the user. The write command first checks if the user has send a decimal or a hexadecimal value and then reads the value. Then the \textit{UART write busy flag} is checked to verify that the \textit{write register} is empty. If the register is not empty a value is counted up and returns a \textit{end of file} value (0) if the register is still not empty, otherwise it puts the value given into the \textit{write register}. The baud rate setup and init functions are explained below.
 \begin{lstlisting}[language=c]
 static ssize_t uart_write(struct file *filp, const char *bufp, size_t count, loff_t *p_pos){
 	---
 	cmd = getCommand(bufp, count, &arg);
 	len = strlen(arg);
+	
 	switch(cmd){
 	/********************************* HELP ********************************************/
 	case HELP:
@@ -537,6 +538,17 @@ void init_uart(int dev, int wl, int sb, int pb){
 \end{lstlisting}
 
 %%%%%%%%%%%SET BAUD%%%%%%%%%%%%%%%%%
+According to the lpc24xx data sheet\footnote{lpc24xx.user.manual.pdf, page 427} the UART clock must be 16 times the desired value of UART. From the drawing below it can be seen that the clock to the UART module is the same as the ARM7 clock (57.6MHz) as it is divided by one (these values are assigned to the PCLKSEL0 and PCLKSEL1 registers during low level initialization in u-boot). 
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.7\textwidth]{images/peripheral_clock_gen.png}
+		\caption{Peripheral clock to UART}
+	\end{centering}
+\end{figure}
+In order to get the desired clock speed to the UART module, a scale value must be written to the \textit{Divisor Latch Register}.
+\\If a baud rate of 9600 is wanted, the value written to the register must be: \\$57.600.000/(16*9600)=375$
+\\As seen in the code below, the divisor register is split into two parts (a low and a high part).
 \begin{lstlisting}[language=c]
 void set_baud(int dev, unsigned int baud){
 	switch(dev){
@@ -561,7 +573,7 @@ The other functions used: \textit{intToStr}, \textit{strToInt}, \textit{chToUppe
 %                Source code with details explained
 %                Description of integration 
 \paragraph{Inserting the UART module in the kernel}
-To automatically insert the module in the kernel during startup, a few files shall be made. The first thing to do is to create the different uart files in \/dev and specify that the module shall be inserted to the after startup. The different files created is specified in the rc file. In the kernel folder structure the rc file used is placed in: \textit{\/home\/emb\/uClinux-dist\/vendors\/EmbeddedArtists\/LPC2478OEM\_Board}
+To automatically insert the module in the kernel during startup, a few files shall be made. The first thing to do is to create the different uart files in \/dev and specify that the module shall be inserted to the kernel after startup. The different files created is specified in the rc file. In the kernel folder structure the rc file used is placed in: \textit{/home/emb/uClinux-dist/vendors/EmbeddedArtists/LPC2478OEM\_Board}
 
 \begin{lstlisting}[language=c]
 ---
@@ -575,24 +587,52 @@ if [ -f /drivers/adc.ko ]; then
 fi
 ---
 \end{lstlisting}
-In the same path a line shall be inserted to add the module to the romfs image which is extracted during boot time.
+In the \textit{Makefile} in the same path a line shall be inserted to add the module to the \textit{romfs image} which is extracted during boot time. Also in the top, the value 5 shall be exchanged with 6, to indicate that there is an extra char device.
 \begin{lstlisting}[language=c]
+---
+DEVICES = console,c,6,1
 ---
 $(ROMFSINST) -S drivers/2.6.x/uart/uart.ko /drivers/uart.ko & \
 ---
 \end{lstlisting}
-The last thing to do is to add uart to the makefile in the drivers\/2.6.x folder, to be sure the kernel remakes the UART module when compiled if any changed were done. 
+The last thing to do is to add uart to the makefile in the drivers/2.6.x folder, to be sure that the kernel remakes the UART module when compiled if any changed were done. 
 \paragraph{Adding the UART user space application}
-When compiling a user space application through the kernel, there is no need to specify which gcc compiler to use or which flags to set in the different local Makefiles (this is all set in the big kernel Makefile). Therefore a makefile was found in the uClinux pdf book\footnote{Getting Started With uClinux Development A, page 72}
-\subsubsection{Verification}
+When compiling a user space application through the kernel, there is no need to specify which gcc compiler to use or which flags to set in the different local Makefiles (this is all set in the big kernel Makefile). Therefore a makefile was found in the uClinux pdf book\footnote{Getting Started With uClinux Development A, page 72} in order to make small changes to the program, add it to the NFS folder and run it on the target, without the need for compiling the whole kernel and restarting the target each time. The makefile used:
+\begin{lstlisting}[language=c]
+CFLAGS= -Wall -W
+LDFLAGS= -Wl,-elf2flt
+CC= /usr/local/bin/arm-elf-gcc
+RM=rm -f
 
+PROG=uart
+SRC= uart.c
+
+OBJ=$(SRC:%.c=%.o)
+
+$(PROG): $(OBJ)
+	$(CC) $(CFLAGS) -o $(PROG) $(OBJ) $(LDFLAGS)
+
+.PHONY: clean all dep
+
+clean:
+	$(RM) $(PROG) $(OBJ) *~ *.gdb .depend *.elf2flt *.elf
+\end{lstlisting}
+After finishing the application, it is added to the kernel by following the steps on Klaus wiki\footnote{\url{http://klaus.ede.hih.au.dk/index.php/How-to_add_a_user_space_application_to_uClinux}}.
+\subsubsection{Verification}
+The module is only verified with the UART2 hardware. The verification of the module is done by the UART user space application. At first the rx and tx pins where short-circuit, to make a loopback. After performing a write to the file by running the UART user space application, the file was read and the values compared to verify that the data was not corrupt. Afterward a test has been made similar to the one performed on the bare-metal driver, where the Embedded Artist board and an MBED communicates with each other through their own power line modules. 
 %        Verification
 %
 %                Module tests
 %                Integration tests
 %                Acceptance test
 \subsubsection{Conclusion}
-
+The UART hardware can be accessed through the device driver, however, the efficiency of the module is not that good. Therefore the driver still need some improvements which shall be further added in order to get a better performance. 
+\begin{itemize}
+	\item Add interrupts to the receive part, to avoid reading the file once in a while to see if someone wrote anything.
+	\item Add file write function, so a whole file can be compressed and sent to another module (wind turbine, photovoltaic, CAES or battery).
+	\item Add more flexibility to initializing the module (break control, interrupt, ...) 
+	\item Add more error handling and better feedback description if an invalid command is received.
+\end{itemize}
 
 %%%%%%%%%%%%%%%%% Dennis End%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Interrupt register - Theis}
@@ -922,9 +962,8 @@ The test bench verify that the interrupt register is working with virtual signal
 
 
 \subsection{Deployment}
-\paragraph{Something}
-	%which versions of the prototype the customer will get
-	%with what functionality.	
+\paragraph{UART Device Driver}
+The first version of the Device Driver is up and running (v0.1), which has implemented read and write functionality (non interruptible). Also different write calls have been implemented in order to initialize a channel.
 \paragraph{Power Switch}
 The power switch system is under development, 4 of this modules will be developed and a test bench build using fast prototyping tools. In time box 6 the complete development of this main system will be finish and a prototype will be present to the client.
 	%which versions of the prototype the customer will get
