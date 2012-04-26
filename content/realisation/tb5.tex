@@ -9,7 +9,6 @@
 	\end{centering}
 \end{figure}
 \subsubsection{Work to be done in this time box}
-\todo[inline]{DENNIS - Update what to do}
 \begin{itemize}
 	\item Power Switch module redesign
 	\begin{itemize}
@@ -17,9 +16,9 @@
 		\item Simulation
 		\item Redesign
 	\end{itemize}
-	\item DENNIS HERE
+	\item UART Device driver
 		\begin{itemize}
-			\item SUB THINGS
+			\item Convert UART bare-metal driver into Linux device driver
 		\end{itemize}
 	\item Interrupt register
 	\begin{itemize}
@@ -29,9 +28,8 @@
 	\end{itemize}
 \end{itemize}
 \paragraph{Description:}
-\todo[inline]{DENNIS - Update description}
 \begin{description}
-	\item[DENNIS HERE] stuff about what you are doing
+	\item[UART Device driver] Convert the bare-metal UART driver from the last time box into a device driver, in order to be able to access the UART hardware from user space in the uClinux environment.
 	\item[Power Switch] Main component of the energy hub system, controls the ports for each module allowing energy to flow in both directions.
 	\item[Interrupt register] is a block in the Spartan 6, that is allow to interrupt the ARM7 directly. The register is handling other interrupts from the Spartan 6 and tell the ARM7 where the interrupt came from.
 \end{description}
@@ -39,12 +37,12 @@
 \begin{table}[H]
 \centering
 	\todo[inline]{Update time}
-	\begin{tabular}{|l|c|c|c|c|}
+	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
-		~			& Some thing	& PS redesign	& Interrupt Register \\ \hline
-		Estimation	& xx			& 17				& 15			 \\
-		Actual		& xx			& 20				& xx			 \\
-		Developer	& Dennis		& Paulo				& Theis			 \\
+		~			& UART Device driver	& PS redesign		& Interrupt Register	& Platform setup\\ \hline
+		Estimation	& 8					& 17				& 15				& 0			  \\
+		Actual		& 22					& 20				& xx				& 11			  \\
+		Developer	& Dennis				& Paulo			& Theis			& Dennis		  \\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -280,6 +278,12 @@ All the verifications for this board are changed to time box 6 since the PCB wil
 %                Integration tests
 %                Acceptance test
 %%%%%%%%%%%%%%%%% Dennis Begin%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Platform setup - Dennis} 
+A virtual CentOS machine running on a machine at school has been assigned to each team in order to have a host machine where the boot loader (u-boot) can be compiled and modification to the uClinux kernel can be made. Unfortunately the kernel compiled started to kernel panic. After undoing the different things done (removing files from the rc file and removing different kernel modules) the kernel kept panicking. Instead of using any more time on the machine, another similar virtual machine has been created on a local machine. The virtual machine is running CentOS 5.8 (like the one assigned), fortunately no kernel panic have been detected after compiling the kernel on the "new" local machine. Another benefit by having a local machine up and running is flexibility as the Embedded Artist board should be connected to the schools network in order to access the tftp server where the board loads the kernel from throughout the development period. 
+\subsubsection{Network File system}
+In order to speed up development process of user space application to the board, a NFS server has been setup on the local host machine using the machintosh application \textit{NFS Manager}. The NFS disk is then mounted on the board by issuing the command: \\\textit{\#mount -o nolock,rsize=4096,wsize=4096 -t nfs 192.168.1.1:\/Users\/Shared\/nfs\_mount \/mnt\/nfs}, 
+\\which mounts the disk in \textit{\/mnt\/nfs}. When having the NFS server setup, there is no need to recompile the whole kernel when changes have been done to a kernel module or a user space application before it can be tester on the target. 
+
 \subsection{UART Device driver - Dennis} 
 As specified in the Technical platform section, the board used is LPC2478-32 from Embedded Artists. The on-board ARM processor is running uClinux, which is a Linux kernel for micro controllers without a memory management unit. In order to communicate with the UART hardware on the board a device driver has to be written, which is a piece of software that allows user-space applications in the kernel to interface with a hardware device (in this case the UART). The reason why implementing a UART driver, is to be able to communicate with the Power Line module which users UART interface. 
 \begin{table}[H]
@@ -378,6 +382,8 @@ Note that the first time a device is opened after reset the INIT and BAUD shall 
 %                Use case scenarios specifications
 %                Sequence diagrams
 \subsubsection{Implementation}
+%%%%%%%%%File Descriptor%%%%%%%%%%%%%%%
+As the device have to be able to both read and write, the file descriptor shall at minimum look like below with a open, close, read and write function. Further implementations is discussed in the conclusion section.
 \begin{lstlisting}[language=c]
 static struct file_operations uart_fops = {
 	.owner   = THIS_MODULE,
@@ -390,16 +396,163 @@ module_init(uart_mod_init);
 module_exit(uart_mod_exit);
 \end{lstlisting}
 
-\subsubsection{Implementation}
-
-\end{lstlisting}
-
-The init and exit functions are similar to the one used in the ADC, except that the UART2 and UART3 power pins is disable by default. If these pins are set and reset then the UART devices erases its settings. Therefore the power pins for UART2 and UART3 are set when inserting the module (UART0 and UART1 are enabled at reset).
+%%%%%%%%%INIT/EXIT%%%%%%%%%%%%%%%
+The init and exit functions are similar to the one used in the ADC, except that the UART2 and UART3 power pins are disable by default. If these pins are set and reset then the UART devices erases its settings. Therefore the power pins for UART2 and UART3 are set when inserting the module (UART0 and UART1 are enabled at reset).
 \begin{lstlisting}[language=c]
 m_reg_bfs(PCONP, 0x03000000);
 \end{lstlisting}
 
+%%%%%%%%%OPEN/CLOSE%%%%%%%%%%%%%%%
+The open and close functions are almost similar to the skeleton made, except that the pins for a module is set the first time a file is opened. When the file closes the pins are not reset to GPIO's as it should still be able to receive data and put it into its buffer. 
+\begin{lstlisting}[language=c]
+static int uart_open(struct inode* inode, struct file* file){
+	---
+	if(chRefCnt[num] == 0){
+		file->private_data = (void *) num;
+		if(num == 0 || num == 2 || num == 3){
+			m_reg_bfs(PINSEL0, enable_pinsel[num]);
+		}
+		else if(num == 1){
+			m_reg_bfs(PINSEL7, enable_pinsel[num]);
+		}
+	}
+	chRefCnt[num]++;
+}
+\end{lstlisting}
 
+%%%%%%%%%%%READ%%%%%%%%%%%%%%%%%
+As for now the read function is implemented as a dummy function which only returns a value when it is called. This implementation is similar to the one implemented in the bare-metal driver. This way of implementing a read call is very simple but also very inefficient. Further improvements of this is discussed in the conclusion section. 
+\begin{lstlisting}[language=c]
+static ssize_t uart_read(struct file *p_file, char *p_buf, size_t count, loff_t *p_pos){
+	---
+	if(endRead[num]){
+		endRead[num] = 0;
+		return 0;
+	}
+
+	if(!(m_reg_read(ulsr[num]) & 0x01)){
+		return 0;
+	}
+	val = m_reg_read(urbr[num]);
+	len = intToStr(val, p_buf+*p_pos, count, 10);
+	if(len < count){
+		p_buf[len++] = '\n';
+	}
+	endRead[num] = 1;
+
+	return len;
+}
+\end{lstlisting}
+
+%%%%%%%%%%%GET CMD%%%%%%%%%%%%%%%%
+When writing to the file, four different valid commands can be given. The \textit{getCommand} function reads the string send and by comparing the string to a local array it returns a value to the write function, which handles the different commands given. 
+\begin{lstlisting}[language=c]
+static int getCommand(const char __user* buf, size_t count, char** ppArg){
+	int i = 0;
+	char* pEnd = NULL;
+
+	if(strncmp("HELP", buf, 4) == 0 || strncmp("help", buf, 4) == 0){
+		return HELP;
+	}
+
+	pEnd = strchr(buf, ':');
+	if(pEnd == NULL)
+		return INVALID;
+	*ppArg = pEnd+1;
+
+	for(i = 0; i < sizeof(commands)/sizeof(char*); i++){
+		if(strnicmp(commands[i], buf, pEnd-buf) == 0){	
+			return i;
+		}
+	}
+	return INVALID;
+}
+\end{lstlisting}
+
+
+%%%%%%%%%%%WRITE%%%%%%%%%%%%%%%%%
+When the command has been read by the \textit{getCommand} function, the remaining length of the string is measured where after a function is called according to the return value of \textit{getCommand}. The help function writes out the different options of writing the file to the user. The write command first checks if the user send a decimal or a hexadecimal value and then reads the value. Then the \textit{UART write busy flag} is checked to see verify that the \textit{write register} is empty. If the register is not empty a value is counted up and returns a \textit{end of file} value (0) if the register is still not empty, otherwise it puts the value given into the \textit{write register}. The baud rate setup and init functions are explained below.
+\begin{lstlisting}[language=c]
+static ssize_t uart_write(struct file *filp, const char *bufp, size_t count, loff_t *p_pos){
+	---
+	cmd = getCommand(bufp, count, &arg);
+	len = strlen(arg);
+	switch(cmd){
+	/********************************* HELP ********************************************/
+	case HELP:
+	    help();
+	    break;
+	/********************************* BAUD ********************************************/
+	case BAUD:
+	    baud = strToInt(arg, len, base);
+	    set_baud(num,baud);
+	    break;
+	/********************************* INIT ********************************************/
+	case INIT:
+	    wl = strToInt(arg,1,1); arg++;
+	    pb = strToInt(arg,1,1); arg++;
+	    sb = strToInt(arg,1,1);
+	    init_uart(num,wl,sb,pb);
+	    break;
+	/*********************************  WR  ********************************************/
+	case WR:
+	    if(strnicmp("0x", arg, 2) == 0){
+	        arg += 2;
+	        len -= 2;
+	        base = 16;
+	    }
+	    val = strToInt(arg, len, base);
+	    while(!(m_reg_read(ulsr[num]) & 0x20)){
+	        ecnt++;
+	        if(ecnt > 100)
+	        return 0;
+	    }
+	    m_reg_write(uthr[num], val);
+	    break;
+	default:
+	    printk("warning: invalid argument'\n");
+ 	}
+  return count;
+}
+\end{lstlisting}
+
+%%%%%%%%%%%INIT UART%%%%%%%%%%%%%%%%%
+As written earlier, the init function has to be called the first time a file is opened after a reset (the same with the baud rate setup). The function enables the receive and transmit FIFO and sets up the: word length, amount of stop bits (1 or 2) and adds a parity bit if was requested. 
+\begin{lstlisting}[language=c]
+void init_uart(int dev, int wl, int sb, int pb){
+	if(sb == 2) sb=1;
+	else sb = 0;
+	switch(dev){
+	---
+	/********** uart2 **********/
+	case 2:
+	    m_reg_write(U2LCR, 0x0);
+	    m_reg_write(U2IER, 0x0);
+	    m_reg_write(U2LCR, ( ((wl-5)<<0) |(sb<<2) | (pb<<3) ));
+	    m_reg_write(U2FCR, 0x07);
+	break;
+	---
+	}
+}
+\end{lstlisting}
+
+%%%%%%%%%%%SET BAUD%%%%%%%%%%%%%%%%%
+\begin{lstlisting}[language=c]
+void set_baud(int dev, unsigned int baud){
+	switch(dev){
+	---
+	  case 2:
+	    m_reg_write(U2DLL, (((LPC24xx_Fcclk/16)/baud) & 0xFF));
+	    m_reg_write(U2DLM, (((LPC24xx_Fcclk/16)/baud) >> 8));
+	  break;
+	---
+	}
+}
+\end{lstlisting}
+
+
+
+The other functions used: \textit{intToStr}, \textit{strToInt}, \textit{chToUpper}, \textit{help} is code reuse from some of the other device drivers provided with the kernel: SFR, ADC and PWM.
 
 %        Implementation
 %
@@ -430,7 +583,9 @@ $(ROMFSINST) -S drivers/2.6.x/uart/uart.ko /drivers/uart.ko & \
 \end{lstlisting}
 The last thing to do is to add uart to the makefile in the drivers\/2.6.x folder, to be sure the kernel remakes the UART module when compiled if any changed were done. 
 \paragraph{Adding the UART user space application}
+When compiling a user space application through the kernel, there is no need to specify which gcc compiler to use or which flags to set in the different local Makefiles (this is all set in the big kernel Makefile). Therefore a makefile was found in the uClinux pdf book\footnote{Getting Started With uClinux Development A, page 72}
 \subsubsection{Verification}
+
 %        Verification
 %
 %                Module tests
