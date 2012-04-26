@@ -9,18 +9,18 @@
 	\end{centering}
 \end{figure}
 \subsubsection{Work to be done in this time box}
+\todo[inline]{DENNIS - Update what to do}
 \begin{itemize}
-	\item Web Server
-	\begin{itemize}
-		\item Web Services
-		\item Further improvements
-	\end{itemize}
 	\item Power Switch module redesign
 	\begin{itemize}
 		\item Improvements
 		\item Simulation
 		\item Redesign
 	\end{itemize}
+	\item DENNIS HERE
+		\begin{itemize}
+			\item SUB THINGS
+		\end{itemize}
 	\item Interrupt register
 	\begin{itemize}
 		\item Wishbone slave interface
@@ -29,10 +29,10 @@
 	\end{itemize}
 \end{itemize}
 \paragraph{Description:}
-\todo[inline]{Update description}
+\todo[inline]{DENNIS - Update description}
 \begin{description}
-	\item[Something] stuff about something
-	\item[Some other thing] about other thing
+	\item[DENNIS HERE] stuff about what you are doing
+	\item[Power Switch] Main component of the energy hub system, controls the ports for each module allowing energy to flow in both directions.
 	\item[Interrupt register] is a block in the Spartan 6, that is allow to interrupt the ARM7 directly. The register is handling other interrupts from the Spartan 6 and tell the ARM7 where the interrupt came from.
 \end{description}
 \subsubsection{Time planning}
@@ -43,7 +43,7 @@
 		\hline
 		~			& Some thing	& PS redesign	& Interrupt Register \\ \hline
 		Estimation	& xx			& 17				& 15			 \\
-		Actual		& xx			& xx				& xx			 \\
+		Actual		& xx			& 20				& xx			 \\
 		Developer	& Dennis		& Paulo				& Theis			 \\
 		\hline
 	\end{tabular}
@@ -126,11 +126,11 @@ $ R_4 = \frac{\frac{V_{OSIU}}{I{UV}}+R_3}{2*O_V} = 246.97k\Omega $ Approximate 2
 \\
 $ R_3 = \frac{V_{OSUV}}{I_{UV}}-R_1 = 50k\Omega $\\
 \\
-
+%
 \lineparagraph{Simulations}
 Linear Technologies have a simulator for them devices, the LTSpiceIV, is a free software that can be downloaded from the web site.
 Using LTSpice to simulate the behaviour of the LTC4365 with the required values for the power switch system.
-
+%
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Updated timebox figure}
@@ -138,9 +138,9 @@ Using LTSpice to simulate the behaviour of the LTC4365 with the required values 
 		\caption{Schematics for the device LTC4365}
 	\end{centering}
 \end{figure}
-
+%
 In the schematics a basic circuit is draw taken from the datasheet of the device, with a NPN transistor to drive the shut-down pin high and low. Two N-channel MOSFETs are connected back to back to  stop the voltage from passing to the load when the device is shut down. The system will work as power switching and ideal diode.
-
+%
 \lineparagraph{Case Scenario 1 ( Producer device connected to the MODULE side )}
 \begin{figure}[H]
 	\begin{centering}
@@ -153,7 +153,7 @@ In this case scenario the under voltage and over voltage can be tested along wit
 The voltage at the module at 80ms is changed to 24V, this will test the under voltage threshold value. From the calculations made in the analysis section, the device should sink the gates to ground when the voltage is under 27V, this happens with success at 75ms as it can be seen in the simulation above.
 To simulate over voltage protection, the MODULE (source) is set to 30V so the device can stabilize again. At 140ms the voltage is pull up to 40V, which the device should sink the gates of the MOSFETs when the voltage is 33V, this happens with success at 142ms.
 To test the control of the shut down pin, the voltage on the source side is set to 30V, getting the device to stabilize again. With the device in working conditions the NPN transistor is turned off at 220ms, the shut down pin is then pull down by a 10k$ \Omega $ resistor.\\
-
+%
 \lineparagraph{Case Scenario 2 ( Device off, no energy flow from MODULE to POWELINE and the other way around )}
 In the case scenario 1, there is no energy flowing when the device is off, is necessary now to simulate if the device is working as a diode, if no energy flows in the opposite direction. In this simulation the source and load positions are changed.
 \begin{figure}[H]
@@ -163,9 +163,9 @@ In the case scenario 1, there is no energy flowing when the device is off, is ne
 		\caption{Schematics for the device LTC4365 with Case scenario 2 specifications}
 	\end{centering}
 \end{figure}
-
+%
 Being now the POWERLINE the source and the MODULE the load, this situation can occurs when a battery is fully charged and there is a different potential higher on the POWERLINE side. The device is going to insure that no energy flows in the opposite direction. This is successfully shown in the simulation bellow.
-
+%
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Case 2 Simulation}
@@ -173,15 +173,15 @@ Being now the POWERLINE the source and the MODULE the load, this situation can o
 		\caption{Simulation for case scenario 2}
 	\end{centering}
 \end{figure}
-
+%
 The voltage at the source (POWERLINE) is kept at 30V, and at the load (MODULE) the voltage is around 0V (1mV), in this configuration the circuit is behaving as expected. When the device is off, and the energy flow in the opposite direction the system behave as a diode.
-
+%
 \lineparagraph{Current Sensors}	
-
+%
 Being part of a green energy system, a current sensor is implemented in this power switch system. The measurement of current allows the system to calculate the efficiency of each module connected to the switch port. The current measurements are shown to the user on the web interface.
-
+%
 The sensor used is a hall effect linear current sensor from Allegro, the ACS756SCA-050B, a bidirectional hall effect sensor with range from -50A to +50A.
-
+%
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Updated timebox figure}
@@ -189,9 +189,9 @@ The sensor used is a hall effect linear current sensor from Allegro, the ACS756S
 		\caption{ACS756SCA Typical application}
 	\end{centering}
 \end{figure}
-
+%
 A test for this device is set on a bread board, the measurements are made using a voltmeter on the output pin. At a temperature of $ 24^\circ C $ the output increments approximated 40mV for each ampere this can be matched with the datasheet. Since we can have a meaningful measure with the factory ranges, theres is no need to amplify the signal.
-
+%
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Current sensor set up.}
@@ -199,7 +199,7 @@ A test for this device is set on a bread board, the measurements are made using 
 		\caption{ACS756SCA-050 pins.}
 	\end{centering}
 \end{figure}
-
+%
 \subsubsection{Design}
 %
 %	Design
@@ -216,21 +216,20 @@ A test for this device is set on a bread board, the measurements are made using 
 The redesign of the power switch system required some more analysis since this is the main functionality of the energy hub. 
 \lineparagraph{Power Switch Overview}
 An overview of the system to be can be seen bellow.
-
+%
 \begin{figure}[H]
 	\begin{centering}
-		\missingfigure{System Block Diagram}
-		%\includegraphics[width=0.40\textwidth]{images/tb5_CS_photo.png}
-		%\caption{ACS756SCA-050 pins.}
+		%\missingfigure{System Block Diagram}
+		\includegraphics[width=0.90\textwidth]{images/PS_BlockDiagram.png}
+		\caption{ACS756SCA-050 pins.}
 	\end{centering}
 \end{figure}
-
+%
 In this block diagram the connection between the different modules can be seen. The ARM7 controls the input and output pins of the power switch system, a device driver will be implemented for this functionality later on this project. 
 The CS\_OUTPUT corresponds to the current sensor voltage output that goes from 0V(-50A) to 5V(50A), this is connected to one of the 8 ADCs implemented on the FPGA and retrieved to the core system (ARM7) through the EMC (External Memory Control) implementation.
 POWERLINE pin form all power switch systems are connected to the same track into the PLC module. This will work as a sniffer fro new communication arriving and to send communication to the modules connected to the energy hub.
 The module pin will is a connector for each module, in this prototype 4 ports are built, since there's no more than 4 modules in development.
-
-
+%
 \lineparagraph{Schematics}
 Schematics of the power switch system bellow.
 \begin{figure}[H]
@@ -241,46 +240,51 @@ Schematics of the power switch system bellow.
 	\end{centering}
 \end{figure}
 In this schematics the current sensor is add to the system a long with the new LTC4365 devices to control the two back to back N-channel MOSFETs. A NPN transistor is added between the $ V_{in} $ and the shut down pin, this will drive the pin to the input voltage or connect to ground, in case off power failure the power switch systems are disconnected since the shut down pin is pull down to ground through a 10K$ \Omega $ resistor.
-
 \lineparagraph{PCB layout}
 A layout is made using Altium Designer software version 10. This layout is a prototype so the components have more space between them for easier debugging and changes if necessary.
 \begin{figure}[H]
 	\begin{centering}
-		\missingfigure{PS layout image.}
-		%\includegraphics[width=1.0\textwidth]{images/PS_LAYOUT.pdf}
-		%\caption{Power switch system schematics.}
+		%\missingfigure{PS layout image.}
+		\includegraphics[width=1.0\textwidth]{images/tb5_layout_bottom.png}
+		\caption{Power switch layout bottom layer.}
+	\end{centering}
+\end{figure}
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{PS layout image.}
+		\includegraphics[width=1.0\textwidth]{images/tb5_layout_top.png}
+		\caption{Power switch layout top layer.}
 	\end{centering}
 \end{figure}
 
+The board is going to be assembled and tested in time box 6.
 
-
-\subsubsection{Implementation}
-%
-%	Implementation
-%
-%                Mechanical drawings with details explained
-%                Electronic diagrams with details explained
-%                Source code with details explained
-%                Description of integration 
 \subsubsection{Verification}
+All the verifications for this board are changed to time box 6 since the PCB will not be ready at this moment:
+\begin{table}[H]
+\centering
+	\begin{tabular}{| c | l | c |}
+		\hline
+		Verification & Description & Acceptance \\\hline
+		1 & Switch the voltage as input or output & TimeBox6 \\\hline
+		2 & Over voltage and under voltage are kept 30V $ \pm10\% $ & TimeBox6 \\\hline
+		3 & Current between maximum 30A & TimeBox6 \\\hline
+		4 & Power Line Communication through the switching system & TimeBox6 \\\hline
+		5 & 4 PCB switching system & TimeBox6 \\\hline
+	\end{tabular}
+\end{table}
 %
 %	Verification
 %
 %                Module tests
 %                Integration tests
-%                Acceptance test 
-
-
-\subsection{Web Server - Paulo}
-
-%	Intro
-%
-%		verification specification
-%		deployment specification
-%
+%                Acceptance test
+\subsection{DENNIS HERE - Dennis} 
+%			Intro
+%					verification specification
+%					deployment specification
 \subsubsection{Analysis}
-%
-%	Analysis
+%			Analysis
 %
 %                Refactored block diagram
 %                Refactored class diagram
@@ -288,10 +292,8 @@ A layout is made using Altium Designer software version 10. This layout is a pro
 %                User interface specification
 %                System interface specification
 %                Dimensioning specification 
-%
 \subsubsection{Design}
-%
-%	Design
+%        Design
 %
 %                UML/SysML deployment view(s)
 %                Mechanical specifications and dimensioning
@@ -301,24 +303,20 @@ A layout is made using Altium Designer software version 10. This layout is a pro
 %                Refactored class diagram
 %                Use case scenarios specifications
 %                Sequence diagrams
-%
 \subsubsection{Implementation}
-%
-%	Implementation
+%        Implementation
 %
 %                Mechanical drawings with details explained
 %                Electronic diagrams with details explained
 %                Source code with details explained
 %                Description of integration 
 \subsubsection{Verification}
-%
-%	Verification
+%        Verification
 %
 %                Module tests
 %                Integration tests
-%                Acceptance test 
-
-
+%                Acceptance test
+\subsubsection{Conclusion}
 
 \subsection{Interrupt register - Theis}
 The interrupt register is made to tune performance by limiting the number of read statements the ARM7 is doing, in order to read from the Spartan 6. The interrupt register is not by itself fulfilling any requirements, but it is tuning the following: \textit{NF-1.5}\footnote{Requirement is found in table 3.2 in EPRO 3 project energy-hub} and \textit{B-3}\footnote{Requirement is found in table 3.4 in EPRO 3 project energy-hub}
