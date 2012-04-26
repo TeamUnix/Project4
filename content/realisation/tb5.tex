@@ -405,14 +405,15 @@ The FIFO buffer is where the interrupt data is stored before they a read. The in
 		\caption{Conceptual diagram of a FIFO buffer}
 	\end{centering}
 \end{figure}
-The FIFO buffer code is from the book \textit{FPGA Prototyping by VHDL Examples - Listing 4.20}
-\begin{lstlisting}[language=VHDL]
-...
---=====================================
-------------- CODE HERE ---------------
---=====================================
-...
-\end{lstlisting}
+The FIFO buffer code is from the book \textit{FPGA Prototyping by VHDL Examples - Listing 4.20}. It is a standard FIFO buffer, with a data vector input, an input for read and one for write, plus clock and reset. As output there is a data vector equal to the input vector, further more there is an empty and a full signal to indicate if the buffer is empty or full. A block diagram for the FIFO buffer is shown below.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.45\textwidth]{images/tb5_fifo_block.png}
+		\caption{State diagram for input}
+	\end{centering}
+\end{figure}
+The FIFO buffer is used to hold the interrupt data from the other blocks in order to present it for the ARM7 in the right order.
 \paragraph{IRQ input}
 The input block gets data and interrupt input from every block with interrupt permissions in the system. The purpose of the block is to handle which block is interrupting and which data that have to be written to the FIFO in order to be handle by the ARM7 in the right way. Below the state diagram of the input block is shown. The purpose of a state digram is to make the coding easier.\\
 When in IDLE the FIFO write is set low, the interrupt inputs is check, if non of them is high the interrupt counter is set low, to enable new interrupts. If a interrupt is high the state is change to IRQx, where the data output to the FIFO is set to the data from the interrupting source, after that is checks if it is the first time this data is written to the FIFO, if that is the case, the data is written to the FIFO and the returns to IDLE. 
