@@ -279,11 +279,25 @@ All the verifications for this board are changed to time box 6 since the PCB wil
 %                Module tests
 %                Integration tests
 %                Acceptance test
-\subsection{DENNIS HERE - Dennis} 
+%%%%%%%%%%%%%%%%% Dennis Begin%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{UART Device driver - Dennis} 
+As specified in the Technical platform section, the board used is LPC2478-32 from Embedded Artists. The on-board ARM processor is running uClinux, which is a Linux kernel for micro controllers without a memory management unit. In order to communicate with the UART hardware on the board a device driver has to be written, which is a piece of software that allows user-space applications in the kernel to interface with a hardware device (in this case the UART). The reason why implementing a UART driver, is to be able to communicate with the Power Line module which users UART interface. 
+\begin{table}[H]
+\centering
+	\begin{tabular}{|p{1.2cm}|p{2.3cm}|p{6cm}|p{6cm}|}
+	\hline
+	ID		& Requirement		& Description												& Comments\\\hline
+	F-1.2		& Communication - System & The hub shall be able to communicate with a connected module through power line communication. & The interface to the power line module is UART.\\\hline
+	\end{tabular}
+\end{table}
 %			Intro
 %					verification specification
 %					deployment specification
 \subsubsection{Analysis}
+The UART used for communication to the Power line module is UART2, however instead of making a device driver especially for UART2, a more generic driver is build instead so other UART can be used in the future if there is a need for it. 
+\p On the 32 bit LPC2478 processor the UART1 is not supported and UART0 is used as console, so during initialization it is very important not to change in any registers concerning these, to avoid kernel panic or loose communication with the console.
+\p The initial framework for the driver was made in the last time box, which will be used as the skeleton together with the bare metal UART driver also made in the last time box. 
+
 %			Analysis
 %
 %                Refactored block diagram
@@ -293,6 +307,66 @@ All the verifications for this board are changed to time box 6 since the PCB wil
 %                System interface specification
 %                Dimensioning specification 
 \subsubsection{Design}
+Before implementing the kernel module, it have to be thought through how to operator with the module from the user side of it. A small test program has been created in order to have some implementation guide lines, but also to have a verification script to all the time test against, to check if the module full files all the tests. 
+\p The script either opens the \/dev\/uart2 file and reads it, or opens it and writes the different commands available. After writing the file with one command, the content of the file is deleted (flushed) to prepare for a new operation. 
+\begin{lstlisting}[language=c]
+#define UART "/dev/uart2"
+
+int main(int argc, char *argv[]) {
+        FILE *fp;
+	//Write commands
+	char buffer1[] = {"INIT:8N1"};
+	char buffer2[] = {"BAUD:9600"};
+	char buffer3[] = {"WR:55"};
+	char buffer4[] = {"WR:0x55"};
+	char buffer5[] = {"help"};
+	//read buffer
+	char read[10];
+	//If read is not specified in the arguments do a write
+	if(strncmp("read", argv[1], 4) != 0){	//Open the file
+		if ((fp = fopen(UART,"wb"))==NULL){
+                	printf("Cannot open file.\n");
+               	 	exit(0);
+        	}
+		//Initialize UART2 with 8N1 setup
+		fwrite(buffer1, 1, sizeof(buffer1), fp);
+		fflush(fp); //Empty the file
+		//Define baudrate of devie
+		fwrite(buffer2, 1, sizeof(buffer2), fp);
+		fflush(fp);
+		//Write a value decimal
+ 		fwrite(buffer3, 1, sizeof(buffer3), fp);
+		fflush(fp);
+		//Write a value hexadecimal
+ 		fwrite(buffer4, 1, sizeof(buffer4), fp);
+		fflush(fp);
+		//Write out different file options
+ 		fwrite(buffer5, 1, sizeof(buffer5), fp);
+        	fclose(fp);
+	}
+	//Read the file
+	else{
+		if ((fp = fopen(UART,"rb"))==NULL){
+                	printf("Cannot open file.\n");
+               	 	exit(0);
+        	}
+		//Read the file and print it if something available
+		if(fread(read,1,10,fp) > 0) printf("\nVAL: %s\n",read);
+		else printf("\nFail or nothing to read\n");
+
+		fclose(fp);
+	}
+        return 0;
+}
+\end{lstlisting}
+As it can be seen in the code, the user has the ability to:
+\begin{itemize}
+	\item help - get a list of commands available in the kernel module.
+	\item WR: - Write a character, which is transmitted on the UART module chosen. The value can be either hex or decimal.
+	\item BAUD: - Change the baud rate of a UART to for instance 9600, 115200 or others.
+	\item INIT: - Initialize the module with \textit{Word length}, 5,6,7 or 8 bits, \textit{stop bits}, 1 or 2 and \textit{parity bit} on or off. 
+\end{itemize}
+Note that the first time a device is opened after reset the INIT and BAUD shall be written to it in order to work as wanted. 
 %        Design
 %
 %                UML/SysML deployment view(s)
@@ -304,12 +378,58 @@ All the verifications for this board are changed to time box 6 since the PCB wil
 %                Use case scenarios specifications
 %                Sequence diagrams
 \subsubsection{Implementation}
+\begin{lstlisting}[language=c]
+static struct file_operations uart_fops = {
+	.owner   = THIS_MODULE,
+	.read	 = uart_read,
+	.write   = uart_write,
+	.open    = uart_open,
+	.release = uart_close,
+};
+module_init(uart_mod_init);
+module_exit(uart_mod_exit);
+\end{lstlisting}
+
+\subsubsection{Implementation}
+
+\end{lstlisting}
+
+The init and exit functions are similar to the one used in the ADC, except that the UART2 and UART3 power pins is disable by default. If these pins are set and reset then the UART devices erases its settings. Therefore the power pins for UART2 and UART3 are set when inserting the module (UART0 and UART1 are enabled at reset).
+\begin{lstlisting}[language=c]
+m_reg_bfs(PCONP, 0x03000000);
+\end{lstlisting}
+
+
+
 %        Implementation
 %
 %                Mechanical drawings with details explained
 %                Electronic diagrams with details explained
 %                Source code with details explained
 %                Description of integration 
+\paragraph{Inserting the UART module in the kernel}
+To automatically insert the module in the kernel during startup, a few files shall be made. The first thing to do is to create the different uart files in \/dev and specify that the module shall be inserted to the after startup. The different files created is specified in the rc file. In the kernel folder structure the rc file used is placed in: \textit{\/home\/emb\/uClinux-dist\/vendors\/EmbeddedArtists\/LPC2478OEM\_Board}
+
+\begin{lstlisting}[language=c]
+---
+/bin/mknod /dev/uart0 c 239 0 
+/bin/mknod /dev/uart1 c 239 1
+/bin/mknod /dev/uart2 c 239 2
+/bin/mknod /dev/uart3 c 239 3
+---
+if [ -f /drivers/adc.ko ]; then
+  insmod /drivers/adc.ko
+fi
+---
+\end{lstlisting}
+In the same path a line shall be inserted to add the module to the romfs image which is extracted during boot time.
+\begin{lstlisting}[language=c]
+---
+$(ROMFSINST) -S drivers/2.6.x/uart/uart.ko /drivers/uart.ko & \
+---
+\end{lstlisting}
+The last thing to do is to add uart to the makefile in the drivers\/2.6.x folder, to be sure the kernel remakes the UART module when compiled if any changed were done. 
+\paragraph{Adding the UART user space application}
 \subsubsection{Verification}
 %        Verification
 %
@@ -318,6 +438,8 @@ All the verifications for this board are changed to time box 6 since the PCB wil
 %                Acceptance test
 \subsubsection{Conclusion}
 
+
+%%%%%%%%%%%%%%%%% Dennis End%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Interrupt register - Theis}
 The interrupt register is made to tune performance by limiting the number of read statements the ARM7 is doing, in order to read from the Spartan 6. The interrupt register is not by itself fulfilling any requirements, but it is tuning the following: \textit{NF-1.5}\footnote{Requirement is found in table 3.2 in EPRO 3 project energy-hub} and \textit{B-3}\footnote{Requirement is found in table 3.4 in EPRO 3 project energy-hub}
 \begin{table}[H]
