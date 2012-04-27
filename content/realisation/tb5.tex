@@ -680,7 +680,7 @@ When a block sends an interrupt to the IRQ\footnote{Interrupt Request} register,
 %                Dimensioning specification 
 %
 \subsubsection{Design}
-The purpose of the interrupt register is to make interrupt functionality on several block with only one interrupt pin to the ARM7. The interrupt register shall be optimized to wishbone use. The interrupt register without wishbone has to inputs, a vector of size N\footnote{N = number of blocks that is allow to interrupt} and an array that is N bit high and AddrRange\footnote{Wishbone address range} bit wide. The output is the IRQ pin to the ARM7 and a data vector equal to the wishbone data width. This is shown in the figure below.
+The purpose of the interrupt register is to make interrupt functionality on several block with only one interrupt pin to the ARM7. The interrupt register shall be optimized to wishbone use. The interrupt register without wishbone has the inputs, a vector of size N\footnote{N = number of blocks that is allow to interrupt} and N AddrRange\footnote{Wishbone address range} bit wide vectors for the interrupt data. The output is the IRQ pin to the ARM7 and a data vector equal to the wishbone data width. This is shown in the figure below.
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Updated timebox figure}
@@ -722,7 +722,7 @@ A block diagram for the interrupt register is shown below. It consist of three b
 \end{figure}
 
 \paragraph{FIFO - First In First Out}
-The FIFO buffer is where the interrupt data is stored before they a read. The input block write data into it, and the output block read data out of it. The FIFO is necessary if the Spartan6 make interrupt faster than the ARM7 can read them. The figure below shows how the First In First Out principle is working.
+The FIFO buffer is where the interrupt data is stored before they are read. The input block write data into it, and the output block read data out of it. The FIFO is necessary if the Spartan6 make interrupt faster than the ARM7 can read them. The figure below shows how the First In First Out principle is working.
 \begin{figure}[H]
 	\begin{centering}
 		%\missingfigure{Updated timebox figure}
