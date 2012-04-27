@@ -53,8 +53,8 @@ The prototype made in time box 3 for the power switch module didn't work as expe
 
 \lineparagraph{Requirements}
 \begin{itemize}
-	\item Voltage input to the Energy hub should be at 30V $ \pm10\% $
-	\item Ampere input to the Energy hub should be max 30A.
+	\item Voltage input to the Energy hub shall be at 30V $ \pm10\% $
+	\item Ampere input to the Energy hub shall be max 30A.
 	\item Power-line communication is used, for communication between the different devices and the hub.
 \end{itemize}
 
@@ -63,7 +63,7 @@ The prototype made in time box 3 for the power switch module didn't work as expe
 	\item The system is able to switch the voltage as input or output. ( Using a Multimeter on both POWERLINE and MODULE connection)
 	\item Over voltage and under voltage are keep as set in common requirements 30V $ \pm10\% $ ( Using a Multimeter on both POWERLINE and MODULE connection)
 	\item Measurement of the current sensor for calculation of efficiency and security, max 30A. ( Using a Multimeter on the current sensor output pin.)
-	\item Create test-bench for 4 PCB switching system. ( Fast prototyping using the mBed )
+	\item Create test-bench for 2 PCB switching system. ( Fast prototyping using the mBed )
 	\item Test Power Line Communication through the switching system, using development boards from Yamar and mBed.
 \end{itemize}
 %	Intro
@@ -287,9 +287,9 @@ All the verifications for the power switch system are changed to time box 6 sinc
 %                Acceptance test
 %%%%%%%%%%%%%%%%% Dennis Begin%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Platform setup - Dennis} 
-A virtual CentOS machine running on a machine at school has been assigned to each team in order to have a host machine where the boot loader (u-boot) can be compiled and modifications to the uClinux kernel can be made. Unfortunately the kernel compiled started to kernel panic. After undoing the different things done (removing files from the rc file and removing different kernel modules) the kernel kept panicking. Instead of using any more time on the machine, another similar virtual machine has been created on a local machine. The virtual machine is running CentOS 5.8 (like the one assigned), fortunately no kernel panic have been detected after compiling the kernel on the "new" local machine. Another benefit by having a local machine up and running is the flexibility as the Embedded Artist board should be connected to the schools network in order to access the tftp server where the board loads the kernel from throughout the development period. Now a tftp server has been set up on the local machine where to the development board can be directly connected though an ethernet cable.
+A virtual CentOS machine running on a machine at school has been assigned to each team in order to have a host machine where the boot loader (u-boot) can be compiled and modifications to the uClinux kernel can be made. Unfortunately the kernel compiled started to kernel panic. After undoing the different things done (removing files from the rc file and removing different kernel modules) the kernel kept panicking. Instead of using any more time on the machine, another similar virtual machine has been created on a local machine. The virtual machine is running CentOS 5.8 (like the one assigned), fortunately no kernel panic have been detected after compiling the kernel on the "new" local machine. Another benefit by having a local machine up and running is the flexibility as the Embedded Artist board should be connected to the schools network in order to access the tftp server where the board loads the kernel from throughout the development period. Now a tftp server has been set up on the local machine, where to the development board can be directly connected though an ethernet cable.
 \subsubsection{Network File system}
-In order to speed up the development process of user space applications and device drivers to the board, a NFS server has been setup on the local host machine using the machintosh application \textit{NFS Manager}. The NFS disk is then mounted on the board by issuing the command: \\\textit{\#mount -o nolock,rsize=4096,wsize=4096 -t nfs 192.168.1.1:/Users/Shared/nfs\_mount /mnt/nfs}, 
+In order to speed up the development process of user space applications and device drivers to the board, a NFS server has been setup on the local host machine using the OS X application \textit{NFS Manager}. The NFS disk is then mounted on the board by issuing the command: \\\textit{\#mount -o nolock,rsize=4096,wsize=4096 -t nfs 192.168.1.1:/Users/Shared/nfs\_mount /mnt/nfs}, 
 \\which mounts the disk in \textit{/mnt/nfs}. When having the NFS server setup, there is no need to recompile the whole kernel when changes have been done to a kernel module or a user space application before it can be tested on the target. 
 
 \subsection{UART Device driver - Dennis} 
@@ -405,7 +405,7 @@ module_exit(uart_mod_exit);
 \end{lstlisting}
 
 %%%%%%%%%INIT/EXIT%%%%%%%%%%%%%%%
-The init and exit functions are similar to the one used in the ADC, except that the UART2 and UART3 power pins are disable by default. If these pins are set and reset then the UART devices erases its settings. Therefore the power pins for UART2 and UART3 are set when inserting the module (UART0 and UART1 are enabled at reset).
+The init and exit functions are similar to the one used in the ADC, except that the UART2 and UART3 power pins are disabled by default. If these pins are set and reset then the UART devices erases its settings. Therefore the power pins for UART2 and UART3 are set when inserting the module (UART0 and UART1 are enabled at reset).
 \begin{lstlisting}[language=c]
 m_reg_bfs(PCONP, 0x03000000);
 \end{lstlisting}
