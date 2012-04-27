@@ -36,13 +36,13 @@
 \subsubsection{Time planning}
 \begin{table}[H]
 \centering
-	\todo[inline]{Update time}
+%	\todo[inline]{Update time}
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
 		~			& UART Device driver	& PS redesign		& Interrupt Register	& Platform setup\\ \hline
 		Estimation	& 8					& 17				& 15				& 0			  \\
-		Actual		& 22					& 20				& xx				& 11			  \\
-		Developer	& Dennis				& Paulo			& Theis			& Dennis		  \\
+		Actual		& 22				& 20				& 25				& 11		  \\
+		Developer	& Dennis			& Paulo				& Theis				& Dennis	  \\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -93,7 +93,7 @@ In contact with Linear Technologies a new device was suggested, the LTC4365, thi
 		\caption{LTC4365 application notes.}
 	\end{centering}
 \end{figure}
-In this application the shut-down pin is always high which makes the device open the MOSFETS if Vin is between the under voltage and over voltage threshold voltage.
+In this application the shut-down pin is always high, which makes the device open the MOSFETS if Vin is between the under voltage and over voltage threshold voltage.
 
 Is necessary to define the over and under voltage threshold, this is found in the common requirements.\\
 \\
@@ -126,7 +126,7 @@ $ R_3 = \frac{V_{OSUV}}{I_{UV}}-R_1 = 50k\Omega $\\
 \\
 %
 \lineparagraph{Simulations}
-Linear Technologies have a simulator for them devices, the LTSpiceIV, is a free software that can be downloaded from the web site.
+Linear Technologies have a simulator for their devices, the LTSpiceIV, is free software that can be downloaded from the web site.
 Using LTSpice to simulate the behaviour of the LTC4365 with the required values for the power switch system.
 %
 \begin{figure}[H]
