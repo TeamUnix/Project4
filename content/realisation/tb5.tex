@@ -730,7 +730,16 @@ The FIFO buffer code is from the book \textit{FPGA Prototyping by VHDL Examples 
 		\caption{State diagram for input}
 	\end{centering}
 \end{figure}
-The FIFO buffer is used to hold the interrupt data from the other blocks in order to present it for the ARM7 in the right order.
+The FIFO buffer is used to hold the interrupt data from the other blocks in order to present it for the ARM7 in the right order. A digram of how it works is shown below.
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/tb5_fifo_ring.png}
+		\caption{Ring buffer diagram}
+	\end{centering}
+\end{figure}
+A ring buffer writes data in at the write pointer and count it up by one. When a read state happens it reads from the read pointer and count it up by one. this is also way a full and empty signal i necessary, in order not to overwrite data or read ahead of the write pointer.
+
 \paragraph{IRQ input}
 The input block gets data and interrupt input from every block with interrupt permissions in the system. The purpose of the block is to handle which block is interrupting and which data that have to be written to the FIFO in order to be handle by the ARM7 in the right way. Below the state diagram of the input block is shown. The purpose of a state digram is to make the coding easier.\\
 When in IDLE the FIFO write is set low, the interrupt inputs is check, if non of them is high the interrupt counter is set low, to enable new interrupts. If a interrupt is high the state is change to IRQx, where the data output to the FIFO is set to the data from the interrupting source, after that is checks if it is the first time this data is written to the FIFO, if that is the case, the data is written to the FIFO and the returns to IDLE. 
