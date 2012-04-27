@@ -537,7 +537,7 @@ void init_uart(int dev, int wl, int sb, int pb){
 	case 2:
 	    m_reg_write(U2LCR, 0x0);
 	    m_reg_write(U2IER, 0x0);
-	    m_reg_write(U2LCR, ( ((wl-5)<<0) |(sb<<2) | (pb<<3) ));
+	    m_reg_write(U2LCR, ( ((wl-5)<<0) |(sb<<2) | (pb<<3)  | (1<<7)));
 	    m_reg_write(U2FCR, 0x07);
 	break;
 	---
