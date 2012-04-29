@@ -627,7 +627,7 @@ clean:
 \end{lstlisting}
 After finishing the application, it is added to the kernel by following the steps on Klaus wiki\footnote{\url{http://klaus.ede.hih.au.dk/index.php/How-to_add_a_user_space_application_to_uClinux}}.
 \subsubsection{Verification}
-The module is only verified with the UART2 hardware. The verification of the module is done by the UART user space application. At first the rx and tx pins where short-circuit, to make a loopback. After performing a write to the file by running the UART user space application, the file was read and the values compared to verify that the data was not corrupt. Afterward a test has been made similar to the one performed on the bare-metal driver, where the Embedded Artist board and an MBED communicates with each other through their own power line modules. 
+The module is only verified with the UART2 hardware. The verification of the module is done by the UART user space application. At first the rx and tx pins where short-circuit, to make a loopback. After performing a write to the file by running the UART user space application, the file was read and the values compared to verify that the data was not corrupt. Afterward a test has been made similar to the one performed on the bare-metal driver, where the Embedded Artist board and an MBED communicates with each other through their own power line modules, this test turned out successfully we where able to communicate between the ARM7 and the MBED through the PLC modules.
 %        Verification
 %
 %                Module tests
