@@ -6,7 +6,7 @@
  NET	"nCpuWr_i"    LOC = "T8";  # Write enable
  NET	"Rst_i"       LOC = "V8";  # Reset_in
  NET	"nCpuCs_i"    LOC = "T12"; # Chip select 2
-# NET	"VHDCIIO2<12>" LOC = "N8";  # IRQ
+ NET	"irq_o"		  LOC = "N8";  # IRQ
 
  NET	"CpuA_i<6>"   LOC = "U15"; # Adress 7
  NET	"CpuA_i<5>"   LOC = "V10"; # Adress 6

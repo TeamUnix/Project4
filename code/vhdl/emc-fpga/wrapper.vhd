@@ -17,18 +17,19 @@ library work;
 entity Wrapper is
 	port	(
 			--Input
-			Clock				: in		std_logic;									--! Clock signal synchronous to CPU signals
-			Rst_i				: in		std_logic;									--! Asynchronous Reset
-			nCpuCs_i			: in		std_logic;									--! CPU Chip Select
-			nCpuRd_i			: in		std_logic;									--! CPU Read strobe
-			nCpuWr_i			: in		std_logic;									--! CPU Write strobe
-			CpuA_i				: in		wb_adr_typ;									--! CPU Address Input
+			Clock				: in		std_logic;							--! Clock signal synchronous to CPU signals
+			Rst_i				: in		std_logic;							--! Asynchronous Reset
+			nCpuCs_i			: in		std_logic;							--! CPU Chip Select
+			nCpuRd_i			: in		std_logic;							--! CPU Read strobe
+			nCpuWr_i			: in		std_logic;							--! CPU Write strobe
+			CpuA_i				: in		wb_adr_typ;							--! CPU Address Input
 			sw					: in		std_logic_vector(7 downto 0);
 			--Inoutput
-			CpuD				: inout	wb_dat_typ;									--! External Bi-directional databus
+			CpuD				: inout	wb_dat_typ;								--! External Bi-directional databus
 			--Output
-			Dbus_En				: out		std_logic;									--! Enable signal for DATABUS latches on LPC2478 board, connect to CS
-			Abus_En				: out		std_logic;									--! Enable signal for ADDRESSBUS latches on LPC2478 board, connect to gnd
+			Dbus_En				: out		std_logic;							--! Enable signal for DATABUS latches on LPC2478 board, connect to CS
+			Abus_En				: out		std_logic;							--! Enable signal for ADDRESSBUS latches on LPC2478 board, connect to gnd
+			irq_o				: out		std_logic;
 			led					: out		std_logic_vector ( 7 downto 0 )		--! Test output port
 			);
 end Wrapper ;
@@ -70,6 +71,10 @@ architecture struct of Wrapper is													--! Architecture declarations
 -- Out test port
 			signal s_led		: std_logic_vector( 7 downto 0);				-- Bus of Rty responses from all Slaves
 			signal switch		: std_logic_vector( 7 downto 0);
+			signal irq_add1		: std_logic_vector(AddrRange-1 downto 0);
+			signal s_irq		: std_logic; --_vector(Num_irqs-1 downto 0);
+			signal irq			: std_logic;
+			signal reset		: std_logic;
 
 begin
 --! Architecture concurrent statements
@@ -78,16 +83,18 @@ begin
 	CpuCs_i <= not nCpuCs_i;
 	CpuRd_i <= not nCpuRd_i;
 	CpuWr_i <= not nCpuWr_i;
+	reset	  <= not Rst_i;
 
 --! Enable Databus latches when CS is set (see LPC2478 OEM manual)
 	Dbus_En <= nCpuCs_i;
 	Abus_En <= '0';
   	
 --! LED Port o
-	led <= s_led;
+	led		<= s_led;
 --! Switch port
 	switch	<= sw;
-
+--! IQR port
+	irq_o	<= irq;
   	
 --! Instantiate and port map
 	Host1 : entity work.host(struct)
@@ -149,72 +156,61 @@ begin
 
 	Syscon1 : entity work.Syscon(RTL)
 		port map	(
-					Reset => not Rst_i,
+					Reset => reset,
 					clk_i => Clock,
 					rst_o => rst_o,
 					clk_o => clk_o
-					);
+					);	
 
--- 	irq_reg : entity work.WBS_irq_reg(RTL)
--- 		port map	(
--- 					clk_i  => clk_o,
--- 					rst_i  => rst_o,
--- 					cyc_i  => cyc_i,
--- 					stb_i  => stb_i(IRQ_REG_WBS),
--- 					we_i   => we_i,
--- 					dat_i  => s_dat_i,
--- 					adr_i  => adr_i,
--- 					ack_o  => ack_o(IRQ_REG_WBS),
--- 					err_o  => err_o(IRQ_REG_WBS),
--- 					rty_o  => rty_o(IRQ_REG_WBS),
--- 					dat_o  => s_dat_o(IRQ_REG_WBS)
--- 					);
+	irq_reg	: entity work.WBS_irq_reg(RTL)
+		port map	(
+					clk_i => clk_o,
+					rst_i => rst_o,
+					cyc_i => cyc_i,
+					stb_i => stb_i(IRQ_REG_WBS),
+					we_i => we_i,
+					adr_i => adr_i,
+					ack_o => ack_o(IRQ_REG_WBS),
+					err_o => err_o(IRQ_REG_WBS),
+					rty_o => rty_o(IRQ_REG_WBS),
+					dat_o => s_dat_o(IRQ_REG_WBS),
+					irq_i => s_irq,
+					add_1 => irq_add1,
+--					add_2 => (others => '0'),
+					irq_o => irq
+					);
 					
 	switches : entity work.WBS_switches(RTL)
 		port map 	(
-					clk_i  => clk_o,
-					rst_i  => rst_o,
-					cyc_i  => cyc_i,
-					stb_i  => stb_i(SWITCH_WBS),
-					we_i   => we_i,
-					dat_i  => s_dat_i,
-					adr_i  => adr_i,
-					ack_o  => ack_o(SWITCH_WBS),
-					err_o  => err_o(SWITCH_WBS),
-					rty_o  => rty_o(SWITCH_WBS),
-					dat_o  => s_dat_o(SWITCH_WBS),
-					sw	   => switch
+					clk_i	=> clk_o,
+					rst_i	=> rst_o,
+					cyc_i	=> cyc_i,
+					stb_i	=> stb_i(SWITCH_WBS),
+					we_i	=> we_i,
+					adr_i	=> adr_i,
+					ack_o	=> ack_o(SWITCH_WBS),
+					err_o	=> err_o(SWITCH_WBS),
+					rty_o	=> rty_o(SWITCH_WBS),
+					dat_o	=> s_dat_o(SWITCH_WBS),
+					sw_i	=> switch,
+					irq_o	=> s_irq,
+					irq_add	=> irq_add1
 					);
-	
--- 	adcs : entity work.WBS_adcs(RTL)
--- 		port map 	(
--- 					clk_i  => clk_o,
--- 					rst_i  => rst_o,
--- 					cyc_i  => cyc_i,
--- 					stb_i  => stb_i(ADC_WBS),
--- 					we_i   => we_i,
--- 					dat_i  => s_dat_i,
--- 					adr_i  => adr_i,
--- 					ack_o  => ack_o(ADC_WBS),
--- 					err_o  => err_o(ADC_WBS),
--- 					rty_o  => rty_o(ADC_WBS),
--- 					dat_o  => s_dat_o(ADC_WBS)
--- 					);
 	
 	leds : entity work.WBS_leds(RTL)
 		port map 	(
-					clk_i  => clk_o,
-					rst_i  => rst_o,
-					cyc_i  => cyc_i,
-					stb_i  => stb_i(LED_WBS),
-					we_i   => we_i,
-					dat_i  => s_dat_i,
-					adr_i  => adr_i,
-					ack_o  => ack_o(LED_WBS),
-					err_o  => err_o(LED_WBS),
-					rty_o  => rty_o(LED_WBS),
-					dat_o  => s_dat_o(LED_WBS),
-					leds => s_led
+					clk_i	=> clk_o,
+					rst_i	=> rst_o,
+					cyc_i	=> cyc_i,
+					stb_i	=> stb_i(LED_WBS),
+					we_i 	=> we_i,
+					dat_i	=> s_dat_i,
+					adr_i	=> adr_i,
+					ack_o	=> ack_o(LED_WBS),
+					err_o	=> err_o(LED_WBS),
+					rty_o	=> rty_o(LED_WBS),
+					dat_o	=> s_dat_o(LED_WBS),
+					leds	=> s_led
 					);
 
 end struct;

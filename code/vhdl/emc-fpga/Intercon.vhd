@@ -134,7 +134,7 @@ begin
 				when BA_WBS_1		=> s <= 1;
 				when BA_WBS_2		=> s <= 2;
 				when BA_WBS_3		=> s <= 3;
-				when BA_WBS_4		=> s <= 4;
+				--when BA_WBS_4		=> s <= 4;
 				when others			=> s <= 0; --! Slave 0 is reserved for dummy addressing, when the address is not valid
 			end case;
 	end process Slave_sel;

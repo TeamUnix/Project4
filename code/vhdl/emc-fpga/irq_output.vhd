@@ -67,7 +67,7 @@ begin
 			when READ_O =>
 				state_next										<= IDLE;
 				read_wb											<= '1';
-				rd													<= '1';
+				rd												<= '1';
 		-- RSET state -----------------------------------------------------
 			when RSET =>
 				state_next		<= IDLE;

@@ -31,9 +31,9 @@ entity WBS_irq_reg is
 			rty_o					: out		std_logic;									--! Retry output, slave not ready
 			dat_o					: out		wb_dat_typ	:= (others => '0');									--! data to host
 			--! Input port
-			irq_i					: in		std_logic_vector (Num_irqs-1	downto 0);
+			irq_i					: in		std_logic; --_vector (Num_irqs-1	downto 0);
 			add_1					: in		std_logic_vector (AddrRange-1	downto 0);
-			add_2					: in		std_logic_vector (AddrRange-1	downto 0);
+--			add_2					: in		std_logic_vector (AddrRange-1	downto 0);
 			--! Output port
 			irq_o					:out		std_logic
 			);
@@ -64,6 +64,7 @@ begin
 	begin
 		if(clk_i'event and clk_i = '1') then
 			if(rst_i = '1') then
+				read_i	<= '0';
 				dat_o <= (others => '0');
 			else
 				if((cyc_i and stb_i and not we_i) = '1') then
@@ -91,7 +92,7 @@ begin
 				full			=>		full,
 				irq_i			=>		irq_i,
 				add_1			=>		add_1,
-				add_2			=>		add_2,
+--				add_2			=>		add_2,
 				--Output
 				wr				=>		wr,
 				w_data		=>		w_data

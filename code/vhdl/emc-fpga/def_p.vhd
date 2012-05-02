@@ -38,9 +38,9 @@ package def_pkg is
   constant Revision_c:        Word        := X"0101";	--rev 0.00.1  
    
 --! Wishbone Constants and types
-  constant Num_s:         integer := 4;  --! Number of slaves  connected to the Intercon
+  constant Num_s:         integer := 3;  --! Number of slaves  connected to the Intercon
   constant Num_m:         integer := 1;  --! Number of masters connected to the Intercon
-  constant Num_irqs:	  integer := 2;	 --! Number of IRQ slaves
+  constant Num_irqs:	  integer := 1;	 --! Number of IRQ slaves
   constant Datawidth:     integer := 16; --! Number of bits in datainterface
   constant AddrRange:     integer := 7;  --! Number of bits in Address space (was 16)
   constant LAddrRange:    integer := 4;  --! Number of bits in Low Address space, which connects to slaves
@@ -89,13 +89,13 @@ package def_pkg is
   constant IRQ_REG_WBS 	: integer := 1;
   constant LED_WBS 		: integer := 2;
   constant SWITCH_WBS	: integer := 3;
-  constant ADC_WBS		: integer := 4;
+--  constant ADC_WBS		: integer := 4;
 
 --! High Address constants
   constant BA_WBS_1		:	wb_had_typ	:= "000";  --! 0x00 Base addresses for IRQ register
   constant BA_WBS_2		:	wb_had_typ	:= "001";  --! 0x01 Base addresses for LEDs
   constant BA_WBS_3		:	wb_had_typ	:= "010";  --! 0x02 Base addresses for Switches
-  constant BA_WBS_4		:	wb_had_typ	:= "011";  --! 0x03 Base addresses for Analog to digital converter
+--  constant BA_WBS_4		:	wb_had_typ	:= "011";  --! 0x03 Base addresses for Analog to digital converter
 
 --! Low Address constants (Memory map) 
   constant WBS_REG1:        wb_lad_typ := "0000"; -- 0x0

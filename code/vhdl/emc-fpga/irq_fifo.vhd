@@ -16,8 +16,8 @@ entity irq_fifo is
 			wr			: in		std_logic;
 			w_data		: in		std_logic_vector (AddrRange-1 downto 0);
 			--Output
-			empty		: out		std_logic;
-			full		: out		std_logic;
+			empty		: out		std_logic := '1';
+			full		: out		std_logic := '0';
 			r_data		: out		std_logic_vector (AddrRange-1 downto 0)
 			);
 end irq_fifo;
