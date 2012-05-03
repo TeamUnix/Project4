@@ -124,7 +124,6 @@ BEGIN
         variable s          : string(1 to 100);
         variable address    : std_logic_vector(15 downto 0);
         variable data       : std_logic_vector(15 downto 0);
-        variable data2      : std_logic_vector(15 downto 0);
     begin
 
     -- Default values

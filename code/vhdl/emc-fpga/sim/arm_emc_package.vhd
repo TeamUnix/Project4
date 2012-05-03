@@ -35,7 +35,7 @@ package arm_emc_package is
 	constant WST_RD  		: integer := 3;
 	constant Tr_CSLAV  		: time := 5 ns;
 	constant Tr_CSLOEL  	: time := 5 ns;
-	constant Tr_OELOEH  	: time := ((WST_RD*CYCLE)+30ns);
+	constant Tr_OELOEH  	: time := ((WST_RD*CYCLE)+30 ns);
 	constant Tr_OEHANV  	: time := 5 ns;
 	constant Tr_CSHOEH  	: time := 5 ns;
 	
@@ -43,8 +43,8 @@ package arm_emc_package is
 	constant WST_WR  		: integer := 3;
 	constant Tw_CSLAV  		: time := 30 ns;
 	constant Tw_CSLWEL  	: time := 30 ns;
-	constant Tw_CSLDW  		: time := 30 ns;
-	constant Tw_WELWEH  	: time := ((WST_RD*CYCLE)+30ns);
+	constant Tw_CSLDV  		: time := 30 ns;
+	constant Tw_WELWEH  	: time := ((WST_RD*CYCLE)+30 ns);
 	constant Tw_WEHANV  	: time := 30 ns;
 	constant Tw_WEHDNV  	: time := 30 ns;
 
@@ -98,21 +98,22 @@ package body arm_emc_package is
         wait for Tw_CSLAV;
         -- setup addr
         uio.CpuA_i <= addr;
-        wait for (Tw_CSLAV-Tw_CSLDW);
+        wait for (Tw_CSLDV-Tw_CSLAV);
         -- setup data
         uio.CpuD <= data;
         -- wait for WE to be set
-        wait for (Tw_CSLWEL-Tw_CSLAV);
+        wait for (Tw_CSLWEL-Tw_CSLDV);
         uio.nCpuWr_i <= '0';
         -- write happens
         wait for (Tw_WELWEH);
+        uio.nCpuWr_i <= '1';
         wait for Tw_WEHDNV;
         --invalidate data and addr
         uio.CpuA_i <= (others => 'U');
         uio.CpuD  <= (others => 'U');
 		    -- deassert cs and WE
         uio.nCpuCs_i <= '1';
-        uio.nCpuWr_i <= '1';
+        --uio.nCpuWr_i <= '1';
 
     end arm_16bit_write;
 

@@ -27,3 +27,7 @@
 #	VHDL
 
 #
+#	Theis
+
+*.tim
+*.dia
