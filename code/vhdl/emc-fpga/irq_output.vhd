@@ -36,6 +36,7 @@ begin
 
 	-- state register
 	process(Clk, Reset)
+--	process(all)
 	begin
 		if	(reset = '1') then
 			state_reg		<= IDLE;
