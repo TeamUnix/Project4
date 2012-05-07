@@ -182,11 +182,11 @@ A short description for each script can be seen bellow:
 	\item savedata.php - Webservice that save data retrieved from the module to the database.
 	\item sendcmd.php - Webservice to send commands to the desired module in the system.
 	\item saveip.php - Webservice necessary to save the ip address of the energy hub, this will keep the system up and running even if a change on the network is made.
-	\item ajax.js - This JavaScrit handle ajax requests when the page have no need to be reloaded, that ensure less bandwidth in the web server.
+	\item ajax.js - This Javascript handle AJAX requests when the page have no need to be reloaded, that ensure less bandwidth in the web server.
 	\item login.php  - This PHP script makes the authentication of the user, creating a session when the user gives the right certifications.
 	\item cron.php  - Cron jobs are running by the server in a predefined time, in this case the cron.php at the web server root will point to the cron jobs inside each module folder.
-	\item db\_connect.php - Handle the connection to the MySQL server, each folder for the modules point to this file in the include folder. This way if the databse change only one file has to be changed.
-	\item db\_globals.php - Includes all the global variables for the credentials to the database.
+	\item db\_connect.php - Handle the connection to the MySQL database.
+	\item db\_globals.php - Includes all the global variables with the credentials for the database.
 \end{itemize}
 
 \lineparagraph{Communication}
@@ -214,7 +214,7 @@ Measurements to be saved in the database:
 \end{figure}
 To retrieve the measurements from the modules, an application running at the energy hub translate the data retrieved from the module through PLC to a URL request at the web server. In the server side the web server will collect the data and save it in the database.
 \\\\
-IP address send from the Embedded Device:
+IP address is send from the Embedded Device:
 \begin{figure}[H]
 	\begin{centering}
 		\missingfigure{Communication SendCmd.php}
@@ -222,9 +222,7 @@ IP address send from the Embedded Device:
 		%\caption{Schematics for the device LTC4365}
 	\end{centering}
 \end{figure}
-A background application running at the uClinux, ensure that after reset the system IP address assigned by DHCP to the energy hub is saved in the database so commands can be send through the web interface.
-
-
+A background application running at the uClinux, ensure that after reset the system IP address assigned by DHCP to the energy hub is saved in the database so commands can be send through the web interface. This add flexibility to the system, since a change in the network could stop the normal work of the system.
 
 \subsubsection{Design}
 %       	 Design
