@@ -70,7 +70,7 @@ begin
 				Wr_o		<= CpuWr_i;					
 				Rd_o		<= CpuRd_i;
 				D_o		<= CpuD_i;
-				CpuD_o	<= (others => '0');
+--				CpuD_o	<= (others => '0');
 			end if;
 		else
 			Wr_o		<= '0';					

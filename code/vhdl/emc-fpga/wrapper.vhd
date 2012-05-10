@@ -18,7 +18,8 @@ entity Wrapper is
 	port	(
 			--Input
 			Clock				: in		std_logic;							--! Clock signal synchronous to CPU signals
-			Rst_i				: in		std_logic;							--! Asynchronous Reset
+			nRst_i				: in		std_logic;							--! LPC Reset
+			Rst_i				: in		std_logic;							--! FPGA Reset
 			nCpuCs_i			: in		std_logic;							--! CPU Chip Select
 			nCpuRd_i			: in		std_logic;							--! CPU Read strobe
 			nCpuWr_i			: in		std_logic;							--! CPU Write strobe
@@ -83,7 +84,7 @@ begin
 	CpuCs_i <= not nCpuCs_i;
 	CpuRd_i <= not nCpuRd_i;
 	CpuWr_i <= not nCpuWr_i;
-	reset	  <= not Rst_i;
+	reset	<= (not nRst_i or not Rst_i);
 
 --! Enable Databus latches when CS is set (see LPC2478 OEM manual)
 	Dbus_En <= nCpuCs_i;

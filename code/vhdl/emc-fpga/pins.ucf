@@ -1,10 +1,12 @@
 # clock pin for Atlys rev C board
  NET	"Clock"       LOC = "L15"; # clk
+ NET    "Rst_i"       LOC = "T15";  # Reset_in FPGA
+ 
 # onboard VHDCI
 # EMC signals
  NET	"nCpuRd_i"    LOC = "U16"; # Output enable
  NET	"nCpuWr_i"    LOC = "T8";  # Write enable
- NET	"Rst_i"       LOC = "V8";  # Reset_in
+ NET	"nRst_i"      LOC = "V8";  # Reset_in EMC
  NET	"nCpuCs_i"    LOC = "T12"; # Chip select 2
  NET	"irq_o"		  LOC = "N8";  # IRQ
 
