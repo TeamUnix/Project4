@@ -319,7 +319,7 @@ The UART used for communication to the Power line module is UART2, however inste
 %                System interface specification
 %                Dimensioning specification 
 \subsubsection{Design}
-Before implementing the kernel module, it has to be thought through how to operate with the module from the user side of it. A small test program has been created in order to have some implementation guide lines, but also to have a verification script to all the time test against, to check if the module fulfills all the tests. 
+Before implementing the kernel module, it has to be thoroughly analyzed how to operate with the module from the user side of it. A small test program has been created in order to have some implementation guide lines, but also to have a verification script to all the time test against, to check if the module fulfills all the tests. 
 \p The script either opens the /dev/uart2 file and reads it, or opens it and writes the different commands available. After writing the file with one command, the content of the file is deleted (flushed) to prepare for a new operation. 
 \begin{lstlisting}[language=c]
 #define UART "/dev/uart2"
@@ -634,6 +634,7 @@ The module is only verified with the UART2 hardware. The verification of the mod
 %                Integration tests
 %                Acceptance test
 \subsubsection{Conclusion}
+\label{sec:device_driver_conclusion}
 The UART hardware can be accessed through the device driver, however, the efficiency of the module is not that good. Therefore the driver still need some improvements which shall be further added in order to get a better performance. 
 \begin{itemize}
 	\item Add interrupts to the receive part, to avoid reading the file once in a while to see if someone wrote anything.
