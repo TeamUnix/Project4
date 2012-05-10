@@ -35,7 +35,7 @@ package def_pkg is
 
 --! FPGA revision: xxxx.yyyy.zzzzzzzz
 --! xxxx: Main revision. yyyy: sub-revision. zzzzzzzz: build
-  constant Revision_c:        Word        := X"0101";	--rev 0.00.1  
+  constant Revision_c:        Word        := X"000F";	--rev 0.00.1  
    
 --! Wishbone Constants and types
   constant Num_s:         integer := 3;  --! Number of slaves  connected to the Intercon

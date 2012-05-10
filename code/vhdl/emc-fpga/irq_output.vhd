@@ -1,5 +1,6 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+	use IEEE.STD_LOGIC_1164.ALL;
+	use IEEE.numeric_std.all;
 library work;
 	use work.def_pkg.all;
 
@@ -66,9 +67,9 @@ begin
 				end if;
 		-- READ_O state ---------------------------------------------------
 			when READ_O =>
-				state_next										<= IDLE;
-				read_wb											<= '1';
-				rd												<= '1';
+				state_next		<= IDLE;
+				read_wb			<= '1';
+				rd					<= '1';
 		-- RSET state -----------------------------------------------------
 			when RSET =>
 				state_next		<= IDLE;

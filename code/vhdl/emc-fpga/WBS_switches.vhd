@@ -43,11 +43,12 @@ end WBS_switches;
 architecture RTL of WBS_switches is
 
 	--Constants
-	constant N				: integer := 3;--21;
-	constant M				: integer := 2;--2;
+	constant N				: integer := 17;--17;
+	constant M				: integer := 3;
 
 	--Types
 	type state_type is	(
+								START,
 								IDLE,
 								WAIT0,
 								OUT0
@@ -55,7 +56,7 @@ architecture RTL of WBS_switches is
 	--Signals
 	signal state_reg		: state_type;
 	signal state_next		: state_type;
-	signal sw_o				: std_logic_vector(7 downto 0) := (others => '0');
+	signal sw_o				: std_logic_vector(7 downto 0);
 	signal q1_reg			: unsigned(N-1 downto 0) := (others => '1');
 	signal q1_next			: unsigned(N-1 downto 0) := (others => '1');
 	signal q2_reg			: unsigned(M-1 downto 0) := (others => '1');
@@ -77,7 +78,8 @@ begin
 		begin
 			if(clk_i'event and clk_i = '1') then
 				if (rst_i = '1') then
-					dat_o <= (others => '0'); 
+					dat_o(7 downto 0)	<= sw_i;
+					dat_o(15 downto 8)	<= (others => '0');
 				else
 					if ((cyc_i and stb_i and not we_i) = '1') then
 						case adr_i is
@@ -96,7 +98,7 @@ begin
 	process(clk_i, rst_i)
 	begin
 		if	(rst_i = '1') then
-			state_reg		<= IDLE;
+			state_reg		<= START;
 			q1_reg			<= (others => '0');
 			q2_reg			<= (others => '0');
 		elsif (clk_i'event and clk_i='1') then
@@ -113,6 +115,12 @@ begin
 		q1_next			<= q1_reg;
 		q2_next			<= q2_reg;
 		case state_reg is
+		-- Start state ------------------------------------------
+			when START =>
+				state_next <= IDLE;
+				sw_o <= sw_i;
+--				dat_o(7 downto 0)	<= sw_i;
+-- 				dat_o(15 downto 8)	<= (others => '0');
 		-- Idle state -------------------------------------------
 			when IDLE =>
 				q2_next <= q2_reg-1;
@@ -142,6 +150,8 @@ begin
 		-- Output state -----------------------------------------
 			when OUT0 =>
 				sw_o		<= sw_i;
+--				dat_o(7 downto 0)	<= sw_i;
+--				dat_o(15 downto 8)	<= (others => '0');
 				irq_o		<= '1';
 				q2_next		<= (others => '1');
 				state_next	<= IDLE;

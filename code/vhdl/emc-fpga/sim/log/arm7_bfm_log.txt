@@ -1,3 +1,5 @@
-825000 ps: WB: testing...                                                             
-2112500 ps: Writing into WBO                                                           
+588900 ps: WB: Write switch to leds                                                   
+1382290 ps: WB: Read switch reg                                                        
+1589470 ps: WB: Read switch reg                                                        
+1796650 ps: WB: Read switch reg                                                        
 *** Simulation END ***

@@ -53,7 +53,7 @@ ARCHITECTURE behavior OF tb_wrapper IS
     COMPONENT Wrapper
     PORT(
          Clock : IN  std_logic;
-         Rst_i : IN  std_logic;
+         nRst_i : IN  std_logic;
          nCpuCs_i : IN  std_logic;
          nCpuRd_i : IN  std_logic;
          nCpuWr_i : IN  std_logic;
@@ -69,7 +69,7 @@ ARCHITECTURE behavior OF tb_wrapper IS
 
    --Inputs
    signal Clock : std_logic := '0';
-   signal Rst_i : std_logic := '0';
+   signal nRst_i : std_logic := '0';
 --   signal nCpuCs_i : std_logic := '0';
 --   signal nCpuRd_i : std_logic := '0';
 --   signal nCpuWr_i : std_logic := '0';
@@ -96,7 +96,7 @@ BEGIN
 	-- Instantiate the Unit Under Test (UUT)
    uut: Wrapper PORT MAP (
           Clock => Clock,
-          Rst_i => Rst_i,
+          nRst_i => nRst_i,
           nCpuCs_i => arm_bus_if.nCpuCs_i,
           nCpuRd_i => arm_bus_if.nCpuRd_i,
           nCpuWr_i => arm_bus_if.nCpuWr_i,
@@ -127,21 +127,21 @@ BEGIN
     begin
 
     -- Default values
-		Rst_i  <=  '0';
+		nRst_i  <=  '0';
 		arm_bus_if.nCpuCs_i  <=  '1';
 		arm_bus_if.nCpuRd_i  <=  '1';
 		arm_bus_if.nCpuWr_i  <=  '1';
 
     -- hold reset
     wait for Clock_period*20;
-		Rst_i  <=  '1';
+		nRst_i  <=  '1';
 				
     -- Get commands from stimulus file
     while not endfile(stimulus) loop
       str_read(stimulus, s);                                  -- Read line into string
 
       if (s(1 to 5) = "#WAIT") then                        	  -- Wait n cycles
-           wait for integer'value(s(7 to 12))*cycle;
+           wait for integer'value(s(7 to 12))*CYCLE;
       elsif (s(1 to 3) = "#RD") then                          -- Read from UART and compare
           address := to_std_logic_vector(s(5 to 20));
 					arm_16bit_read (Clock, arm_bus_if, address, log);
