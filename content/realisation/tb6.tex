@@ -24,9 +24,9 @@
 		\begin{itemize}
 			\item sub thing
 		\end{itemize}
-	\item Dennis thing
+	\item UART Device driver
 	\begin{itemize}
-		\item Sub thing
+		\item Improvement on the driver made in last timebox
 	\end{itemize}
 \end{itemize}
 
@@ -35,7 +35,7 @@
 \begin{description}
 	\item[Theis thing]
 	\item[Jesus thing]
-	\item[Dennis thing]
+	\item[UART Device driver] Implementation of input/output control and interrupt handling in the UART device driver made in time box 5.
 \end{description}
 
 \subsubsection{Time planning}
@@ -45,14 +45,26 @@
 	\todo[inline]{Update Time}
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
-		~			& Theis thing			& Jesus thing		& Dennis thing	\\ \hline
-		Estimation	& xx					& xx				& xx			\\
-		Actual		& xx					& xx				& xx			\\
-		Developer	& Theis					& Paulo				& Dennis		\\
+		~			& Theis thing			& Jesus thing		& UART improvements	\\ \hline
+		Estimation	& xx					& xx				& 5			\\
+		Actual		& xx					& xx				& 15			\\
+		Developer	& Theis				& Paulo			& Dennis		\\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
 \end{table}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% Scaling the project due to limited time.
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\subsection{Project scaling}
+What have been downscaled in the project in order to make something to work. 
+
+
+
+
+
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Theis Thing
@@ -255,12 +267,19 @@ A background application running at the uClinux, ensure that after reset the sys
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Dennis Thing
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-\subsection{Dennis thing - Dennis}
+\subsection{UART Device driver improvements - Dennis}
+As described in section \ref{sec:device_driver_conclusion}, some improvements should be implemented in order to boost performance on the UART devices. The parts which will be further implemented in the UART device driver is:
+\begin{itemize}
+	\item Interrupt controlled read.
+	\item More flexibel initialization. 
+	\item Better feedback/help description to the user. 
+\end{itemize}
+Furthermore it was pointed out (by Klaus Kolle) that the implemented way of setting up the device broke general politic for device drivers. To avoid this, an IOCTL (Input Output Control) function shall be implemented to take care of all setup and to leave the write function to sending characters. 
 %			Intro
 %					verification specification
 %					deployment specification
 %
-\subsubsection{Analysis}
+%\subsubsection{Analysis}
 %			Analysis
 %
 %                Refactored block diagram
@@ -271,6 +290,18 @@ A background application running at the uClinux, ensure that after reset the sys
 %                Dimensioning specification 
 %
 \subsubsection{Design}
+The functionalities implemented in the IOCTL call are:
+\begin{itemize}
+	\item Help command. Write out the different choices of IOCTL calls.
+	\item Default setup call. Sets up the defined UART to 8n1, 9600 baud rate. 
+	\item Baud rate. Set a baud rate in the range 2400 to 230400.
+	\item Word length. Define the word length between 5 and 8.
+	\item Stop bits. Number of stop bits, 1 or 2.
+	\item Parity bits. Define parity bit setting: none, odd, even, forced 1 stick, forced 0 stick.
+	\item Fifo. Enable or disable fifo.
+	\item Fifo trigger. Number of characters in the buffer before an interrupt: 1,4,8,14
+\end{itemize}
+
 %       	 Design
 %
 %                UML/SysML deployment view(s)
@@ -283,20 +314,335 @@ A background application running at the uClinux, ensure that after reset the sys
 %                Sequence diagrams
 %
 \subsubsection{Implementation}
-%     	   Implementation
-%
-%                Mechanical drawings with details explained
-%                Electronic diagrams with details explained
-%                Source code with details explained
-%                Description of integration 
-%
+Common header file for the UART device driver and the UART user space application. The magic number 'k' is used to by the IOCTL macros \_IO and \_IOR to create an IOCTL number, which is then decoded and verified in the kernel module. 
+\begin{lstlisting}[language=c]
+#ifndef UARTIOCTL_H
+#define UARTIOCTL_H
+
+#include <linux/ioctl.h>
+
+#define UART_IOC_MAGIC  'K'
+
+#define IOCTL_HELP 		_IO(UART_IOC_MAGIC,  1)
+#define IOCTL_DEFAULT	_IO(UART_IOC_MAGIC,  2)
+#define IOCTL_BAUD 		_IOR(UART_IOC_MAGIC, 3, int)
+#define IOCTL_WORDLEN 	_IOR(UART_IOC_MAGIC, 4, int)
+#define IOCTL_STOPBIT 		_IOR(UART_IOC_MAGIC, 5, int)
+#define IOCTL_PARBIT 		_IOR(UART_IOC_MAGIC, 6, int)
+#define IOCTL_FIFO			_IOR(UART_IOC_MAGIC, 7, int)
+#define IOCTL_FIFO_TRIG 	_IOR(UART_IOC_MAGIC, 8, int)
+
+#define UART_IOC_MAXNR 8
+
+#endif
+\end{lstlisting}
+
+Using IOCTL to setup UART registers. Note that the \textit{fwrite} call cannot be used with IOTCL, as it needs an file descriptor instead of a file pointer. Therefore the libraries \textit{fcntl.h} and \textit{unistd.h} are included in order to use the functions \textit{open, close, read, write} and \textit{ioctl} as they make use of the file descriptor. 
+\begin{lstlisting}[language=c]
+	if(strncmp("io", argv[1], 2) == 0){
+		if ((fd = open(UART,O_RDWR)) < 0){
+     	          	printf("Cannot open file.\n");
+			exit(-1);
+        	}
+
+		ret_val = ioctl(fd, IOCTL_DEFAULT);
+		if(ret_val < 0){
+			printf("ioctl_get_msg failed:%d\n", ret_val);
+			exit(-1);
+		}
+		ret_val = ioctl(fd, IOCTL_BAUD, 19200);
+		if(ret_val < 0){
+			printf("ioctl_get_msg failed:%d\n", ret_val);
+			exit(-1);
+		}
+
+		close(fd);
+	}
+\end{lstlisting}
+Loop reading used for testing purpose of the power line communication. 
+\begin{lstlisting}[language=c]
+	---
+	else if(strncmp("readloop", argv[1], 8) == 0){
+		if ((fd = open(UART,O_RDONLY)) < 0){		//Open the file
+     	          	printf("Cannot open file.\n");
+			exit(-1);
+        	}
+		while(1){
+			if(read(fd,rb,10) != 0) 
+				printf("%s\n",rb);
+		}
+		printf("\n");
+		close(fd);
+	}
+\end{lstlisting}
+
+IOCTL added to file operator
+\begin{lstlisting}[language=c]
+static struct file_operations uart_fops = {
+	.owner   	= THIS_MODULE,
+	.read			= uart_read,
+	.write  	= uart_write,
+	.open    	= uart_open,
+	.ioctl	 	= uart_ioctl,
+	.release 	= uart_close,
+};
+\end{lstlisting}
+
+IOCTL implementation. At first the function verifies the IOCTL number sent and checks if the transferred command is valid. The rest of the function is a  switch/case which takes the cmd parameter sent and performs an action according to the command (help, default setup, baud rate etc.)
+\begin{lstlisting}[language=c]
+/******************************************************************************
+ * IOCTL call
+ *****************************************************************************/
+static int uart_ioctl(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg){
+	unsigned int num = 0;
+        int err = 0, ret = 0;
+	int div, mult,bflag = 0;
+	unsigned int baud = 0;
+
+        /* don't even decode wrong cmds: better returning  ENOTTY than EFAULT */
+        if (_IOC_TYPE(cmd) != UART_IOC_MAGIC) return -ENOTTY;
+        if (_IOC_NR(cmd) > UART_IOC_MAXNR) return -ENOTTY;
+
+        /*
+         * the type is a bitmask, and VERIFY_WRITE catches R/W
+         * transfers. Note that the type is user-oriented, while
+         * verify_area is kernel-oriented, so the concept of "read" and
+         * "write" is reversed
+         */
+        if (_IOC_DIR(cmd) & _IOC_READ) err = !access_ok(VERIFY_WRITE, (void __user *)arg, _IOC_SIZE(cmd));
+        else if (_IOC_DIR(cmd) & _IOC_WRITE) err =  !access_ok(VERIFY_READ, (void __user *)arg, _IOC_SIZE(cmd));
+        if (err) return -EFAULT;
+	// Get minor number
+	num = MINOR(inode->i_rdev);
+	DPRINT("\nuart%d_ioctl, ioctl_cmd: %u\n",num,cmd);
+	// Check if minor number is okay
+	if(num >= NUM_UART_DEVICES){
+		return -ENODEV;
+	}
+
+	switch (cmd) {
+	/***************************** HELP ************************************************/
+	case IOCTL_HELP:
+	    DPRINT("\nHELP\n");
+	    help();	// Print different IOCTL call options to user
+	  break;
+	/***************************** DEFAULT *********************************************/
+	case IOCTL_DEFAULT:
+	    m_reg_write(ulcr[num], 0x80);	// Enable write to divisor latch
+	    m_reg_write(udll[num], (unsigned char)((LPC24xx_Fpclk/(16*9600)) & 0xFF));
+	    m_reg_write(udlm[num], (unsigned char)((LPC24xx_Fpclk/(16*9600)) >> 8));
+	    m_reg_write(ulcr[num], 0x03);	// 8N1 setup and disable write to divisor latch
+	    m_reg_write(ufcr[num], 0x7);	// Enable FIFO's
+	  break;
+	/***************************** BAUD ************************************************/
+	case IOCTL_BAUD:
+	    if(arg < 2400 || arg > 230400){	// Verify argument
+		printk("\nInvalid parameter");
+		return -EFAULT;
+	    }
+	    bflag = 0;	
+	/* From datasheet:
+	   Mult values: 1-15, Div: 0-14. Mult shall be bigger than div.
+	   DLL shall be above 2 if DLM is zero.
+
+	*/ 
+	   // Loop through different div and mult values in order to get a integer value to
+	   // the divisor latch reg (DLM+DLL).
+	    for(div = 0; div <= 15; div++){
+		for(mult = div+1; mult <= 15; mult++){
+		    baud = ((16*arg)+((16*arg*div)/mult));
+		    if(LPC24xx_Fpclk%baud == 0){
+			if((div != 0) && ((LPC24xx_Fpclk/baud) >= 3)){
+			    bflag = 1;
+			    break;
+			}
+		    }
+		}
+		if(bflag==1) break;
+	    }
+	    DPRINT("\ndiv: %d, mult: %d, baud: %d",div,mult,baud);
+	    if(div == 15){	// If no value was found, return error
+		printk("\nCannot calculate BAUD!");
+		return -EFAULT;
+	    }
+	    m_reg_bfs(ulcr[num], 0x80); // Enable write to divisor latch
+	    m_reg_write(ufdr[num], ((div<<0) | (mult<<4)));	// Write div and mult to fraction dividor reg
+	    m_reg_write(udll[num], (unsigned char)((LPC24xx_Fpclk/baud) & 0xFF)); // Input DLL val (8 lowest bits)
+	    m_reg_write(udlm[num], (unsigned char)((LPC24xx_Fpclk/baud) >> 8));	  // Input DLM val (8 highest bits)
+	    m_reg_bfc(ulcr[num], 0x80);	// Disable write to divisor latch
+
+	  break;
+	/***************************** Wordlen *********************************************/
+	case IOCTL_WORDLEN:
+	    if(arg < 5 || arg > 8){	// Verify that argument is valid
+		printk("\nInvalid parameter");
+		return -EFAULT;
+	    }
+	    m_reg_bfc(ulcr[num], 0x3);	// Clear bits holding world lenght
+	    m_reg_bfs(ulcr[num], ((arg-5)<<0));	// Inset value for world lenght
+	  break;
+	/***************************** STOP bits *******************************************/
+	case IOCTL_STOPBIT:
+	    if(arg != 1 || arg != 2){	// Verify that argument is valid
+		printk("\nInvalid parameter");
+		return -EFAULT;
+	    }
+	    m_reg_bfc(ulcr[num], (1<<2)); // Set stop bit to 1
+	    if(arg == 2){
+	    	m_reg_bfs(ulcr[num], (1<<2)); // Set stop bit to 2
+	    }
+	  break;
+	/***************************** Parity Bit ******************************************/
+	case IOCTL_PARBIT:	
+	    if(arg < 0 || arg > 4){ // Verify that argument is valid
+		printk("\nInvalid parameter");
+		return -EFAULT;
+	    }
+	    m_reg_bfc(ulcr[num], (1<<3));	// Disable parity bits. if 0 was written
+	    if(arg > 0){
+		m_reg_bfs(ulcr[num], (1<<3));	// Enable parity.
+		m_reg_bfs(ulcr[num], ((arg-1)<<4)); // Set parity (odd, even, forced 0 or 1
+	    }
+	  break;
+	/***************************** FIFO Enable *****************************************/
+	case IOCTL_FIFO:
+	    if(arg != 0 || arg != 1){ // Verify that argument is valid
+		printk("\nInvalid parameter");
+		return -EFAULT;
+	    }
+	    m_reg_bfc(ufcr[num], 0x7);	// Disable fifo
+	    if(arg==1){
+		m_reg_bfs(ufcr[num], 0x7);	// Enable fifo
+	    }
+	  break;	
+	/***************************** FIFO Enable *****************************************/
+	case IOCTL_FIFO_TRIG:
+	    if(arg != 1 || arg != 4 || arg != 8 || arg != 14){	// Verify that argyment is valid
+		printk("\nInvalid parameter");
+		return -EFAULT;
+	    }
+	    m_reg_bfc(ufcr[num], 0xC0);	// Clear bits holding trigger level
+	    m_reg_bfs(ufcr[num], (int)((arg/4)<<6));	// 1/4=0, 4/4=1, 8/4=2, 14/4=3
+	  break;	
+	/***************************** Wrong ***********************************************/
+	default:
+	    help();	// If wrong parameter sent. Print options. 
+	    return -ENOTTY;
+	}
+
+        return ret;
+}
+\end{lstlisting}
+
+Interrupt implementation. The interrupt is requested in the open call. If there is no data to read, the module is sent to sleep and awaken again when the buffer is not empty anymore. In close the interrupt is freed again. 
+\begin{lstlisting}[language=c]
+//Interrupt sources for UART0,1,2,3
+#define UART0_IRQ 6 
+#define UART1_IRQ 7
+#define UART2_IRQ 28
+#define UART3_IRQ 29
+//Array of interrupt flags
+static int flag[NUM_UART_DEVICES];
+
+//Prototypes of interrupt functions. Int\_uart is an array of function pointers.
+static irqreturn_t interrupt_uart0(int irq, void *dev_id);
+static irqreturn_t interrupt_uart1(int irq, void *dev_id);
+static irqreturn_t interrupt_uart2(int irq, void *dev_id);
+static irqreturn_t interrupt_uart3(int irq, void *dev_id);
+typedef irqreturn_t (*INTERRUPT_UART)(int irq, void *dev_id);
+const INTERRUPT_UART int_uart[NUM_UART_DEVICES] = {interrupt_uart0, interrupt_uart1, interrupt_uart2, interrupt_uart3};
+
+static int uart_open(struct inode* inode, struct file* file){
+---
+	flag[num] = 0;
+	m_reg_write(uier[num], 0x1);	//Enable interrupt on rx buf not empty
+	m_reg_bfs(VICSoftIntClear, (1<<uirq[num])); // Clear interrupts from uart source
+	m_reg_bfs(VICIntEnable, (1<<uirq[num]));    // Enable uart interrupt
+
+	ret = request_irq(uirq[num], int_uart[num], SA_INTERRUPT,"UART interrupt", NULL); //NULL = Pointer based on IRC handler
+
+	if(ret){
+		printk("IRQ %d is not free. RET: %d\n", UART2_IRQ,ret);
+		return ret;
+	}
+	return 0;
+}
+
+static int uart_close(struct inode* inode, struct file* file){
+	---
+	free_irq(uirq[num], NULL);	// Free interrupt
+	return 0;
+}
+\end{lstlisting}
+UART read call.
+\begin{lstlisting}[language=c]
+static ssize_t uart_read(struct file *p_file, char *p_buf, size_t count, loff_t *p_pos){
+	---
+	if(!(m_reg_read(ulsr[num]) & 0x01)){		//If the read buffer is empty, go to sleep.
+		DPRINT("\nBUF EMPT, SLEEP\n");
+		wait_event_interruptible(my_queue, (flag[num] != 0));	// Put the function to sleep
+		flag[num] = 0;
+	}
+	else{
+		cread = m_reg_read(urbr[2]);
+	}
+	*p_buf = cread;		// Write value to read buffer. 
+	
+	return count;
+}
+\end{lstlisting}
+UART interrupt function. The four different interrupt functions are all similar, except for the registers that is handled. 
+\begin{lstlisting}[language=c]
+/******************************************************************************
+ * Interrupt recieve routine UART2
+ *****************************************************************************/
+static irqreturn_t interrupt_uart2(int irq, void *dev_id){
+	
+	cread = m_reg_read(urbr[2]);		// Read the buffer
+	
+	DPRINT("\nREAD VAL: %c\n", cread);		
+
+	m_reg_bfs(VICSoftIntClear, (1<<uirq[2]));		// Clear int flag in vic
+	flag[2] = 1;	
+	wake_up_interruptible(&my_queue);		// Wake up from interrupt
+	return IRQ_HANDLED;
+}
+\end{lstlisting}
+
+The help function implemented gives the following input if it is called:
+\begin{lstlisting}[language=c]
+# ./uart help
+Available commands:
+  IOCTL_HELP : show different help commands
+  IOCTL_DEFAULT : 8N1, 9600 baud
+  IOCTL_BAUD : send argument between 2400 and 230400
+  IOCTL_WORDLEN : send argument 5-8 wordlenght
+  IOCTL_STOPBIT : send argument, 1 or 2 stop bits
+  IOCTL_PARBIT : send arg, 0, 1(odd), 2(even), 3(Forced 1 stick), 4(Forced 0 stick
+  IOCTL_FIFO : send arg 0 (off), 1 (on)
+  IOCTL_FIFO_TRIG : send arg number to trig, 1, 4, 8 or 14 characters
+\end{lstlisting}
+
 \subsubsection{Verification}
+According to the requirement F-1.2 and the test for it, the communication between two modules have been tested over power line. 
+\begin{table}[H]
+\centering
+	\begin{tabular}{|p{1.2cm}|p{2.3cm}|p{9.5cm}|p{2.5cm}|}
+	\hline
+	ID		& Requirement		& Test Description		& Grade/Comment\\\hline
+	F-1.2		& Communication - System & Connect a module to the hub, by connecting the module to the hubs power line (plugs on the back of the hub). If the module respond to a ping signal send from the hub, the two modules are communicating through power line. The response of the ping can be seen by using an oscilloscope and simply analyzing the packages on the power line according to the protocol. & PASSED\\\hline
+	\end{tabular}
+\end{table}
+A small test setup have been made with a MBED device as one of the modules and an ARM board running uClinux as the other module. Data have been sent in both direction (from the MBED to the ARM and from the ARM to the MBED) through each of their Power Line modules, with use of the UART user space application written. The default settings of the Power Line module is 8N1 with a baud rate of 19200 which has been used for the test. 
+\\ The test has passed. No invalid or missing data have been observed throughout the test. 
 %       	 Verification
 %
 %                Module tests
 %                Integration tests
 %                Acceptance test
 \subsubsection{Conclusion}
+The UART module is working with implemented IOCTL and interrupt handler.
+Further improvements before the fully functional energy system can use the UART driver is implementation of file write.
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Deployment
