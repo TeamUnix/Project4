@@ -46,10 +46,10 @@
 	\todo[inline]{Update Time}
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
-		~			& Switch interrupt			& Jesus thing		& UART improvements	\\ \hline
-		Estimation	& 12					& xx				& 5				\\
-		Actual		& 20					& xx				& 15			\\
-		Developer	& Theis					& Paulo				& Dennis		\\
+		~			& Switch interrupt		& Jesus thing		& UART improvements	\\ \hline
+		Estimation	& 12					& xx				& 5					\\
+		Actual		& 20					& xx				& 15					\\
+		Developer	& Theis				& Paulo			& Dennis				\\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -60,11 +60,26 @@
 % Scaling the project due to limited time.
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 \subsection{Project scaling}
-What have been downscaled in the project in order to make something to work. 
-
-
-
-
+Unfortunately there is still a lot of work tasks to be done before the fully project is realized. With only 2 weeks before delivering the report it has been decided to down scale the project, to have some blocks fully up and running. The picture below shows the parts that will hopefully be implemented in the handed in version. 
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/project_scaling_tb6.jpg}
+		\caption{Project Scaling diagram}
+	\end{centering}
+\end{figure}
+\textbf{The scaled project will then contain:} 
+\begin{itemize}
+	\item ARM to FPGA communication through External Memory Controller. The ARM gets an interrupt from the FPGA whenever a switch changes status. The ARM then sets the LEDS on the ARM board according to the switches status.
+	\item UART communication to Power Line Module to send and transmit data between two modules. 
+	\item MBED setup to work as two modules (communicating with the ARM board through two power line modules).
+	\item Dummy protocol to send data from MBED to ARM board. 
+	\item Direct received data from MBED to WEB-server.
+	\item \todo[inline]{JESUS, something about database and web server}
+	\item ...
+\end{itemize} 
+The setup will then be able to check which state it should be running in, according to the switches set on the FPGA board. The ARM board will be able to control the Power Line modules (switching direction and turning off modules). When communication is established between the MBED and the ARM through Power Line, the data received from the MBED is verified and sent to the WEB-server. 
+\todo[inline]{JESUS, something about database and web server}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
