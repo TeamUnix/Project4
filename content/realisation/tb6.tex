@@ -14,7 +14,6 @@
 \end{figure}
 
 \subsubsection{Work to be done in this time box}
-\todo[inline]{Update List}
 \begin{itemize}
 	\item Switch interrupt
 	\begin{itemize}
@@ -80,8 +79,8 @@ Unfortunately there is still a lot of work tasks to be done before the fully pro
 	\item Save current sensors measurements to database and plot data in the web interface.
 	\item System control background application running on ARM board.
 \end{itemize} 
-The setup will then be able to check which state it should be running in, according to the switches set on the FPGA board. The ARM board will be able to control the Power Line modules (switching direction and turning off modules). When communication is established between the MBED and the ARM through Power Line, the data received from the MBED is verified and sent to the WEB-server. 
-\todo[inline]{JESUS, something about database and web server}
+The setup will then be able to check which state it should be running in, according to the switches set on the FPGA board. The ARM board will be able to control the Power Line modules (switching direction and turning off modules). When communication is established between the mBed and the ARM through Power Line, the data received from the mBed ( Module ) is convert and sent to the web server with a URL request to the web service savedata.php, the data is then saved into the database.
+In the web interface the user is able to start or stop a module and see the current production or consumption of the system.
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
