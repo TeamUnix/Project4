@@ -2,7 +2,7 @@
 % INTRO
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 \section{Time box 6}
-\listoftodos
+%\listoftodos
 \subsection{Time box planning}
 
 \begin{figure}[H]
@@ -33,7 +33,7 @@
 \end{itemize}
 
 \paragraph{Description:}
-\todo[inline]{Update Description}
+%\todo[inline]{Update Description}
 \begin{description}
 	\item[Switch interrupt] In order to send data to the interrupt register, an interrupt output for the switch block has to be implemented, and the switches has to be debounced, to secure that the interrupt data is send only once.
 	\item[Web Server] The web server is the communication between the system and the world. The communication between the web server and energy hub is implemented and the file structure is set for the collaboration of other teams/modules.
@@ -44,12 +44,12 @@
 
 \begin{table}[H]
 \centering
-	\todo[inline]{Update Time}
+%	\todo[inline]{Update Time}
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
 		~			& Switch interrupt		& Jesus thing		& UART improvements	\\ \hline
 		Estimation	& 12					& 15				& 5					\\
-		Actual		& 20					& 22				& 15				\\
+		Actual		& 20					& 22				& 17				\\
 		Developer	& Theis					& Paulo			& Dennis				\\
 		\hline
 	\end{tabular}
@@ -925,6 +925,7 @@ The switch block is the last part in the Spartan 6. The VHDL coding for the Spar
 The web server is up and running with the basic structure for the web interface development. The web server is able to send commands to the energy hub and it will route the commands to the desired module. For a complete system the applications running in background will be developed so all the communication can be handle.
 %
 %
-\paragraph{Dennis thing}
+\paragraph{UART Device driver improvements}
+The UART device driver is working with implemented interrupt handling, input output control and clean write function. Klaus Kolle and Morten Opprud have been by and verified the test setup. 
 %
 %
