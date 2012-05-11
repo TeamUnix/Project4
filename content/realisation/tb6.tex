@@ -21,9 +21,10 @@
 		\item debouncer
 		\item Interrupt
 	\end{itemize}
-	\item Jesus thing
+	\item Web Server
 		\begin{itemize}
-			\item sub thing
+			\item Web Services - Communication
+			\item File structure
 		\end{itemize}
 	\item UART Device driver
 	\begin{itemize}
@@ -35,7 +36,7 @@
 \todo[inline]{Update Description}
 \begin{description}
 	\item[Switch interrupt] In order to send data to the interrupt register, an interrupt output for the switch block has to be implemented, and the switches has to be debounced, to secure that the interrupt data is send only once.
-	\item[Jesus thing]
+	\item[Web Server] The web server is the communication between the system and the world. The communication between the web server and energy hub is implemented and the file structure is set for the collaboration of other teams/modules.
 	\item[UART Device driver] Implementation of input/output control and interrupt handling in the UART device driver made in time box 5.
 \end{description}
 
@@ -47,9 +48,9 @@
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
 		~			& Switch interrupt		& Jesus thing		& UART improvements	\\ \hline
-		Estimation	& 12					& xx				& 5					\\
-		Actual		& 20					& xx				& 15					\\
-		Developer	& Theis				& Paulo			& Dennis				\\
+		Estimation	& 12					& 15				& 5					\\
+		Actual		& 20					& 22				& 15				\\
+		Developer	& Theis					& Paulo			& Dennis				\\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -920,7 +921,8 @@ Further improvements before the fully functional energy system can use the UART 
 The switch block is the last part in the Spartan 6. The VHDL coding for the Spartan 6 is finished, the last part is to test it all together and verify that everything works.
 %
 %
-\paragraph{Jesus thing}
+\paragraph{Web Server}
+The web server is up and running with the basic structure for the web interface development. The web server is able to send commands to the energy hub and it will route the commands to the desired module. For a complete system the applications running in background will be developed so all the communication can be handle.
 %
 %
 \paragraph{Dennis thing}
