@@ -16,9 +16,10 @@
 \subsubsection{Work to be done in this time box}
 \todo[inline]{Update List}
 \begin{itemize}
-	\item Theis thing
+	\item Switch interrupt
 	\begin{itemize}
-		\item Sub thing
+		\item debouncer
+		\item Interrupt
 	\end{itemize}
 	\item Jesus thing
 		\begin{itemize}
@@ -33,7 +34,7 @@
 \paragraph{Description:}
 \todo[inline]{Update Description}
 \begin{description}
-	\item[Theis thing]
+	\item[Switch interrupt] In order to send data to the interrupt register, an interrupt output for the switch block has to be implemented, and the switches has to be debounced, to secure that the interrupt data is send only once.
 	\item[Jesus thing]
 	\item[Dennis thing]
 \end{description}
@@ -46,8 +47,8 @@
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
 		~			& Theis thing			& Jesus thing		& Dennis thing	\\ \hline
-		Estimation	& xx					& xx				& xx			\\
-		Actual		& xx					& xx				& xx			\\
+		Estimation	& 12					& xx				& xx			\\
+		Actual		& 20					& xx				& xx			\\
 		Developer	& Theis					& Paulo				& Dennis		\\
 		\hline
 	\end{tabular}
@@ -57,11 +58,12 @@
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Theis Thing
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-\subsection{Theis thing - Theis}
+\subsection{Switch interrupt - Theis}
 %			Intro
 %					verification specification
 %					deployment specification
 %
+This part is, together with the interrupt register from earlier timebox a way to tune performance in reading and writing between the Spartan 6 and the LPC2478.
 \subsubsection{Analysis}
 %			Analysis
 %
@@ -72,6 +74,17 @@
 %                System interface specification
 %                Dimensioning specification 
 %
+The interrupt block in the Spartan 6 is the switch block. The switch block needs to be redesign in order to get an interrupt output to the interrupt register, the switches also needs to be debounced, to prevent it from sending the same interrupt data more than once. Two output is added to the switch block, one single bit for interrupt indication and a 7 bit vector for the data to the interrupt register. Inside the block a finite state machine is made for denouncing the switches. Below the redesigned switch block is shown.
+
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.3\textwidth]{images/tb6_switchblock.eps}
+		\caption{Updated switch block}
+	\end{centering}
+\end{figure}
+
+
 \subsubsection{Design}
 %       	 Design
 %
@@ -84,6 +97,26 @@
 %                Use case scenarios specifications
 %                Sequence diagrams
 %
+Because of switch bounce, the block needs to take care of this. Below a picture of switch bouncing is shown. The problem is every time the signal goes high the switch block will send data to the interrupt register, to prevent this the block compare a delayed input signal to the present signal, and first when the signal is stable, the system will react on the input.
+
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.5\textwidth]{images/tb6_bounce.png}
+		\caption{Switch bouncing}
+	\end{centering}
+\end{figure}
+
+To debounce the switch a state machine for the switch block is made. This diagram is shown below. The start box set the start output signal to the input signal. The interrupt signal is set high in the OUT0 state, and low again in the IDLE state after the "q2" delay. This is done to have the interrupt signal high enough time for the interrupt register to save the data. The "q1" delay is used to compare the input signal with the output signal in order to capture changes on the 8 switches.
+
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=0.7\textwidth]{images/tb6_switch_FSD.eps}
+		\caption{Switch block state machine}
+	\end{centering}
+\end{figure}
+
 \subsubsection{Implementation}
 %     	   Implementation
 %
@@ -92,12 +125,65 @@
 %                Source code with details explained
 %                Description of integration 
 %
+The code for the IDLE state is shown below, here the "q2" delay is used in the start, then the interrupt pin is set to zero, then the input and output is compared, if they are not equal the next state is WAIT0 and the "q1" delay is set.
+\begin{lstlisting}[language=VHDL]
+...
+when IDLE =>
+	q2_next <= q2_reg-1;
+	if	(q2_next = 0) then
+		irq_o <= '0';
+		if	(sw_i = sw_o) then
+			state_next <= IDLE;
+		else
+			q1_next		<= (others => '1');
+			state_next	<= WAIT0;
+		end if;
+	else
+		state_next <= IDLE;
+	end if;
+...
+\end{lstlisting}
+In the WAIT0 state the input and output is compared repeatedly to check if the input is stable. If the input is stable long enough time the OUT0 state is entered.
+\begin{lstlisting}[language=VHDL]
+...
+when WAIT0 =>
+	if	(sw_i = sw_o) then
+		state_next <= IDLE;
+	else
+		q1_next <= q1_reg-1;
+		if	(q1_next = 0) then
+			state_next <= OUT0;
+		else
+			state_next <= WAIT0;
+		end if;
+	end if;
+...
+\end{lstlisting}
+In the OUT0 state the switch output is set to switch input signal, and an interrupt signal is set high, the "q2" delay is set and it returns to the IDLE state.
+\begin{lstlisting}[language=VHDL]
+...
+when OUT0 =>
+	sw_o		<= sw_i;
+	irq_o		<= '1';
+	q2_next		<= (others => '1');
+	state_next	<= IDLE;
+...
+\end{lstlisting}
+
 \subsubsection{Verification}
 %       	 Verification
 %
 %                Module tests
 %                Integration tests
 %                Acceptance test
+The code is tested on a test bench in isim. The test verify that the block first set the switch output after the input has been stable for a while. And when the output is set the interrupt signal is set high for some time and then set low again. 
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/tb6_switch_tb.png}
+		\caption{Switch block test bench}
+	\end{centering}
+\end{figure}
 \subsubsection{Conclusion}
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
