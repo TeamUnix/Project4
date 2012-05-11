@@ -27,26 +27,33 @@ USE work.txt_util.all;
 
 -- package declaration similar to "entity"
 package arm_emc_package is
-  -- cycle @ 16Mhz
-  constant CYCLE  	: time := 62.5 ns;
+	constant CYCLE		: time		:= 13.89 ns;-- 13.89ns @ 72MHz
+	--Read
+	constant WAITOEN	: integer	:= 1;		-- Waitstates from CS to Output Enable
+	constant WAITRD		: integer	:= 6;		-- Waitsattes from CS to Read Access
+	--Write
+	constant WAITWEN	: integer	:= 1;		-- Waitstates from CS to Write Enable
+	constant WAITWR		: integer	:= 6;		-- Waitstates from CS to Write Access
+  
+  
+  -- WAITTURN - Bus turnaround 
+  -- WAITPAGE - Wait states async page mode read
 
 	-- EMC timing, adjust to fit electricaldatasheet
 	-- Read timing
-	constant WST_RD  		: integer := 3;
-	constant Tr_CSLAV  		: time := 5 ns;
-	constant Tr_CSLOEL  	: time := 5 ns;
-	constant Tr_OELOEH  	: time := ((WST_RD*CYCLE)+30 ns);
-	constant Tr_OEHANV  	: time := 5 ns;
-	constant Tr_CSHOEH  	: time := 5 ns;
+	constant Tr_CSLAV  	: time := 2.54 ns;									-- Max time
+	constant Tr_CSLOEL  : time := ((CYCLE*WAITOEN)-0.78 ns);				-- Min time 
+	constant Tr_OELOEH  : time := (((WAITRD-WAITOEN+1)*CYCLE) -0.59 ns);	-- Min time
+	constant Tr_OEHANV  : time := 0.20 ns;									-- Typ time
+	constant Tr_CSHOEH  : time := 0 ns;										-- Typ time
 	
 	-- Write timing
-	constant WST_WR  		: integer := 3;
-	constant Tw_CSLAV  		: time := 30 ns;
-	constant Tw_CSLWEL  	: time := 30 ns;
-	constant Tw_CSLDV  		: time := 30 ns;
-	constant Tw_WELWEH  	: time := ((WST_RD*CYCLE)+30 ns);
-	constant Tw_WEHANV  	: time := 30 ns;
-	constant Tw_WEHDNV  	: time := 30 ns;
+	constant Tw_CSLAV  	: time := 2.54 ns;									-- Max time
+	constant Tw_CSLWEL  : time := ((1+WAITWEN)*CYCLE)-0.88 ns;				-- Min time
+	constant Tw_CSLDV  	: time := 4.79 ns;									-- Max time
+	constant Tw_WELWEH  : time :=  ((WAITWR-WAITWEN+1)*CYCLE)-0.78 ns;		-- Min time
+	constant Tw_WEHANV  : time := CYCLE;									-- Min time
+	constant Tw_WEHDNV  : time := 0.78 ns + CYCLE;							-- Min time
 
   -- ARM EMC interface
   type arm_emc_t is record
@@ -92,13 +99,13 @@ package body arm_emc_package is
 
     begin
         --print (log, "EMC write: 0x" & hstr(addr) & " : 0x" & hstr(data));
-		    -- start cycle;
-        -- assert CS
-        uio.nCpuCs_i <= '0'; 
-        wait for Tw_CSLAV;
+		    -- start cycle; 
         -- setup addr
         uio.CpuA_i <= addr;
-        wait for (Tw_CSLDV-Tw_CSLAV);
+		  wait for Tw_CSLAV;
+        -- assert CS
+        uio.nCpuCs_i <= '0';
+        wait for (Tw_CSLDV);
         -- setup data
         uio.CpuD <= data;
         -- wait for WE to be set
@@ -106,14 +113,15 @@ package body arm_emc_package is
         uio.nCpuWr_i <= '0';
         -- write happens
         wait for (Tw_WELWEH);
-        uio.nCpuWr_i <= '1';
+		  uio.nCpuWr_i <= '1';
+		  uio.nCpuCs_i <= '1';
         wait for Tw_WEHDNV;
         --invalidate data and addr
         uio.CpuA_i <= (others => 'U');
-        uio.CpuD  <= (others => 'U');
-		    -- deassert cs and WE
+        uio.CpuD  <= (others => 'Z');
+		    -- deassert cs
         uio.nCpuCs_i <= '1';
-        --uio.nCpuWr_i <= '1';
+        
 
     end arm_16bit_write;
 
@@ -124,28 +132,28 @@ package body arm_emc_package is
                           		--data      : out std_logic_vector (15 downto 0);
                           		file log  : TEXT
                          	   ) is
-      variable data : std_logic_vector(15 downto 0);
+--      variable data : std_logic_vector(15 downto 0);
     begin
         --  print (log, "EMC read: 0x" & hstr(addr) & " : 0x" & hstr(data));
 		    -- start cycle;
         -- assert CS
         uio.nCpuCs_i <= '0'; 
-        wait for Tr_CSLOEL;
-        -- assert RD (OE)
-        uio.nCpuRd_i <= '0';
-        wait for (Tr_CSLAV-Tr_CSLOEL);
+        wait for Tr_CSLAV;
         -- setup address
         uio.CpuA_i <= addr;
+        wait for (Tr_CSLOEL-Tr_CSLAV); 
+		  -- assert RD (OE)
+        uio.nCpuRd_i <= '0';
         wait for (Tr_OELOEH-Tr_CSHOEH);
         --sample data
         --data  <= uio.CpuD;
         --print (log, "EMC read: 0x" & hstr(addr) & " : 0x" & hstr(uio.CpuD));
         --deassert CS
         uio.nCpuCs_i <= '1';
-        wait for Tr_CSHOEH;
+        wait for Tr_CSHOEH; 
         --deassert RD (OE)
         uio.nCpuRd_i <= '1';
-        wait for Tr_OEHANV;
+        wait for Tr_OEHANV; 
         -- invalidate Address
         uio.CpuA_i <= (others => 'U');
 
@@ -153,7 +161,7 @@ package body arm_emc_package is
 
     -- Compare two std_logig_vectors (handles don't-care)
     function compare (d1 : std_logic_vector; d2 : std_logic_vector) return boolean is
-        variable i : natural;
+--        variable i : natural;
     begin
         for i in d1'range loop
             if (not (d1(i)='-' or d2(i)='-')) then
@@ -166,4 +174,3 @@ package body arm_emc_package is
     end compare;
 
 end arm_emc_package;
-

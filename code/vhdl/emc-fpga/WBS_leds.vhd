@@ -47,6 +47,7 @@ begin
 	rty_o <= '0';	--retry signal
 	ack_o <= stb_i and cyc_i;  --! asynhronous cycle termination is OK here.
 --	Data
+	dat_o(15 downto 8) <= (others => '0');
 	dat_o(7 downto 0) <= Q;
 	leds <= Q;
 

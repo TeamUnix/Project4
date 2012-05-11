@@ -75,7 +75,7 @@ begin
 						when others =>
 					end case;
 				else
-				dat_o		<= (others => '0');
+				--dat_o		<= (others => '0');
 				read_i	<= '0';
 				end if;
 			end if;
