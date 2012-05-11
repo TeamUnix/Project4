@@ -7,9 +7,9 @@
 
 \begin{figure}[H]
 	\begin{centering}
-		\missingfigure{Updated timebox figure}
-		%\includegraphics[width=1.0\textwidth]{images/tb_r5.png}
-		%\caption{Updated time-box}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/tb_r6.png}
+		\caption{Updated time-box}
 	\end{centering}
 \end{figure}
 
@@ -72,12 +72,13 @@ Unfortunately there is still a lot of work tasks to be done before the fully pro
 \textbf{The scaled project will then contain:} 
 \begin{itemize}
 	\item ARM to FPGA communication through External Memory Controller. The ARM gets an interrupt from the FPGA whenever a switch changes status. The ARM then sets the LEDS on the ARM board according to the switches status.
-	\item UART communication to Power Line Module to send and transmit data between two modules. 
+	\item UART communication to Power Line Module to send and transmit data between the modules and the ARM board.
 	\item MBED setup to work as two modules (communicating with the ARM board through two power line modules).
 	\item Dummy protocol to send data from MBED to ARM board. 
-	\item Direct received data from MBED to WEB-server.
-	\item \todo[inline]{JESUS, something about database and web server}
-	\item ...
+	\item Send measurements from modules to the web server.
+	\item Control modules status through the web interface.
+	\item Save current sensors measurements to database and plot data in the web interface.
+	\item System control background application running on ARM board.
 \end{itemize} 
 The setup will then be able to check which state it should be running in, according to the switches set on the FPGA board. The ARM board will be able to control the Power Line modules (switching direction and turning off modules). When communication is established between the MBED and the ARM through Power Line, the data received from the MBED is verified and sent to the WEB-server. 
 \todo[inline]{JESUS, something about database and web server}
