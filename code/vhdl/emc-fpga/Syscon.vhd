@@ -41,7 +41,7 @@ begin
 	DCM_Sys : DCM_SP
 	generic map (
 		CLKFX_DIVIDE				=> 2,												-- Can be any integer from 1 to 32
-		CLKFX_MULTIPLY				=> 2)												-- Can be any integer from 1 to 32
+		CLKFX_MULTIPLY				=> 2)												-- Can be any integer from 2 to 32
 	port map	(
 				CLK0				=> clk_s,											-- 0 degree DCM CLK ouptput
 				CLKFX				=> clk_r,											-- DCM CLK synthesis out (M/D)

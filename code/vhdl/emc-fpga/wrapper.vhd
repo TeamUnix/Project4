@@ -18,7 +18,7 @@ entity Wrapper is
 	port	(
 			--Input
 			Clock				: in		std_logic;							--! Clock signal synchronous to CPU signals
-			nRst_i				: in		std_logic;							--! LPC Reset
+			nRst_i			: in		std_logic;							--! LPC Reset
 			Rst_i				: in		std_logic;							--! FPGA Reset
 			nCpuCs_i			: in		std_logic;							--! CPU Chip Select
 			nCpuRd_i			: in		std_logic;							--! CPU Read strobe
@@ -28,8 +28,8 @@ entity Wrapper is
 			--Inoutput
 			CpuD				: inout	wb_dat_typ;								--! External Bi-directional databus
 			--Output
-			Dbus_En				: out		std_logic;							--! Enable signal for DATABUS latches on LPC2478 board, connect to CS
-			Abus_En				: out		std_logic;							--! Enable signal for ADDRESSBUS latches on LPC2478 board, connect to gnd
+--			Dbus_En				: out		std_logic;							--! Enable signal for DATABUS latches on LPC2478 board, connect to CS
+--			Abus_En				: out		std_logic;							--! Enable signal for ADDRESSBUS latches on LPC2478 board, connect to gnd
 			irq_o				: out		std_logic;
 			led					: out		std_logic_vector ( 7 downto 0 )		--! Test output port
 			);
@@ -87,8 +87,8 @@ begin
 	reset	<= (not nRst_i or not Rst_i);
 
 --! Enable Databus latches when CS is set (see LPC2478 OEM manual)
-	Dbus_En <= nCpuCs_i;
-	Abus_En <= '0';
+--	Dbus_En <= nCpuCs_i;
+--	Abus_En <= '0';
   	
 --! LED Port o
 	led		<= s_led;
