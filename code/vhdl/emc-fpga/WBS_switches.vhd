@@ -43,7 +43,7 @@ end WBS_switches;
 architecture RTL of WBS_switches is
 
 	--Constants
-	constant N				: integer := 19;--17;
+	constant N				: integer := 4;--19;
 	constant M				: integer := 3;
 
 	--Types
@@ -70,10 +70,10 @@ begin
 	ack_o				<=	stb_i and cyc_i;  --! asynhronous cycle termination is OK here.
 	
 --! IRQ address
-	irq_add(AddrRange-1 downto LAddrRange)		<= BA_WBS_3;
-	irq_add(LAddrRange-1 downto 0)				<= WBS_REG1;
+	irq_add(AddrRange-1 downto LAddrRange)		<= "100"; --Hard coded for the EMC
+	irq_add(LAddrRange-1 downto 0)				<= "0000";
 	
---!  Processes                                             --
+--!  Processes                                             
 	Reg : process(clk_i)
 		begin
 			if(clk_i'event and clk_i = '1') then

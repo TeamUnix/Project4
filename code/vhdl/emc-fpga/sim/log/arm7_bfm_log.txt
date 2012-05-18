@@ -1,5 +1,6 @@
-588900 ps: WB: Write switch to leds                                                   
-1382290 ps: WB: Read switch reg                                                        
-1589470 ps: WB: Read switch reg                                                        
-1796650 ps: WB: Read switch reg                                                        
+338900 ps: Write 0x00 to LEDs                                                         
+465570 ps: Change switches                                                            
+882270 ps: Read IRQ reg                                                               
+978330 ps: Read switch reg                                                            
+1074390 ps: Write 0x00 to LEDs                                                         
 *** Simulation END ***

@@ -15,6 +15,7 @@
 *.synctex-gz
 *.synctex.gz
 #*.pdf
+pro4.pdf
 *.project
 *.DS_Store
 *.toc
