@@ -1,0 +1,40 @@
+\input{preamble.tex}
+\begin{document}
+
+	%Frontmatter
+	\input{content/01_frontpage.tex}
+	\newpage
+	\input{content/02_executive_summary.tex}
+	\input{content/03_preface.tex}
+	
+	%Table of content
+	\renewcommand{\contentsname}{Table of Content}
+	\tableofcontents
+	\newpage
+	%Content
+	
+	%Part I
+	\part{Analysis}
+	\input{content/04_introduction.tex}
+	\input{content/05_problem_statement.tex}
+	
+	%Part II
+	\part{Realisation}
+	\input{content/06_material_and_methods.tex}
+	\input{content/07_results.tex}
+	
+	%Part III
+	\part{Recapitulation}
+	\input{content/08_conclusion.tex}
+	\input{content/09_discussion.tex}
+	\input{content/10_process_evaluation.tex}
+	%BibTeX
+	\bibliographystyle{plain}
+	\bibliography{bibtex/bibtex}
+
+	%Part IV
+	\part{Appendix}
+	\appendix
+	\input{content/11_appendix.tex}
+	
+\end{document}
