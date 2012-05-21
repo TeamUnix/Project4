@@ -35,6 +35,9 @@ architecture RTL of Syscon is
 
 begin
 
+--	clk_o <= clk_i;
+--	clk_r <= clk_i;
+
 	clk_o <= clk_r;
 
 -- DCM instantiation for the system clock.

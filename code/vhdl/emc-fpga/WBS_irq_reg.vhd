@@ -11,6 +11,7 @@
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 library IEEE;
 	use IEEE.std_logic_1164.all;
+	use IEEE.numeric_std.all;
 library work;
 	use work.def_pkg.all;
 
@@ -41,14 +42,25 @@ end WBS_irq_reg;
 
 architecture RTL of WBS_irq_reg is
 
+	--Types
+--	type state_type is	(
+--								IDLE,
+--								DELAY
+--								);
+
 	--Signals
 	signal	full		:	std_logic;
 	signal	wr			:	std_logic;
 	signal	rd			:	std_logic;
 	signal	read_i	:	std_logic;
+	signal	read_1	:	std_logic;
 	signal	w_data	:	std_logic_vector (AddrRange-1	downto 0);
 	signal	r_data	:	std_logic_vector (AddrRange-1	downto 0);
 	signal	data_o	:	std_logic_vector (Datawidth-1 downto 0);
+--	signal	q_reg		:	unsigned(1 downto 0);
+--	signal	q_next	:	unsigned(1 downto 0);
+--	signal state_reg	: state_type;
+--	signal state_next	: state_type;
 
 begin
 -- =================================================
@@ -59,28 +71,62 @@ begin
 	err_o <= '0';	--error signal
 	rty_o <= '0';	--retry signal
 	ack_o <= stb_i and cyc_i;  --! asynhronous cycle termination is OK here.
+	read_i <= (cyc_i and stb_i and not we_i) or read_1;
 	--Wishbone read
 	data_output	:	process(clk_i)
 	begin
 		if(clk_i'event and clk_i = '1') then
 			if(rst_i = '1') then
-				read_i	<= '0';
+				read_1	<= '0';
 				dat_o <= (others => '0');
+--				state_reg <= IDLE;
+--				q_reg <= (others => '0');
 			else
+--				q_reg <= q_next;
+--				state_reg <= state_next;
 				if((cyc_i and stb_i and not we_i) = '1') then
 					case adr_i is
 						when WBS_REG1 =>
 							dat_o		<= data_o;
-							read_i	<= '1';
+--							state_reg <= IDLE;
+							read_1	<= '1';
 						when others =>
 					end case;
 				else
+--				state_reg <= state_next;
 				--dat_o		<= (others => '0');
-				read_i	<= '0';
+				read_1	<= '0';
 				end if;
 			end if;
 		end if;			
 	end process;
+-- =================================================
+-- Read input
+-- =================================================
+--read_input: process(state_reg)
+--	begin
+--		state_next		<= state_reg;
+--		case state_reg is
+--		-- Idle state -----------------------------------------------------
+--			when IDLE =>
+--				if((cyc_i and stb_i and not we_i) = '1') then
+--					state_next <= DELAY;
+--					q_next <= (others => '1');
+--					read_i <= '1';
+--				else
+--					state_next		<= IDLE;
+--					read_i <= '0';
+--				end if;
+--		-- Delay state ---------------------------------------------------
+--			when DELAY =>
+--				q_next <= q_reg-1;
+--					if	(q_next = 0) then
+--						state_next <= IDLE;
+--					else
+--						state_next <= DELAY;
+--					end if;
+--		end case;
+--	end process;
 -- =================================================
 -- IRQ input
 -- =================================================
@@ -101,9 +147,9 @@ begin
 -- IRQ FIFO
 -- =================================================
 	irq_fifo		:	entity	work.irq_fifo(RTL)
-	Generic map	(
-					W		=> 4
-					)
+--	Generic map	(
+--					W		=> 2
+--					)
 	Port map	(
 				--Input
 				Clk			=>		clk_i,

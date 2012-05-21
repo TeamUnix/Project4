@@ -3,4 +3,7 @@
 882270 ps: Read IRQ reg                                                               
 978330 ps: Read switch reg                                                            
 1074390 ps: Write 0x00 to LEDs                                                         
+1201060 ps: Read IRQ reg                                                               
+1297120 ps: Read IRQ reg                                                               
+1393180 ps: Read IRQ reg                                                               
 *** Simulation END ***
