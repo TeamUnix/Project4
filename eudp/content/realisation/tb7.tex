@@ -54,7 +54,7 @@
 		\hline
 		~			& Requirements for debouncing	& Verification			& Jesus thing		& GPIO device driver	\\ \hline
 		Estimation	& 3							& 7					& xx				& 10			\\
-		Actual		& 3 							& xx					& xx				& 14			\\
+		Actual		& 3 							& 15					& xx				& 14			\\
 		Developer	& Theis						& Theis				& Paulo			& Dennis		\\
 		\hline
 	\end{tabular}
@@ -213,7 +213,7 @@ The figure below is the continued BFM test bench. First the BFM reads the interr
 	\end{centering}
 \end{figure}
 \subsubsection{Digital clock manager}
-In the code handed out by Morten Opprud Jakobsen, there is a DCM\footnote{Digital Clock Manager}. The main purpose of this block is to multiply the $16MHz$ on Spartan 3 with a factor of 4 to get a $64MHz$ clock. In the Spartan 6 the normal clock speed is $100MHz$, so the multiplication is not necessary in this case. But it turns out that the EMC is not able to read or write any data on the Spartan 6 with use only of the standard clock. The reason for this could be \textit{jitter} on the clock. The DCM in Spartan 6 tolerates two types of jitter, \textit{cycle-to-cycle jitter} and \textit{period jitter}. Cycle-to-cycle jitter is the change in clock period from cycle to cycle, the period jitter is the change over millions of clock cycles. The code for the DCM is shown below.
+In the code handed out by Morten Opprud Jakobsen, there is a DCM\footnote{Digital Clock Manager}. This module is used for making a jitter-free clock, and have the possibility to change the clock speed in order to match the clock for the LCP2478. The DCM in Spartan 6 tolerates two types of jitter, \textit{cycle-to-cycle jitter} and \textit{period jitter}. Cycle-to-cycle jitter is the change in clock period from cycle to cycle, the period jitter is the change over millions of clock cycles. The code for the DCM is shown below.
 \begin{lstlisting}[language=VHDL, caption=DCM\_SP]
 ...
 	clk_o <= clk_r;
@@ -232,7 +232,7 @@ In the code handed out by Morten Opprud Jakobsen, there is a DCM\footnote{Digita
 				);
 ...
 \end{lstlisting}
-It is not possible to multiply with one, so in order to not change the clock speed, the clock is multiplied with 2 and divided with 2. The DCM in the Spartan 6 has a lots of features, one feature that is not used in the project is to make phase shift in the clock, the feature that is used is removing the jitter, this is done in the code above. The DCM takes the standard clock input, and the zero phase shifted clock is routed into the clock feedback, for the DCM to compensate for jitter.
+The DCM in the Spartan 6 has many different features, one of the features that is used is removing jitter, this is done in the code above. The DCM takes the standard clock input, and the zero phase shifted clock is routed into the clock feedback, for the DCM to compensate for jitter. The DCM is also used to scale the clock to match the clock in the LPC2478, this is done by multiplying and dividing the clock with integer values.
 \subsubsection{Spartan 6}
 The final design of the Spartan 6 in this project has been verified and the figure below shows the top layer block, and the inputs and outputs on the Spartan 6.
 \begin{figure}[H]
