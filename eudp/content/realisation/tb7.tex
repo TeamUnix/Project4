@@ -282,7 +282,7 @@ Verifications:
 		4 & Current Sensor giving feedback voltage & The current sensor feedback pin is connected to the analogue input in the mBed, the value is shown by the serial connection. \\\hline
 	\end{tabular}
 \end{table}
-\p
+
 Verification 3 is not performed since this board is a prototype, the header pins soldered and the tracks are not consistent to such current, this test could damage the components in the board. For this requirement to be fulfilled the tracks on the PCB should be increase and connectors that could support high currents have to be used.
 
 \subsubsection{Verification}
@@ -297,7 +297,7 @@ The verifications are done following the numeration in ID.
 		1 & Switch the voltage as input or output & Using an mBed to drive the input pins from the power switch system high or low. \\\hline
 	\end{tabular}
 \end{table}
-\p
+
 The mBed is used to simulate the control system, it will set the input pins from the power switch module high and low according to the commands given to the mBed by serial connection.
 
 \paragraph{Test bench set up:} An 60V with max 1A is used as power supply to the system, the mBed will simulate the control system of the power switch system and the voltmeters will show the energy flow direction.
@@ -309,7 +309,7 @@ The mBed is used to simulate the control system, it will set the input pins from
 		\caption{Test bench set up}
 	\end{centering}
 \end{figure}
-\p
+
 The code implemented in the mBed uses 3 pins, a regulated 5V is supplied to the current sensor and the USB serial connection is used for the communication. Pins 13 and 14 are set as digital outputs while pin 15 is set as analogue input for the current sensor measure.
 
 \paragraph{Case scenario 1:} Setting the output pin as high, will drive the SHTD pin high, closing the circuit. The energy will flow from the power line (source) to the module (load). Using a voltmeter the input voltage and output voltage is measure and a drop of 10mV. The results are as expected.
@@ -372,7 +372,7 @@ The test bench used is the same as in the earlier verification.
 		\caption{Case scenario 2: Voltage below 27V will shut down the port.}
 	\end{centering}
 \end{figure}
-\p
+
 The results were the same in both ports, this verification shows that the system have a low and high voltage protection as requested in common requirements. The under voltage protection is unnecessary and might even give malfunctions to the system, since the system might be running only on the power provided by a battery module at the time the voltage goes under 27V, this will shut down the port and the system will be disconnected from any power source. 
 
 \paragraph{Verification ID: 4}
@@ -634,7 +634,7 @@ The web server have to be able to handle errors such the lost of communication w
 Is necessary to define the web interface response for both situations database and energy hub connection lost. If the connection is lost to the device the user is able to see the data stored in the database, so the system is not blocked, but a warning is shown to the user/administrator, do the correspondent debug can be done. In case the connection to the database is lost, the user interface is blocked with an warning, the energy hub will continue working, since it doesn't affected the correct work of the system to route the energy, in this situation all the data retrieved by the modules will be lost.
 \p
 Since a script is running recursively at the client side, when the communications are re-establish to the energy hub or database the user will be able to use the system normally, this is a great improvement in the user experience and functionalities as an web application.
-\p
+
 \subsubsection{Implementation}
 The development of the web interface is made in a local machine using MAMP ( MAC Apache MySQL PHP), and transfer later on to a web server on the university network. 
 
@@ -706,14 +706,14 @@ Script parameters:
 	
 ?>
 \end{lstlisting}
-\p
+
 This script saves the measurement retrieved from a sensor to the database. At first it established the connection to the MySQL server so SQL requests can be made.
 A PHP function returns an array with the current date and time, this is formatted into YYYY-M-D H:M:S, after it can be saved to the MEASUREMENTS table. The script collects all the parameters send through the URL encoding GET, a SQL code is generated and a request made to the MySQL server, the data is added to the MEASUREMENTS table.
 \p
 In case of status changes, a parameter \textbf{op} is encode with the method GET and if it value is 'status' the function changeStatus() will be called. This function will update the HUB\_PORT on the table MODULES and insert a new log to the table LOGS. The request for this functionality is  \textbf{savedata.php?op=status\&id\_module=MODULE ID\&id\_status=STATUS TO CHANDE TO\&hub\_port=HUB\_PORT}.
 
 \paragraph{sendcmd.php}
-\p
+
 The web interface is able to send commands to the energy hub and the modules using the\\ \textbf{sendcmd.php?id\_module=\textless module id\textgreater\&cmd=\textless command to be send\textgreater }. The id\_module tells the hub which module the command should be send.
 No verification is made of the send command by the web server or the energy hub unless the command is specifically send to the hub.
 
@@ -820,7 +820,7 @@ In this script an object is instantiated with a connection to the MySQL server.
 The parameters are included from the db\_globals.php, setting the server host, user, password and database to be used.
 
 \paragraph{db\_globals.php}
-\p
+
 Using a script to define the parameters for the MySQL connection, 
 All the scripts that need to use the global parameters for the connection to the MySQL server, should include db\_globals.php as shown in the db\_connect.php above.
 
@@ -1031,7 +1031,8 @@ In order to fulfill the requirements shown in table \ref{tab:gpio_req}\footnote{
 %
 \subsubsection{Analysis}
 The kernel is running in an embedded system environment with only known parameters connected to it. Therefore a specific GPIO driver is written to decrease development time compared to if a more generic driver was made.
-\p In order to verify a part
+\p 
+In order to verify a part
 \begin{table}[H]
 	\centering
 	\begin{tabular}{|p{2cm}|p{2cm}|p{3cm}|p{3cm}|}\hline
