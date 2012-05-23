@@ -26,9 +26,16 @@
 		\item External memory controller
 		\item Verification of the Spartan 6
 	\end{itemize}
-	\item Jesus thing
+	\item Power Switch system
 		\begin{itemize}
-			\item sub thing
+			\item Testing
+			\item Finalized version
+		\end{itemize}
+	\item Web Interface
+		\begin{itemize}
+			\item Database Corrections
+			\item Error Handling
+			\item User experience
 		\end{itemize}
 	\item GPIO Device driver
 	\begin{itemize}
@@ -260,48 +267,746 @@ The BFM verify the design, and it has been tested on the hardware and it is work
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Jesus Thing
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-\subsection{Jesus thing - Paulo}
+\subsection{Power Switch System- Paulo Fontes}
+The power switch system is the main functionality of the energy hub, it have to be able to switch the energy flow and turn off the port if needed. A prototype PCB was design in time box 5, in this time box the verifications are made and the PCB is improved according to the results.
+\p
+Verifications:
+\begin{table}[H]
+\centering
+	\begin{tabular}{| c | l | p{7cm} | }
+		\hline
+		ID & Description & Verification \\\hline
+		1 & Switch the voltage as input or output & Using an mBed to drive the input pins from the power switch system high or low. \\\hline
+		2 & Over voltage and under voltage are kept between 30V $ \pm10\% $ & Connect two 30V power supplies in series and decrease the voltage below 27V, and increase again to 30V. Increase the voltage above 33V, and decrease to 30V again. \\\hline
+		3 & Current between maximum 30A & Not tested \\\hline
+		4 & Current Sensor giving feedback voltage & The current sensor feedback pin is connected to the analogue input in the mBed, the value is shown by the serial connection. \\\hline
+	\end{tabular}
+\end{table}
+\p
+Verification 3 is not performed since this board is a prototype, the header pins soldered and the tracks are not consistent to such current, this test could damage the components in the board. For this requirement to be fulfilled the tracks on the PCB should be increase and connectors that could support high currents have to be used.
+
+\subsubsection{Verification}
+The verifications are done following the numeration in ID.
+
+\paragraph{Verification ID: 1}
+\begin{table}[H]
+\centering
+	\begin{tabular}{| c | l | p{7cm} | }
+		\hline
+		ID & Description & Verification \\\hline
+		1 & Switch the voltage as input or output & Using an mBed to drive the input pins from the power switch system high or low. \\\hline
+	\end{tabular}
+\end{table}
+\p
+The mBed is used to simulate the control system, it will set the input pins from the power switch module high and low according to the commands given to the mBed by serial connection.
+
+\paragraph{Test bench set up:} An 60V with max 1A is used as power supply to the system, the mBed will simulate the control system of the power switch system and the voltmeters will show the energy flow direction.
+% %	Image of the set up
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Case 2 Schematics changed}
+		\includegraphics[width=0.7\textwidth]{images/tb7_ps_setup.png}
+		\caption{Test bench set up}
+	\end{centering}
+\end{figure}
+\p
+The code implemented in the mBed uses 3 pins, a regulated 5V is supplied to the current sensor and the USB serial connection is used for the communication. Pins 13 and 14 are set as digital outputs while pin 15 is set as analogue input for the current sensor measure.
+
+\paragraph{Case scenario 1:} Setting the output pin as high, will drive the SHTD pin high, closing the circuit. The energy will flow from the power line (source) to the module (load). Using a voltmeter the input voltage and output voltage is measure and a drop of 10mV. The results are as expected.
+
+% %	Image of the set up 1
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Case 2 Schematics changed}
+		\includegraphics[width=0.7\textwidth]{images/tb7_ps_case1.png}
+		\caption{Case scenario 1: Energy flow from power line to the module}
+	\end{centering}
+\end{figure}
+
+
+\paragraph{Case scenario 2:}Changing, the input pin to high and the output pin low, energy will not flow in any direction since the circuit will be open from source to load and two MOSFETs back to back will work as a diode. The results are as expected.
+
+% %	Image of the set up 2
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Case 2 Schematics changed}
+		\includegraphics[width=0.7\textwidth]{images/tb7_ps_case2.png}
+		\caption{Case scenario 2: Open circuit energy is blocked by the back to back MOSFETs working as diode.}
+	\end{centering}
+\end{figure}
+
+Both port are tested and the system works as expected. The tests show that the system have a low voltage drop across the MOSFETs but still working as a diode. The direction of the energy flow can be changed without problems. The verification is successful.
+
+\paragraph{Verification ID: 2}
+In this verification both ends of the systems are tested for over and under voltage. The power supply is connected and the voltage in increased until 35V, after its estabelized again at 30V and decreased to 25V. The power switch system should shut down the port if over 33V and under 25V.
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| c | l | p{7cm} | }
+		\hline
+		ID & Description & Verification \\\hline
+		2 & Over voltage and under voltage are kept between 30V $ \pm10\% $ & Connecting two 30V power supplies in series and decrease the voltage below 27V and increase again to 30V until stabilise. Increase the voltage above 33V, and decrease to 30V again. \\\hline
+	\end{tabular}
+\end{table}
+
+The test bench used is the same as in the earlier verification.
+
+\paragraph{Case scenario 1:} The power supply is connected to the power line, the voltage is increased to 34V.
+
+% %	Image of the set up 1
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Case 2 Schematics changed}
+		\includegraphics[width=0.7\textwidth]{images/tb7_ps_ov_1.png}
+		\caption{Case scenario 1: Voltage above 33V will shut down the port.}
+	\end{centering}
+\end{figure}
+
+\paragraph{Case scenario 2:} The power supply is connected to the power line, the voltage is decrease to 26V.
+
+% %	Image of the set up 2
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Case 2 Schematics changed}
+		\includegraphics[width=0.7\textwidth]{images/tb7_ps_ov_2.png}
+		\caption{Case scenario 2: Voltage below 27V will shut down the port.}
+	\end{centering}
+\end{figure}
+\p
+The results were the same in both ports, this verification shows that the system have a low and high voltage protection as requested in common requirements. The under voltage protection is unnecessary and might even give malfunctions to the system, since the system might be running only on the power provided by a battery module at the time the voltage goes under 27V, this will shut down the port and the system will be disconnected from any power source. 
+
+\paragraph{Verification ID: 4}
+The current sensor implemented in the power switch system is used to retrieve data regarding the direction of the flow and for security reasons turn of the port in case the current is too high. For this test a variable load is added to the test bench and set to 30$\omega$. The current sensor implemented gives a feedback of 40mV/A.
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| c | l | p{7cm} | }
+		\hline
+		4 & Current Sensor giving feedback voltage & The current sensor feedback pin is connected to the analogue input in the mBed, the value is shown by the serial connection. \\\hline
+	\end{tabular}
+\end{table}
+
+\paragraph{Case scenario 1:} The power supply is connected to the power line and a variable load as module. The resistance is set to 30$\omega$ giving a difference of approximately 40mV in the feedback pin.
+
+% %	Image of the set up 1
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Case 2 Schematics changed}
+		\includegraphics[width=0.7\textwidth]{images/tb7_ps_cs_1.png}
+		\caption{Case scenario 1: Current measures.}
+	\end{centering}
+\end{figure}
+
+Due to the sensitivity of the current sensor, the accuracy can change according to the temperature and voltage supplied. Improvements regarding the accuracy have to be done.
+
+\subsection{Web Interface - Paulo Fontes}
+For the development and evaluative procedures, a LAMP(Linux Apache MySQL PHP) web server is set up, this process is described in time box 4. The web interface can be accessed on the university network at the address http://10.1.18.223/.
+\p
+The web interface application includes a great amount of different scripting languages such as server side PHP and client side JavaScript, along with markup languages HTML and XML. The code for each will not be explained extensively, instead the most important functionalities will be filtered and explained.
+\p
+An extra web application is developed in PHP only for evaluative propose, it allows the user to view the code of all the files on the web server file structure. By this method the last version of the code is always updated for visualization. The application is called SeeIt and can be accessed at the address: http://10.1.18.223/SeeIt/. 
+
 %			Intro
 %					verification specification
 %					deployment specification
 %
 \subsubsection{Analysis}
-%			Analysis
-%
-%                Refactored block diagram
-%                Refactored class diagram
-%                Detailed use cases
-%                User interface specification
-%                System interface specification
-%                Dimensioning specification 
-%
-\subsubsection{Design}
-%       	 Design
-%
-%                UML/SysML deployment view(s)
-%                Mechanical specifications and dimensioning
-%                HW module specification per block
-%                UML SW deployment view
-%                Class specification
-%                Refactored class diagram
-%                Use case scenarios specifications
-%                Sequence diagrams
-%
+
+\paragraph{Database}
+For a well constructed database, it has to be consistent, flexible and efficient so no data is lost or repeated when saved. The data base structure has changed since time box 4 when it was developed. The new structure can be seen bellow.
+
+TYPE(ID\_TYPE, NAME);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_TYPE & Auto increment integer, a new id number is generated when a different type is needed to the system. \\\hline
+		NAME & Describe the type name for example: Input, output, bidirectional, etc.\\\hline
+	\end{tabular}
+\end{table}
+
+STATUS(ID\_STATUS, NAME);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_STATUS & Auto increment integer, a new id number is generated when a different status is needed to the system. \\\hline
+		NAME & Describe the status name for example: Running, stopped, warning, etc.\\\hline
+	\end{tabular}
+\end{table}
+
+
+MODULES(ID\_MODULE, ID\_TYPE, NAME, HUB\_PORT);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_MODULE &  Module unique ID, this id as primary key ensures that no module with is repeated in the database.\\\hline
+		ID\_TYPE & This is a foreigner key for the table type, this way if some other type of module is needed it can be dynamical add. \\\hline
+		NAME & The name of the module for example, Solar Panel, wind turbine, battery. \\\hline
+		HUB\_PORT & Actual connected port for this module\\\hline
+	\end{tabular}
+\end{table}
+
+As a requirement, the database have to store the measurement  from different sensors. This is stored in a the table MEASUREMENTS.
+
+MEASUREMENTS(ID\_MEASURE, ID\_SENSOR, DATE\_TIME, HUB\_PORT, VALUE)
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_MEASURE &  Measurement id, auto increment field.\\\hline
+		ID\_SENSOR & This is a foreigner key for the table sensor, this associated the value retrieved to the correspondent sensor. \\\hline
+		DATE\_TIME & Date and time of the measurement is saved so it can be plotted or in case of a lower efficiency a detailed history can analysed. \\\hline
+		HUB\_PORT & Actual connected port for this module\\\hline
+		VALUE & Measurement retrieved by the energy hub.\\\hline
+	\end{tabular}
+\end{table}
+
+Logs are a simplified method of keeping track about what is happening in the system, this is one of the most fundamental functionalities of the system.
+
+LOGS(ID\_LOG, ID\_MODULE, DATE\_TIME, ID\_STATUS, ID\_USER, ID\_ERROR);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_LOG & Auto increment integer, a new id number is generated every time a measurement is add. \\\hline
+		ID\_MODULE & This is a foreigner key for the table modules, this allow the system to know from which module correspond the measurement .\\\hline
+		DATE\_TIME & Date and time of the log is saved, in case of malfunction it will help with a time line. \\\hline
+		ID\_STATUS & The new status of the module that was changed.\\\hline
+		ID\_USER & Foreigner key for the table users, this will allow the system to know which user made the change. \\\hline
+		ID\_ERROR & Foreigner key for the table error, if any error occurs it will be stored. \\\hline
+	\end{tabular}
+\end{table}
+
+For error handling situations a table ERRORS is created this way the administrator can have more control and act in case some mall function of the system.
+\\\\
+
+ERRORS(ID\_ERROR, NAME);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_ERROR & Auto increment integer, a new id number is generated when a different unit is needed to the system. \\\hline
+		NAME & Predefined error description. \\\hline
+	\end{tabular}
+\end{table}
+
+Measurements are add to the database constantly, which in a non-stop system database size could be a problem, to avoid this situation a MERGES data set is created. This will store an average of values between a time span for each sensor, allowing the customer either to erase the values from the log or export them out from the database.
+\\\\
+
+MERGERS(ID\_MERGE, DATE\_FROM, DATE\_TO, ID\_SENSOR, VALUE);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| l | p{10cm} |}
+		\hline
+		ID\_MERGE & Auto increment integer, a new id number is generated every time an wrap is needed. \\\hline
+		ID\_SENSOR & This is a foreigner key for the table sensors, this allow the system to know from which sensor correspond the values .\\\hline
+		DATE\_FROM & Date and time of the time span start. \\\hline
+		DATE\_TO & Date and time of the time span end. \\\hline
+		VALUE & Average measurements value. \\\hline
+	\end{tabular}
+\end{table}
+
+SENSOR(ID\_SENSOR, ID\_MODULE, ID\_UNITS);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_SENSOR & Auto increment integer, a new id number is generated when a different sensor is needed to the system. \\\hline
+		ID\_MODULE & This is a foreigner key for the table sensors, this allow the system to know from which module correspond the sensor, being a primary key with the id\_sensor, this way each sensor correspond to only one module .\\\hline
+		ID\_UNITS & This is a foreigner key for the table units, this allow the system to know which units the sensor is measuring.\\\hline
+	\end{tabular}
+\end{table}
+
+UNITS(ID\_UNIT, NAME);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_UNIT & Auto increment integer, a new id number is generated when a different unit is needed to the system. \\\hline
+		NAME & Describe the unit name for example: A, V, deg ,m/s,etc. (Ampere, Volt, Degrees, Velocity)\\\hline
+	\end{tabular}
+\end{table}
+To increase security, an USERS table is added associated with different PRIVILEGES for different users. A user root is created leaving the system able to manage multiple users with different privileges if needed.
+\\
+
+USERS(ID\_USER, NAME, PASS, EMAIL, ID\_PRIV);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_USER & Auto increment integer, a new id number is generated when a different privilege is needed to the system. \\\hline
+		NAME & Username credential. \\\hline
+		PASS & User password (Not encrypted in this version). \\\hline
+		EMAIL & Email to which warnings are send. \\\hline
+		ID\_PRIV & Foreigner key for the table privileges. \\\hline
+	\end{tabular}
+\end{table}
+
+PRIVILEGES(ID\_PRIV, NAME);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_UNIT & Auto increment integer, a new id number is generated when a different privilege is needed to the system. \\\hline
+		NAME & Describe the user privileges. \\\hline
+	\end{tabular}
+\end{table}
+For the communication process between the web interface and the energy hub, the ip address of the device need to be always accessible this way a table DEVICES is created in which the last known IP address of the device is stored.
+\\\\
+
+DEVICES(ID\_DEVICE, IP);
+
+\begin{table}[H]
+\centering
+	\begin{tabular}{| p{2cm} | p{10cm} |}
+		\hline
+		ID\_DEVICE & Auto increment integer, a new id number is generated when a different ip added. \\\hline
+		IP & IP address of the device. \\\hline
+	\end{tabular}
+\end{table}
+
+At this point, in an abstract way, the database can initialise a new module or identify if the module where connected before, change the status for each module and add new measurements for each sensor.
+\paragraph{Data Model}
+Data model is a high-level overview of the database structure. At this stage data sets are translated to a logic structure with the relationship between tables.
+
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Webserver first page}
+		\includegraphics[width=1.0\textwidth]{images/db_datamodel.png}
+		\caption{Database relational overview ( Data Model )}
+	\end{centering}
+\end{figure}
+
+\paragraph{File Structure}
+The file structure defines how files are grouped on a system, in a web server architecture the files are stored in the root directory defined by the web server (Apache) configuration. The file structure necessary for this web interface has change since last time box due to a meeting with other teams. The above structure was approved from the meeting.
+
+\begin{figure}[H]
+	\begin{centering}
+		%\missingfigure{Webserver first page}
+		\includegraphics[width=0.3\textwidth]{images/file_structure.png}
+		\caption{Proposed File structure}
+	\end{centering}
+\end{figure}
+
+A short description for each script listed above can be seen in this list:
+\begin{itemize}
+	\item includes/images/ - Contains images related with the system functionalities.
+	\item includes/db\_connect.php - Handle the connection to the MySQL database.
+	\item includes/db\_globals.php - Includes all the global variables with the credentials for the database.
+	\item includes/popStyle.css - Popup login style definition.
+	\item includes/popUp.js - Client side script to handle the user login.
+	\item modules/[0-2] - Modules pages, the numbers are associated with the modules ids, being 0 the hub, 1 the battery and 2 the photovoltaic panels.
+	\item modules/control.js - Client side script, makes background requests to a PHP script, this script is part of the user experience optimization.
+	\item modules/dock.php - PHP script contains the navigation system for the web interface.
+	\item modules/getdata.php - PHP script called in background by the client side script running recursively control.js, this script retrieves the system status and data form database in real time, is part of the user experience optimization.
+	\item modules/index.php - This page includes each module page structure.
+	\item modules/module\_styles.css - Graphical layout definition.
+	\item control.js - Client side script, makes background requests to a PHP script and handle the connections of new modules, this script is part of the user experience optimization.
+	\item cron.php  - Cron jobs are running by the server in a predefined time, in this case the cron.php at the web server root will point to the cron jobs inside each module folder.
+	\item error.js - Client side script, make background requests to a PHP script part of the error handling system.
+	\item errorhandler.php - PHP script called in background by the client side script running recursively, is part of the error handling system.
+	\item getdata.php - PHP script called in background by the client side script running recursively control.js, this script retrieves the modules connected to the system in real time. Is part of the user experience optimization.
+	\item index.php - First page of the web interface.
+	\item login.php  - This PHP script is called in background by the pop up login client side script.
+	\item reset.css - Layout definition of the web interface.
+	\item sendcmd.php - Webservice to send commands to the desired module/enegy hub.
+	\item style\_index.css - Layout definition of the web interface.
+\end{itemize}
+
+Due to the size of such system and the few time for the development, the project was scaled down so a high fidelity prototype where the system to be can be implemented and the main functionalities of the system tested.
+
+\paragraph{Error Handling}
+The web server have to be able to handle errors such the lost of communication with the energy hub or database connection problems. For a reliable system, a script running on the client side using JavaScript have to be implemented, this way the web interface can recursively test the communication to the energy hub and database.
+\p
+Is necessary to define the web interface response for both situations database and energy hub connection lost. If the connection is lost to the device the user is able to see the data stored in the database, so the system is not blocked, but a warning is shown to the user/administrator, do the correspondent debug can be done. In case the connection to the database is lost, the user interface is blocked with an warning, the energy hub will continue working, since it doesn't affected the correct work of the system to route the energy, in this situation all the data retrieved by the modules will be lost.
+\p
+Since a script is running recursively at the client side, when the communications are re-establish to the energy hub or database the user will be able to use the system normally, this is a great improvement in the user experience and functionalities as an web application.
+\p
 \subsubsection{Implementation}
-%     	   Implementation
+The development of the web interface is made in a local machine using MAMP ( MAC Apache MySQL PHP), and transfer later on to a web server on the university network. 
+
+\paragraph{Communication}
+The communication between the several components of the system is crucial, data is retrieved at a high rate from the modules, so an effective communication between the energy hub and the web server is implemented. Among the communication with the energy hub, the web interface needs a constant connection with the MySQL server, so data can added and retrieved from the database.
+
+\paragraph{savedata.php}
+A background application running in the energy hub converts the measurement sent through PLC (UART) to a HTTP request \textbf{savedata.php?sensor\_id=ID Sensor\&value=Sensor Measurement\&hub\_port=Hub Port}.
+
+Script parameters:
+\begin{itemize}
+	\item sensor\_id - Id of the sensor to where save data.
+	\item value - the vlue to be saved
+	\item hub\_port - the connected port of the module
+	\item op - status, change status of a module. <unique\_id><new status>, this is added to the log table.
+\end{itemize}
+\begin{lstlisting}[language=php]
+<?php
+	function changeStatus($con){
+		$date = getdate();
+		$today = $date['year'].'-'.$date['mon'].'-'.$date['mday'].' '.$date['hours'].':'.$date['minutes'].':'.$date['seconds'];
+		$sql = 'INSERT INTO `LOGS` (
+				`ID_LOG` ,
+				`ID_MODULE` ,
+				`DATE_TIME` ,
+				`ID_STATUS` ,
+				`ID_USER` ,
+				`ID_ERROR` 
+				)
+				VALUES (
+				NULL , \''.$_GET['id_module'].'\', \''.$today.'\', \''.$_GET['id_status'].'\', \''.$_SESSION['id_user'].'\', \'1\'
+				)';
+		if($con->query($sql)){
+			echo "Success";
+		}
+		$sql = 'UPDATE `MODULES` SET `HUB_PORT` = '.$_GET['hub_port'].' WHERE `MODULES`.`UNIQUE_ID` ='.$_GET['id_module'];
+		
+		if($con->query($sql)){
+			echo "Success";
+		}
+	}
+	
+	if(isset($_GET['op'])){
+		
+		switch ($_GET['op']){
+			case "status": changeStatus($con); break;	
+		}
+		
+	} else {
+		$date = getdate();
+
+		$today = $date['year'].'-'.$date['mon'].'-'.$date['mday'].' '.$date['hours'].':'.$date['minutes'].':'.$date['seconds'];
+
+		if(isset($_GET['sensor_id']) && isset($_GET['value']) && isset($_GET['hub_port'])){
+			$sql= "INSERT INTO `MEASUREMENTS` (".
+				  "`ID_MEASURE` ,".
+			  	  "`ID_SENSOR` ,".
+			  	  "`DATE_TIME` ,".
+			  	  "`HUB_PORT` ,".
+			  	  "`VALUE`) ".
+			  	  "VALUES (NULL , '".$_GET['sensor_id']."', '".$today."', '".$_GET['hub_port']."', '".$_GET['value']."')";
+	
+			$con->query($sql); // Run the query in the MySQL server
+			echo $sql;
+		}	else {
+			echo 'Invalide parameters';	
+		}
+	}
+	
+?>
+\end{lstlisting}
+\p
+This script saves the measurement retrieved from a sensor to the database. At first it established the connection to the MySQL server so SQL requests can be made.
+A PHP function returns an array with the current date and time, this is formatted into YYYY-M-D H:M:S, after it can be saved to the MEASUREMENTS table. The script collects all the parameters send through the URL encoding GET, a SQL code is generated and a request made to the MySQL server, the data is added to the MEASUREMENTS table.
+\p
+In case of status changes, a parameter \textbf{op} is encode with the method GET and if it value is 'status' the function changeStatus() will be called. This function will update the HUB\_PORT on the table MODULES and insert a new log to the table LOGS. The request for this functionality is  \textbf{savedata.php?op=status\&id\_module=MODULE ID\&id\_status=STATUS TO CHANDE TO\&hub\_port=HUB\_PORT}.
+
+\paragraph{sendcmd.php}
+\p
+The web interface is able to send commands to the energy hub and the modules using the\\ \textbf{sendcmd.php?id\_module=\textless module id\textgreater\&cmd=\textless command to be send\textgreater }. The id\_module tells the hub which module the command should be send.
+No verification is made of the send command by the web server or the energy hub unless the command is specifically send to the hub.
+
+\begin{lstlisting}[language=php]
+
+<?php
+	
+	// SQL request for the device page.
+	require_once("includes/db_connect.php");
+	
+	if(isset($_GET['cmd']) && isset($_GET['id_module'])){
+		
+		$device_port = 5555;
+			
+		$sql= "SELECT IP ". 
+			  "FROM `DEVICE` ". 
+			  "ORDER BY ID_DEVICE DESC ".
+			  "LIMIT 1";
+		
+		$res = $con->query($sql); // Run the query in the MySQL server
+		
+		$row = $res->fetch_row();
+		
+		$device_ip = $row[0];
+		
+		if (!$socket=socket_create(AF_INET, SOCK_STREAM, SOL_TCP)){
+			exit (socket_strerror(socket_last_error()));
+		}
+	
+		if (!socket_connect($socket,$device_ip,$device_port)){
+			exit (socket_strerror(socket_last_error()));
+		}
+	
+		$str = $_GET['cmd'].';'.$_GET['id_module'].';'.$_GET['dir'];
+		
+		socket_write($socket,$str);
+	
+		$msg='';
+		$c='';
+    	
+		while(socket_recv($socket, $c, 256,0)){
+  			if($c != null) {
+   				$msg .= $c;
+			}
+		}
+		
+		echo $msg;
+        
+		socket_close($socket);
+		
+	} else {
+		echo 'Command or Module Id not set';
+	}
+
+?>
+\end{lstlisting}
+
+At first the script will get the ip address of the energy hub, a SQL query retrieves the last IP address added to the table DEVICES. With the energy hub ip and a predefined port, a connection is created using a TCP socket for the communication between the energy hub and the web server. The parameters are collected from the encode URL and translated to a recognized format in the energy hub. The data is send to the energy hub and a answer of success or not is returned.
+\p
+This script is called in background by a client side script, this will handle how to warning the user in case a problem occurs.
+
+\paragraph{saveip.php}
+
+This script is called by the background application running on the energy hub, it saves the IP address given by DHCP, this is used for further communication between the web server and the energy hub.
+\begin{lstlisting}[language=php]
+	require_once("includes/db_connect.php");
+
+	if(isset($_GET['ip'])){
+		$sql= "INSERT INTO `DEVICE` (".
+			  "`ID_DEVICE` ,".
+		  	  "`IP`)".
+		  	  "VALUES (NULL , '".$_GET['ip']."')";
+	
+		$con->query($sql); // Run the query in the MySQL server
+		
+		// No feedback needed since the energy hub will not expect an answer.
+		
+	} else {
+		echo 'IP not set';
+	}
+\end{lstlisting}
+The ip address is send by the GET method (saveip.php?ip=127.0.0.1), this is how the data in encoded into a URL, being collected in the variable \$\_GET['ip']. 
+A \$sql variable string is created containing the SQL code to be run at the MySQL server.
+
+\paragraph{db\_connect.php}
+
+For the communication to the database a driver is used in PHP that provides an interface to the MySQL server. The PHP mysqli extension (MySQL improved) is used in this project, this is recommend for MySQL servers version 4.1.3 or later. This extension provides several benefits as a objective-oriented interface, support for multiple statements, embedded server support and more can be found in the MySQL documentation.
+
+\begin{lstlisting}[language=php]
+	require_once("db_globals.php");
+	
+	$con = new mysqli(DB_HOST,DB_USER,DB_PASS,DB_NAME); // Creates new mysql connection
+	
+	if($con->connect_error){
+		echo "Failed to connect to MySQL: (" . $con->connect_errno . " ) ". $con->connect_error;
+	} 
+	else { echo "Connection established"; }
+\end{lstlisting}
+
+In this script an object is instantiated with a connection to the MySQL server.
+\p
+\textit{\$con = new mysqli\textless parameters \textgreater)}
+\p
+The parameters are included from the db\_globals.php, setting the server host, user, password and database to be used.
+
+\paragraph{db\_globals.php}
+\p
+Using a script to define the parameters for the MySQL connection, 
+All the scripts that need to use the global parameters for the connection to the MySQL server, should include db\_globals.php as shown in the db\_connect.php above.
+
+\begin{lstlisting}[language=php]
+	// MySQL condifuration
+	DEFINE ('DB_USER','root');
+	DEFINE ('DB_PASS','pass');
+	DEFINE ('DB_HOST','localhost');
+	DEFINE ('DB_NAME','iEnergy');
+\end{lstlisting}
+
+The global parameters the connection to the MySQL server are define in this script.
+
+\begin{itemize}
+	\item DB\_USER - Database user name with read, write and execute permissions.
+	\item DB\_PASS - Password for the user
+	\item DB\_HOST - Hostname for the MySQL server, if running at the same host as the PHP server, localhost or 127.0.0.1 should be used.
+	\item DB\_NAME - Database name to connect to.
+\end{itemize}
+
+\paragraph{Error Handling}
+The implementation of an error handling will keep the web interface more reliable, improve user experience and alert the administrators to a error situation. A error handling PHP script is called in background, this script will test the communication between the web server and the energy hub, and the communication to the MySQL server. As described in the analysis in this report, the user interface is blocked giving the message warning when the communication with the MySQL server is lost and a warning is given to the user when no communication with energy hub is found.
+
+\paragraph{errorhandler.php} The error handler PHP script is included in each web page before any other script, this script is included when a page is loaded and is recursively called in background to test the connections. The script gives a XML response, when called as background so the client side JavaScript can handle the real time warnings to the user. This method can be called as active error handle, since it acts in real time, usually error handling is implemented when is need to do some action, for example retrieve data from database. With this system the user is immediately blocked from doing any action until the situation is solved.
+\p
+Since this script is included before everything else, the HTML, JavaScript and CSS layout is included in the file. Bellow several code blocks were extracted for and easier explanation, the full code can be seen using the application SeeIt and in the appendix of this report.
+\p
+At first and most important the database connection have to be tested, as such a connection to the database is attempted. If the connection is successful the database error session variable will be 0. In case of connection failure the error variable will be changed to one and kept until the connection is re established, changing the session error variable to 2. This will tell the client side script that the situation was solved and in the next test the variable is changed to 0 again. This can be seen in the code bellow.
+\begin{lstlisting}[language=php]
+	
+	if ($_SESSION['error_db']>1) { 
+		$_SESSION['error_db']=0;
+	}
+
+	$_SESSION['error_device']=0;
+
+	// Test DB connection
+	require_once("includes/db_globals.php");
+	
+	$con = mysql_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME);
+	
+	if(!$con){
+		$_SESSION['error_db']=1;
+		$error = "Failed to connect to database: ". mysql_error();
+	} else {
+		if ($_SESSION['error_db']==1){
+			$_SESSION['error_db']=2;
+		} else {
+			$_SESSION['error_db']=0;	
+		}
+	}
+\end{lstlisting}
+
+If no error regarding the database connection is acknowledge, the ip address for the energy hub is retrieved and the connection with the energy hub can be established.
+
+\begin{lstlisting}[language=php]
+if($_SESSION['error_db']==0){
+		
+		$device_port = 5555;
+		
+		$con = new mysqli(DB_HOST,DB_USER,DB_PASS,DB_NAME);
+		
+		$sql= "SELECT IP ". 
+			  "FROM `DEVICE` ". 
+			  "ORDER BY ID_DEVICE DESC ".
+			  "LIMIT 1";
+		
+		$res = $con->query($sql);
+		
+		$row = $res->fetch_row();
+		
+		$device_ip = $row[0];
+\end{lstlisting}
+
+The SQL statement  \textbf{SELECT IP FROM `DEVICE` ORDER BY ID\_DEVICE DESC LIMIT 1} retrieves the last ip address insert in the table. The keywords ORDER BY ID\_DEVICE DESC will show the last data added and the keyword LIMIT 1, limits the number of values return to only one. The value is then fetched from the result and assigned to the variable device\_ip for later use in the connection.
+\p
+For the communication to the energy hub a socket have to be created and a connection established. In case of one of this steps don't work (Socket creation and Connection), a error session variable is set to 1, the client side application will catch this error and alert the user for such situation. The socket is closed after testing to leave the connection path open for new tests or commands to be send.
+
+\begin{lstlisting}[language=php]
+		if (!$socket=socket_create(AF_INET, SOCK_STREAM, SOL_TCP)){
+			$_SESSION['error_device']=1;
+		} else {
+			$_SESSION['error_device']=0;
+		}
+	
+		if (!socket_connect($socket,$device_ip,$device_port)){
+			$_SESSION['error_device']=1;
+		} else {
+			$_SESSION['error_device']=0;
+		}
+		
+		socket_write($socket,"a");
+		
+		socket_close($socket);
+	
+	}
+\end{lstlisting}
+
+The error handle client side (JavaScript) and server side (PHP) are developed at the same time, since the cooperation between both is essential for the proper operation of the error handling system.
+\p
+This block of code is used only by the client side script, it make a request to the errorhandle.php with the encoded URL variable op=d, this block will return an XML response. The client side script then interpret the answer and reacts according to the errors.
+\begin{lstlisting}[language=php]
+	if(isset($_GET['op']) && $_GET['op']=='d'){
+		
+		echo '<ERROR>'.
+			    '<DB>'.$_SESSION['error_db'].'</DB>'.
+				'<DEVICE>'.$_SESSION['error_device'].'</DEVICE>'.
+			  '</ERROR>';
+		
+	} else {
+\end{lstlisting}
+
+The else statement in this code indicates that, if the script was not called by the error.js, then it will include the necessary HTML, CSS and JavaScript to the file where it was included.
+\p
+An example of this situation is found at the index.php, the first lines of this script starts the session and includes errorhandle.php.
+
+\begin{lstlisting}[language=php]
+<?php
+	session_start();
+	
+	require_once("errorhandler.php");
+	
+	require_once("includes/db_connect.php");
+?>
+\end{lstlisting}
+
+\paragraph{error.js}
+This script catches and handle errors in the client side, it uses background requests to the PHP script errorhadle.php. By the XML response it acts according the situation. JavaScript is a dynamic language with a lot of potential, and this is used in detail in this script.Meaningful blocks will be extracted from the code and explained here.
+\p
+Three functions are part of this script, being two of them for animation to improve the user experience, they are not documented in this section. The remaining function is the mains focus of the error handling system, is called makeTests().
+\p
+This functions initialize the variables req for the URL request, db\_error and dev\_error that will be assigned with the values returned by the request.
+At first the browser is tested to define which HTTP request object to use, the main difference is between IE (version 5 and 6) form Microsoft and the rest ot the browsers, since IE (version 5 and 6) uses an ActiveX object to deal with background requests.
+\begin{lstlisting}[language=php]
+	var req;
+	var db_error;
+	var dev_error;
+	
+	if(window.XMLHttpRequest){
+		req	= new XMLHttpRequest();
+	} else {
+		req = ActiveXObject("Microsoft.XMLHTTP");	
+	}
+\end{lstlisting}
+
+The open and send methods from the XMLHttpRequest object, are used to send a request to the server. The 'open' method specifies the type of encoding used in the URL (GET or POST) and if the request is synchronous or not. The 'send' method sends the request to the server, parameters are needed in case of POST encoding method. 
+
+\begin{lstlisting}[language=php]
+	req.open("GET","/errorhandler.php?op=d",false);
+	req.overrideMimeType('text/xml');
+	req.send();
+	
+	var result = req.responseXML;
+\end{lstlisting}
+
+The result variable is initialized and the returned XML data is assigned to it, this data is then extracted and used according to the situation. An example of retrieved XML data can be seen bellow:
+
+\begin{lstlisting}[language=xml]
+		<ERROR>
+			<DB>0</DB>
+			<DEVICE>0</DEVICE>
+		</ERROR>
+\end{lstlisting}
+
+%	IMAGE from ERROR HANDLING database and device
 %
-%                Mechanical drawings with details explained
-%                Electronic diagrams with details explained
-%                Source code with details explained
-%                Description of integration 
-%
-\subsubsection{Verification}
-%       	 Verification
-%
-%                Module tests
-%                Integration tests
-%                Acceptance test
+
+Graphical representation of an error in the connection to the database and communication to the energy hub device.
+\begin{figure}[H]
+	\begin{tabular}{ c c }
+		\includegraphics[width=0.5\textwidth]{images/error_db.png}
+&
+		\includegraphics[width=0.2\textwidth]{images/error_device.png}
+\end{tabular}
+\caption{Database Error and Device communication Error}
+\end{figure} 
+
 \subsubsection{Conclusion}
+
+In the analysis phase of this project, it was necessary to understand how can the database an the web interface be verified. As such a scaled down web interface with only two modules and the energy hub is implemented.
+\p
+With this more realistic approach to the system, it was possible to verify problems regarding the common requirements for the communication between the modules and the energy hub. The database is able to handle several sensors connect to one module, but the energy hub have no knowledge of the sensors connected to each module. For a completely working system, deeper communication and protocol analysis have to be done.
+\p
+A working high-fidelity prototype is created, ids are assigned to the modules being id:0 to the energy hub, id:1 to the battery and id:2 for the photovoltaic panels. Each module have just one sensor that measures the current (ampere), the id of the sensor is the same as the module id for a working prototype.
+\p
+The end system can handle all functionalities expected for this project, the energy hub is able to send commands to the energy hub and data can be added or retrieved from the database. The error handling and the dynamic update of contents on the client side, improved the user experience for the control and navigation in the system.
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Dennis Thing
