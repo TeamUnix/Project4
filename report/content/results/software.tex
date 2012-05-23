@@ -8,16 +8,18 @@ The kernel does not have a MMU (memory management unit) implemented, which handl
 \section{Das U-Boot}
 \writer{Dennis Madsen}
 %
-Default startup text changed to easily verify that another version is running.
+Das U-Boot is a universal boot loader with support for several micro controller architectures (including the LPC2478 processor).
+\p According to the \textit{External memory controller} section in \textit{Time Box 7}, the external memory controller 2 has been setup in order to be able to send and receive commands to and from the FPGA device. 
+\p The default startup text has been changed slightly in order to show that it is not the standard compiled u-boot boot loader the system makes use of. 
 
 %%%%%%%%%%%%%%%%DEVICE DRIVERS%%%%%%%%%%%%%%%%%%%%
 \section{Device drivers}
 \writer{Dennis Madsen}
 %
-A device driver is a piece of software in the kernel which makes it possible for user space application to communicate with the hardware. For the project 3 device drivers have been made.
+A device driver is a piece of software in the kernel which makes it possible for user space application to communicate with the hardware. For the project, 3 device drivers have been made.
 \subsection{ADC}
 The driver made by Embedded Artist (included in the kernel source tree), has been modified in order to be able to read all 8 ADC inputs. The documentation for modifying the ADC driver is found in \textit{Time box 3}. 
-\p To access the ADC channels, the ADCx files in \textit{/dev/} can be read or written.
+\p To access the ADC channels, the ADCx files in \textit{/dev/} can be read or written (where x goes from 0 to 7).
 \subsection{UART}
 Time box 6 describes the design of the UART driver. When issuing the help command the different setup options are returned by the driver.
 \begin{lstlisting}[language=c, caption=UART help command]
@@ -60,7 +62,7 @@ The GPIO device driver is specially designed for the Energy HUB project, table \
 Documentation of the GPIO device driver can be found in \textit{Time Box 7}
 %%%%%%%%%%%%%%%%%%USER SPACE%%%%%%%%%%%%%%%%%%%%%
 \section{User space applications}
-An user space application has been made for each device driver in order to simplify hardware calls from the systems main program. The implementation of each user space application is described in the corresponding device driver time box. 
+An user space application has been written for each device driver in order to simplify hardware calls from the systems main program. The implementation of each user space application is described in the corresponding device driver time box. 
 \subsection{ADC}
 The ADC program takes two arguments: number and reference. \textit{Number} indicates the ADCx that should be read where \textit{reference} defines how the read value should be converted and returned. 
 \\The reference value is given in mV.
