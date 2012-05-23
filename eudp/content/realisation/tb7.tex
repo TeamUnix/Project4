@@ -30,9 +30,9 @@
 		\begin{itemize}
 			\item sub thing
 		\end{itemize}
-	\item Dennis thing
+	\item GPIO Device driver
 	\begin{itemize}
-		\item Sub thing
+		\item Setup and control of GPIO pins used in the system
 	\end{itemize}
 \end{itemize}
 
@@ -42,7 +42,7 @@
 	\item[Requirements for debouncing] This is the timing requirements for the switch block to avoid bouncing when switching state
 	\item[Verification] This is verification of the VHDL design including the EMC part in the LPC2478
 	\item[Jesus thing]
-	\item[Dennis thing]
+	\item[GPIO device driver] Driver to set and read the GPIO pins used in the energy HUB system. 
 \end{description}
 
 \subsubsection{Time planning}
@@ -52,10 +52,10 @@
 	\todo[inline]{Update Time}
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
-		~			& Requirements for debouncing	& Verification			& Jesus thing		& Dennis thing	\\ \hline
-		Estimation	& 3								& 7						& xx				& xx			\\
-		Actual		& 3 							& xx					& xx				& xx			\\
-		Developer	& Theis							& Theis					& Paulo				& Dennis		\\
+		~			& Requirements for debouncing	& Verification			& Jesus thing		& GPIO device driver	\\ \hline
+		Estimation	& 3							& 7					& xx				& 10			\\
+		Actual		& 3 							& xx					& xx				& 14			\\
+		Developer	& Theis						& Theis				& Paulo			& Dennis		\\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -638,9 +638,9 @@ In order to test requirement B-2.1, B-2.2 and B-2.3 the whole system needs to be
 	\caption{Verification of energy routing requirements.}
 	\label{tab:gpio_req_test}
 \end{table}
-As these tests cannot be performed, a minor test has been made in order to verify the functionality of the written device driver.
+As these tests cannot be performed, due to only a part of the system is finish, a minor test has been made in order to verify the functionality of the written device driver.
 \p With a multimeter the different pins used as outputs are measured one by one and the output set by sending a value to the file by the \textit{echo} command. Also the pins are read with the \textit{cat} command after setting the pin in order to verify the read function.
-\p The interrupt input pin is tested by reading the pin when the FPGA is not yet interrupting to verify if it goes to sleep.
+\p The interrupt input pin is tested by reading the pin when the FPGA is not yet interrupting to verify if it goes to sleep. If the interrupt pin are read after an interrupt has been given from the FPGA, '0' is returned. 
 
 %       	 Verification
 %
@@ -648,6 +648,7 @@ As these tests cannot be performed, a minor test has been made in order to verif
 %                Integration tests
 %                Acceptance test
 \subsubsection{Conclusion}
+The small GPIO device driver test has been made with success. All 8 output pins can be set and cleared through the driver. Also the status of the 8 output pins and the one input pin can be read through the driver. If the FPGA has set the interrupt pin to '0', the driver returns '0' immediately without waiting for an falling edge.
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Deployment
@@ -661,6 +662,6 @@ As these tests cannot be performed, a minor test has been made in order to verif
 \paragraph{Jesus thing}
 %
 %
-\paragraph{Dennis thing}
+\paragraph{GPIO Device driver}
 %
 %
