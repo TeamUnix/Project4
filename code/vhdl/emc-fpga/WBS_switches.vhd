@@ -43,7 +43,7 @@ end WBS_switches;
 architecture RTL of WBS_switches is
 
 	--Constants
-	constant N				: integer := 4;--19;
+	constant N				: integer := 20;--19;
 	constant M				: integer := 3;
 
 	--Types

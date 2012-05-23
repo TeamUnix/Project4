@@ -6,7 +6,7 @@ library work;
 
 entity irq_fifo is
 	generic	(
-			W		:	natural	:=	4 -- number of address bits
+			W		:	natural	:=	1 -- number of address bits
 			);
 	port	(
 			--Input
