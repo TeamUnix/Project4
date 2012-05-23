@@ -1,20 +1,22 @@
 \chapter{Digital design}\label{chap:digital_design}
-\section{Introduction}
-\writer{Theis Christensen}
-%
-
+The digital design chapter describes the part inside the FPGA and the digital part of the interface between the LPC2478 and the Spartan 6.
 \section{LPC2478 to spartan 6 interface} \label{sec:arm_to_fpga}
 \writer{Theis Christensen}
 %
-
-\subsection{External memory controller}
-\subsection{Bus functional module}
-\subsection{Wishbone}
+A communication between a Spartan 6 FPGA and the LPC2478 has been made. The FPGA acts like a memory block, that the LCP2478 is communication with through the external memory controller. For verification of the VHDL code a bus functional module has been made with timings for the different operation in the EMC\footnote{External memory controller} The working process and full documentation of this interface can be read in the following timeboxes from appendix\footnote{Project 4 report}:
+\begin{itemize}
+\item Bus functional module - Timebox 7
+\item External memory controller - Timebox 7
+\item Host controller\footnote{block inside Spartan 6 that takes the EMC input} - Timebox 3
+\end{itemize}
 \section{Module design}
 \writer{Theis Christensen}
 %
-
-\subsection{Design}
-\subsection{Indicator}
-\subsection{Interrupt register}
-\subsection{Interface}
+Different features has been implemented in the FPGA, the possibility of controlling LEDs for indication, taking input from switches, and in order to make the system event based an interrupt function including an interrupt register has been implemented. All the blocks inside the FPGA can be accessed from the EMC through a wishbone shell, with the EMC controlling the master, to read and write date from an to the slaves located on the other blocks. The development process and the documentation for the FPGA design is located in the following timeboxes, from appendix\footnote{Project 4 report}:
+\begin{itemize}
+\item Module design - Timebox 2
+\item Wishbone - Timebox 3
+\item Indicator block - Timebox 4
+\item Interrupt register - Timebox 5
+\item Switch block with interrupt functionality - Timebox 6 and 7
+\end{itemize}
