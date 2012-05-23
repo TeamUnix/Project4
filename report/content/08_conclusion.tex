@@ -3,3 +3,10 @@
 %Make sure that the connection between problem statement and conclusion is absolutely clear
 %The conclusion must conclude on whether the objectives in the specification requirement have been achieved
 %Assess whether your solutions are sustainable or if there are any hurdles you need to overcome.
+%
+In the project the EUDP method has been used to solve the problem statement. In the launch phase the specific requirements has been defined.\\
+For controlling the current flow a power switch has been developed, this part can control which direction the current is allow to flow. The power switch has not been implemented in the final system, and it still needs features to fulfil the requirements for communication between the modules.\\
+The requirements for the interface was that the user shall be able to control the hub on the physical system and through a web page. The physical interaction has been made on the Spartan 6 and is working with the LPC2478, and a web page that interact with the LPC2478 has been developed and working properly\\
+For communication between the modules a power line module have been made for every device that is connected to the hub. This allow the hub to communicate with the devices through the power lines. This module has been tested with the LPC2478 and it is working properly.\\
+In order to make the system more energy efficient, an interrupt function on the Spartan 6 has been implemented, this make the communication between the Spartan 6 and the LPC2478 event based instead of reading the data from the Spartan 6 with at time interval.\\
+The energy hub is not completely finish, but the essential parts for building an energy hub has been made, and tested in a way that it can be used as at solution.
