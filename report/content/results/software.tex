@@ -60,14 +60,15 @@ The GPIO device driver is specially designed for the Energy HUB project, table \
 Documentation of the GPIO device driver can be found in \textit{Time Box 7}
 %%%%%%%%%%%%%%%%%%USER SPACE%%%%%%%%%%%%%%%%%%%%%
 \section{User space applications}
-A user space application has been made for each device driver in order to simplify hardware calls from the systems main program. The implementation of each user space application is described in the corresponding device driver time box. 
+An user space application has been made for each device driver in order to simplify hardware calls from the systems main program. The implementation of each user space application is described in the corresponding device driver time box. 
 \subsection{ADC}
 The ADC program takes two arguments: number and reference. \textit{Number} indicates the ADCx that should be read where \textit{reference} defines how the read value should be converted and returned. 
 \\The reference value is given in mV.
 \p example: \textit{adc 2 5000}
 \\The command will return a value from 0.00V to 5.00 volt if no erros are encounted. 
 \subsection{UART}
-
+The UART program is made for UART2, so there is no need to specify the number when calling the program. The program takes the arguments: \textit{io}, \textit{read} and \textit{write}. When using the argument \textit{io}, the UART is configured to an 8n1, 19200 baudrate setup. The \textit{read} call returns a value from the UART input buffer if it is not empty, if it is empty, it goes to sleep and waits for a character to apear before it returns. When using \textit{write} another argument shall be sent to defining what character should be sent.
 \subsection{PORT}
-The PORT program controls the five power switch pins (see table \ref{tab:gpio_table}. The program takes two arguments, a number and a command. The number can be be 0, 1 or 2 while the command can be either: in, out or off.
-\subsection{EMC}
+The PORT program controls the five power switch pins (see table \ref{tab:gpio_table}. The program takes two arguments, a number and a command. The number can be be \textit{0}, \textit{1} or \textit{2} while the command can be either: \textit{in}, \textit{out} or \textit{off}.
+\p each port number corresponds to an power switch, where number 0 controls the grid and number 1 and 2 controls each of their modules. 
+\p If argument is \textit{in}, the device routes energy from the module to the power line. If the argument is \textit{out}, energy is routed from the power line to the module connected. If \textit{off}, energy flow in the switch is disabled.
