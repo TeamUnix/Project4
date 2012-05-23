@@ -16,6 +16,9 @@
 *.synctex.gz
 #*.pdf
 pro4.pdf
+report.pdf
+*.log
+*.lot
 *.project
 *.DS_Store
 *.toc
