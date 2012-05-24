@@ -58,10 +58,11 @@
 \centering
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
-		~			& Requirements for debouncing	& Verification			& Web Interface  & Power Switch Verification	& GPIO device driver	\\ \hline
-		Estimation	& 3							    & 7				        & 35		     &	3           & 10			\\
-		Actual		& 3 							& 15					& 40		     &	5	        & 14			\\
-		Developer	& Theis						& Theis				        & Paulo		     &	Paulo Fontes   & Dennis		\\
+		~			& Requirements	& Verification	& Web Interface  	& Power Switch 	& GPIO \\
+		~			& for denouncing	& ~ 			& ~				& Verification		& device driver \\\hline
+		Estimation	& 3				& 7			& 35		     		&	3			& 10			\\
+		Actual		& 3 				& 15			& 40		     		&	5			& 14			\\
+		Developer	& Theis			& Theis		& Paulo			&	Paulo		& Dennis		\\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -148,14 +149,14 @@ The EMC interface has been analysed with timings and signal assignment in order 
 		\caption{EMC block}
 	\end{centering}
 \end{figure}
-The EMC is used in static mode without the \textit{BLS}\footnote{Byte lane selects} signal, and for memory selection it is only using the \textit{CS2}\footnote{Chip Select 2} for the Spartan 6, this is the interface that has to be implemented in the Spartan 6 to control the wishbone master. The block that takes care of this assignment is the host controller from timebox 3. The timings and signal assignment is shown on the next to figures.
+The EMC is used in static mode without the \textit{BLS}\footnote{Byte lane selects} signal, and for memory selection it is only using the \textit{CS2}\footnote{Chip Select 2} for the Spartan 6, this is the interface that has to be implemented in the Spartan 6 to control the wishbone master. The block that takes care of this assignment is the host controller from timebox 3. The timings and signal assignment is shown on the next two figures.
 \begin{figure}[H]
 	\begin{centering}
 		\includegraphics[width=0.8\textwidth]{images/tb7_EMC_read.png}
 		\caption{EMC Read timing}
 	\end{centering}
 \end{figure}
-The important thing when the EMC read data from the Spartan 6, is the $t_{am}$ this is where the EMC reads the data from the Spartan 6, therefore the Spartan 6 has to have valid data ready latest at that time, for the EMC to read correct data. From the electrical datasheet the timing for $t_{am}$ is taken.
+The important thing when the EMC reads data from the Spartan 6, is the $t_{am}$, which is where the EMC reads the data from the Spartan 6, therefore the Spartan 6 has to have valid data ready latest at that time, for the EMC to read correct data. From the electrical datasheet the timing for $t_{am}$ is taken.
 \begin{align}
 t_{am}min &= (WAITRD - WAITOEN + 1) \cdot T_{cy} - 12.70ns\\
 t_{am}typ &= (WAITRD - WAITOEN + 1) \cdot T_{cy} - 9.57ns\\
@@ -261,13 +262,13 @@ The Spartan 6 acts as a memory block seen from the EMC in the LPC2478, the memor
     		 S = Slave, DIR = Direction}
 \end{table}
 \subsubsection{Conclusion}
-The BFM verify the design, and it has been tested on the hardware and it is working properly. It is not possible to measure the clock speed with the equipment at the university, so it is not possible to verify that the code fails without the DCM because of jitter on the clock.
+The BFM verifies the design. Afterward the design has been tested on the hardware and it is working properly. It is not possible to measure the clock speed with the equipment at the university, so it is not possible to verify that the code fails without the DCM because of jitter on the clock.
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Jesus Thing
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 \subsection{Power Switch System- Paulo Fontes}
-The power switch system is the main functionality of the energy hub, it have to be able to switch the energy flow direction and turn off the port if needed. A prototype PCB was design in time box 5, in this time box the verifications are made and the PCB is improved according to the results.
+The power switch system is the main functionality of the energy hub, it have to be able to switch the energy flow direction and turn off the port if needed. A prototype PCB was designed in time box 5, in this time box the verifications are made and the PCB is improved according to the results.
 \p
 Verifications:
 \begin{table}[H]
@@ -282,7 +283,7 @@ Verifications:
 	\end{tabular}
 \end{table}
 
-Verification 3 is not performed since this board is a prototype, the header pins soldered and the tracks are not consistent to such current, this test could damage the components in the board. For this requirement to be fulfilled the tracks on the PCB should be increase and connectors that could support high currents have to be used.
+Verification 3 is not performed since this board is a prototype, the header pins soldered and the tracks are not consistent to such current and this test could damage the components in the board. For this requirement to be fulfilled the tracks on the PCB should be increase and connectors that could support high currents have to be used.
 
 \subsubsection{Verification}
 The verifications are done following the numeration in ID.
@@ -299,7 +300,7 @@ The verifications are done following the numeration in ID.
 
 The mBed is used to simulate the control system, it will set the input pins from the power switch module high and low according to the commands given to the mBed by serial connection.
 
-\paragraph{Test bench set up:} An 60V with max 1A is used as power supply to the system, the mBed will simulate the control system of the power switch system and the voltmeters will show the energy flow direction.
+\paragraph{Test bench set up:} An variable power supply (0-60V) with max. 1A is used as supply to the system, the mBed will simulate the control system of the power switch system and the voltmeters will show the energy flow direction.
 % %	Image of the set up
 \begin{figure}[H]
 	\begin{centering}
@@ -334,7 +335,7 @@ The code implemented in the mBed uses 3 pins, a regulated 5V is supplied to the 
 	\end{centering}
 \end{figure}
 
-Both port are tested and the system works as expected. The tests show that the system have a low voltage drop across the MOSFETs but still working as a diode. The direction of the energy flow can be changed without problems. The verification is successful.
+Both ports are tested and the system works as expected. The tests show that the system have a low voltage drop across the MOSFETs but still working as a diode. The direction of the energy flow can be changed without problems. The verification is successful.
 
 \paragraph{Verification ID: 2}
 In this verification both ends of the systems are tested for over and under voltage. The power supply is connected and the voltage in increased until 35V, after its estabelized again at 30V and decreased to 25V. The power switch system should shut down the port if over 33V and under 25V.
@@ -1480,12 +1481,11 @@ The small GPIO device driver test has been made with success. All 8 output pins 
 \subsection{Deployment}
 	%which versions of the prototype the customer will get
 	%with what functionality.
-\paragraph{Theis thing}
-%
-%
-\paragraph{Jesus thing}
+\paragraph{Web interface}
+The final web interface is up and running at the address http://10.1.18.223 inside the university network.
 %
 %
 \paragraph{GPIO Device driver}
+The GPIO driver is working with implemented read and write to single GPIO pins and interrupt on GPIO3. Morten Opprud has been by and verified the functionality.
 %
 %
