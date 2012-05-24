@@ -1,0 +1,37 @@
+#status{
+	height: 100%;
+	width: 100%;
+}
+
+#status table{
+	text-align:center;
+	margin:0 auto;
+	padding-top:100px
+}
+
+#status td {
+	display:inline-block;
+	padding-left: 0px;
+}
+
+.stat{
+	width:100%;
+}
+
+.stat td{
+	border-bottom:1px dashed #CCC;
+	
+}
+
+.identifier{
+	width:250px;	
+	font-weight: bold;
+	font-size: 14px;
+}
+
+.value{
+	text-align:right;
+	padding-top:4px;
+	width:150px;
+	font-size: 12px;	
+}

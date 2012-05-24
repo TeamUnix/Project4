@@ -1,0 +1,94 @@
+#status{
+	border-right: 1px dashed #999;
+	height: 100%;
+	width: 45%;
+}
+
+#status table{
+	text-align:center;
+	margin:0 auto;
+	padding-top:100px
+}
+
+
+#status td {
+	display:inline-block;
+	padding-left: 0px;
+}
+
+.actions{
+	border-top: 1px dashed #F00;
+	border-bottom: 1px dashed #F00;
+}
+
+.modules {
+	text-align: center;
+	font-weight: bold;
+	height: 200px;
+	position:absolute;
+	left: 46%;
+	top: 100px;
+	z-index:0;
+	
+}
+
+.M {
+	height:178px;	
+	float:left;
+	padding-left:10px;
+	z-index:0;
+}
+
+.M td {
+	height: 9px;
+	width:150px;
+	text-align:center;
+	
+	border-right: 1px dashed #CCC;
+	border-left: 1px dashed #CCC;
+	vertical-align:top;
+	padding-top: 5px;
+	z-index:0;
+}
+
+.mtitle{
+	border-top: 1px dashed #CCC;
+}
+
+.mstat{
+	border-bottom: 1px dashed #CCC;
+}
+
+.icon{
+	border-bottom: 1px dashed #CCC;
+}
+
+#M3	{left: 280px; display:none;}
+#M4	{left: 370px; display:none;}
+#M5	{left: 460px; display:none;}
+#M6	{left: 550px; display:none;}
+#M7	{left: 640px; display:none;}
+#M8	{left: 730px; display:none;}
+#M9 {left: 820px; display:none;}
+#M10{left: 820px; display:none;}
+
+.stat{
+	width:100%;
+}
+
+.stat td{
+	border-bottom:1px dashed #CCC;
+}
+
+.identifier{
+	width:250px;	
+	font-weight: bold;
+	font-size: 14px;
+}
+
+.value{
+	text-align:right;
+	padding-top:4px;
+	width:150px;
+	font-size: 12px;	
+}
