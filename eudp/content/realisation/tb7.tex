@@ -267,7 +267,7 @@ The BFM verify the design, and it has been tested on the hardware and it is work
 % Jesus Thing
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 \subsection{Power Switch System- Paulo Fontes}
-The power switch system is the main functionality of the energy hub, it have to be able to switch the energy flow and turn off the port if needed. A prototype PCB was design in time box 5, in this time box the verifications are made and the PCB is improved according to the results.
+The power switch system is the main functionality of the energy hub, it have to be able to switch the energy flow direction and turn off the port if needed. A prototype PCB was design in time box 5, in this time box the verifications are made and the PCB is improved according to the results.
 \p
 Verifications:
 \begin{table}[H]
@@ -588,6 +588,123 @@ Data model is a high-level overview of the database structure. At this stage dat
 		\caption{Database relational overview ( Data Model )}
 	\end{centering}
 \end{figure}
+
+\paragraph{getData.php} This script is described in this section since its main functionality is to retrieve values from the database using SQL queries and construct a XML file with the data retrieved. Only the Ampere measurements are requested and saved into this database since this is prototype of the system the necessary protocol and structure for the sensors in the modules was not defined.
+
+Script parameters:
+\begin{itemize}
+	\item unique\_id - this is the only parameter expected by this script, since it will retrieve all the measurements from an unique module/sensor, the URL encoding method for this parameter have to be POST.
+\end{itemize}
+
+Several requests to the database are done by this script, each SQL query and is described bellow:
+
+Current power production of the modules:
+\begin{lstlisting}[language=sql]
+// Current Power Production and Current Power Consuption
+	$sql = "SELECT  VALUE FROM `MEASUREMENTS` WHERE `ID_SENSOR`=".$_POST['unique_id']." ORDER BY ID_MEASURE DESC LIMIT 1";
+	$res = $con->query($sql);
+	$row = $res->fetch_row();
+	if($row[0]>0){
+		$c_pw_pro = ($row[0]*$voltage)."W ";
+		$c_pw_con = "0W ";
+	} else if ($row[0]<0){
+		$c_pw_con = ($row[0]*$voltage*-1)."W ";
+		$c_pw_pro = "0W ";
+	} else {
+		$c_pw_pro = "0W ";
+		$c_pw_con = "0W ";
+	}
+\end{lstlisting}
+
+The SQL query, uses the keyword \textbf{SELECT} to show the value of the column \textbf{VALUE}, \textbf{FROM} the table \textbf{MEASUREMENTS}, \textbf{WHERE} the field \textbf{ID\_SENSOR} match with the \textbf{unique\_id} send by parameter, the results are \textbf{ORDER BY} the column \textbf{ID\_MEASURE}, from the last inserted value to the first(\textbf{DESC}), with a \textbf{LIMIT} of \textbf{1} result.
+
+The result of this query is the last data entry in the table. If the value is negative it will be multiplied by the voltage and -1, this is the current power consumption. If positive it will be multiplied by the voltage and assigned to the current power production.
+
+Total Power Production:
+\begin{lstlisting}
+	$sql = 'SELECT SUM(VALUE) 
+			FROM `MEASUREMENTS` 
+			WHERE `ID_SENSOR`='.$_POST['unique_id'].'
+			AND DATE_TIME>(SELECT DATE_TIME FROM LOGS WHERE ID_MODULE='.$_POST['unique_id'].' ORDER BY DATE_TIME DESC LIMIT 1)';
+	$res = $con->query($sql);
+	$row = $res->fetch_row();
+	$tt_pw_pro = ($row[0]*$voltage)."W ";
+\end{lstlisting}
+
+The SQL query, uses the keyword \textbf{SELECT} to retrieve the addition (\textbf{SUM}) of the values from the column \textbf{VALUE}, \textbf{FROM} the table \textbf{MEASUREMENTS}, \textbf{WHERE} the field \textbf{ID\_SENSOR} match with the \textbf{unique\_id} send by parameter, AND the columns DATE\_TIME is greater than the result from the  \textbf{SELECT} value of the field \textbf{DATE\_TIME FROM} table LOGS \textbf{WHERE} the \textbf{ID\_SENSOR} match with the \textbf{unique\_id} send by parameter, this result is \textbf{ORDER BY} the column \textbf{DATE\_TIME}, from the last inserted value to the first(\textbf{DESC}), with a \textbf{LIMIT} of \textbf{1} result.
+
+This query returns the addition of all data in column VALUE from the table measurements after the date and time of the last log entry. This way the total power production seen in the user interface corresponds to the uptime of the module/sensor.
+
+Average power production:
+\begin{lstlisting}[language=sql]
+	// Average Power Production
+	$sql = 'SELECT AVG(VALUE) 
+			FROM `MEASUREMENTS` 
+			WHERE `ID_SENSOR`='.$_POST['unique_id'].'
+			AND DATE_TIME>(SELECT DATE_TIME FROM LOGS WHERE ID_MODULE='.$_POST['unique_id'].' ORDER BY DATE_TIME DESC LIMIT 1)';
+	$res = $con->query($sql);
+	$row = $res->fetch_row();
+	$avg_pw_pro = ($row[0]*30)."W ";
+\end{lstlisting}
+
+This query is similar to the total power production, instead of the addition of the data in the column VALUES the average is made. This will give the average of values since the last data entry in the table logs.
+
+Module status:
+\begin{lstlisting}[language=sql]
+	// Status
+	if($_SESSION['error_device']==1){
+		$stat = "Connection Failed";
+	} else {
+	
+	$sql = 'SELECT `STATUS`.NAME, `STATUS`.ID_STATUS
+			FROM STATUS 
+			INNER JOIN LOGS ON `STATUS`.ID_STATUS = `LOGS`.ID_STATUS
+			WHERE `ID_MODULE`='.$_POST['unique_id'].'
+			ORDER BY `LOGS`.ID_LOG DESC 
+			LIMIT 1';
+	
+	$res = $con->query($sql);
+	$row = $res->fetch_row();
+	
+	if($row[0]==""){
+		$stat = "Disconnected";
+		$id_stat = 2;
+	} else {
+		$stat = ($row[0]);
+		$id_stat = $row[1];
+	}
+	
+	if($row[1]!=3){
+			$uptime = " --- ";
+			$c_pw_pro = " --- ";
+			$c_pw_con = " --- ";
+			$tt_pw_pro = " --- ";
+			$avg_pw_pro = " --- ";
+	} ...
+\end{lstlisting}
+
+The SQL query, uses the keyword \textbf{SELECT} to show the values of the columns \textbf{NAME} and \textbf{ID\_STATUS}, \textbf{FROM} table \textbf{STATUS}, when joined (\textbf{INNER JOIN ON}) with table \textbf{LOGS} where the \textbf{STATUS.ID\_STATUS} match with \textbf{LOGS.ID\_STATUS}, and \textbf{WHERE} the field \textbf{ID\_MODULE} match with the \textbf{unique\_id} send by parameter, the results are \textbf{ORDER BY} the column \textbf{ID\_LOG}, from the last inserted value to the first(\textbf{DESC}), with a \textbf{LIMIT} of \textbf{1} result.
+
+This query returns the status name and id for the desired module, the returned values are assigned to the variable stat and id\_stat for later use in this script. In case the status id is different then 3, the module will not be running, so no values are shown to the user.
+
+Create the XML result:
+\begin{lstlisting}[language=sql]
+	echo '<DATA>'.
+			 '<C_PW_PRO>'.$c_pw_pro.'</C_PW_PRO>'.
+			 '<C_PW_CON>'.$c_pw_con.'</C_PW_CON>'.
+			 '<TT_PW_PRO>'.$tt_pw_pro.'</TT_PW_PRO>'.
+			 '<AVG_PW_PRO>'.$avg_pw_pro.'</AVG_PW_PRO>'.
+			 '<UPTIME>'.$uptime.'</UPTIME>'.
+			 '<STAT id_stat="'.$id_stat.'">'.$stat.'</STAT>'.
+			 '<M1 id="'.$m_id[1].'" name="'.$m_name[1].'" status="'.$m_status[1].'" id_status="'.$m_id_status[1].'"></M1>'.
+			 '<M2 id="'.$m_id[2].'" name="'.$m_name[2].'" status="'.$m_status[2].'" id_status="'.$m_id_status[2].'"></M2>'.
+			 '<PRIV>'.$priv.'</PRIV>'.
+			 '<DEV_ERROR>'.$_SESSION['error_device'].'</DEV_ERROR>'.
+			'</DATA>';
+\end{lstlisting}
+XML as HTML is a markup language, using elements defined by tags. JavaScript is able to translate XML files with built-in objects, this allows the return of a large amount of data at once, reducing the number of scripting needed and requests to the web server.
+
+The construction of the XML file can be seen above, the main element is DATA, having several 'child nodes'. This nodes (like HTML) can have several attributes, for example the element M1 and M2 contain attributes that defines the modules connected to the port 1 and 2 of the energy hub.
 
 \paragraph{File Structure}
 The file structure defines how files are grouped on a system, in a web server architecture the files are stored in the root directory defined by the web server (Apache) configuration. The file structure necessary for this web interface has change since last time box due to a meeting with other teams. The above structure was approved from the meeting.
