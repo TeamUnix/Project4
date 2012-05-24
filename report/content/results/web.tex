@@ -23,7 +23,7 @@ The final database model can be seen bellow with all the necessary relationships
 \end{figure}
 %
 \section{File structure}
-Among with the database, the file structure is designed in cooperation with the other teams. In the implementation phase, deeper analysis was needed, as a result the file structure was updated. New scripts were added to keep the dynamics of the web interface, error handling and user experience were not taken in consideration in the analysis and design phase, being this important functionalities when developing a web interface application they were implemented in the end interface.
+Among with the database, the file structure is designed in cooperation with the other teams. Deeper analysis was made, as result the file structure was updated with new scripts added to keep the dynamics of the web interface. Error handling and user experience are important functionalities when developing a web interface application they were implemented in the end interface.
 \p
 The file structure used can be seen using an extra web application developed for evaluation. It can be access in the AU-Herning network at the address: http://10.1.18.223/SeeIt/.
 \begin{figure}[H]
@@ -35,7 +35,7 @@ The file structure used can be seen using an extra web application developed for
 \end{figure}
 %
 \subsection{Core Scripts}
-From the developed scripts, four of them are of great importance. This are the core of the web interface, they allow the communication between the web interface and the energy hub, retrieve data from the database to be show to the user and handle errors regarding communication to the energy hub and connection to the database.
+From the developed scripts, four of them are of great importance. This scripts allow the communication between the web interface and the energy hub, retrieve data from the database to be show to the user and handle errors regarding communication to the energy hub and connection to the database.
 
 \paragraph{Get Data}
 This scripts expects a unique parameter, the id of the module or sensor which data should be retrieved. It establishes the connection to the database and using several SQL statements it returns an XML response to the client side script, that will update the data in the layout of the interface. The implementation of this script is describe in time box 7.
@@ -69,11 +69,11 @@ Script parameters:
 \paragraph{Send Commands}
 The ability to send commands to the energy hub is a fundamental for the control of the system by the administrator. By the user interface the administrator have to be able to control the modules (for example change wind turbine rotation, break the wind turbine blades, etc.) and start or stop the modules connected to the energy hub.
 \p
-This script doesn't do any verification regarding the command to be send, it will send the same command as it receives by parameter. The script will wait for a response from the energy hub if successful or not, so the administrator can be alerted in case of malfunctions or difficulties in the communication.
+The script will wait for a answer from the energy hub if the command was routed successful or not, if not the administrator is alerted.
 \p
-The implementation of this script can be seen in time box 6, the script was updated when developing the end web interface, since a result from the the energy hub is now retrieved so the web interface application can alert the user in case error during the commands.
+The implementation of this script can be seen in time box 6. The script was updated since a result from the energy hub is now retrieved so the web interface application can alert the user in case error during the commands.
 \p
-The script is called making a GET encoding request to:
+The script is called by a encoding request method GET to:
 \p
 sendcmd.php \\
 ?id\_module=\textless Module id\textgreater \\
