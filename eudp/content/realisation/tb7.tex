@@ -2,19 +2,19 @@
 % INTRO
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 \section{Time box 7}
-\listoftodos
+
 \subsection{Time box planning}
 
 \begin{figure}[H]
 	\begin{centering}
-		\missingfigure{Updated timebox figure}
-		%\includegraphics[width=1.0\textwidth]{images/tb_r5.png}
-		%\caption{Updated time-box}
+		%\missingfigure{Updated timebox figure}
+		\includegraphics[width=1.0\textwidth]{images/tb_r7.png}
+		\caption{Updated time-box}
 	\end{centering}
 \end{figure}
 
 \subsubsection{Work to be done in this time box}
-\todo[inline]{Update List}
+
 \begin{itemize}
 	\item Requirements for debouncing
 	\begin{itemize}
@@ -29,7 +29,6 @@
 	\item Power Switch system
 		\begin{itemize}
 			\item Testing
-			\item Finalized version
 		\end{itemize}
 	\item Web Interface
 		\begin{itemize}
@@ -44,11 +43,12 @@
 \end{itemize}
 
 \paragraph{Description:}
-\todo[inline]{Update Description}
+
 \begin{description}
 	\item[Requirements for debouncing] This is the timing requirements for the switch block to avoid bouncing when switching state
 	\item[Verification] This is verification of the VHDL design including the EMC part in the LPC2478
-	\item[Jesus thing]
+	\item[Power Switch system] Verification on the power switch system
+	\item[Web Interface] User web interface development.
 	\item[GPIO device driver] Driver to set and read the GPIO pins used in the energy HUB system. 
 \end{description}
 
@@ -56,13 +56,12 @@
 
 \begin{table}[H]
 \centering
-	\todo[inline]{Update Time}
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
-		~			& Requirements for debouncing	& Verification			& Jesus thing		& GPIO device driver	\\ \hline
-		Estimation	& 3							& 7					& xx				& 10			\\
-		Actual		& 3 							& 15					& xx				& 14			\\
-		Developer	& Theis						& Theis				& Paulo			& Dennis		\\
+		~			& Requirements for debouncing	& Verification			& Web Interface  & Power Switch Verification	& GPIO device driver	\\ \hline
+		Estimation	& 3							    & 7				        & 35		     &	3           & 10			\\
+		Actual		& 3 							& 15					& 40		     &	5	        & 14			\\
+		Developer	& Theis						& Theis				        & Paulo		     &	Paulo Fontes   & Dennis		\\
 		\hline
 	\end{tabular}
 	\caption{Estimation and actual time used on the project}
@@ -1007,6 +1006,8 @@ With this more realistic approach to the system, it was possible to verify probl
 A working high-fidelity prototype is created, ids are assigned to the modules being id:0 to the energy hub, id:1 to the battery and id:2 for the photovoltaic panels. Each module have just one sensor that measures the current (ampere), the id of the sensor is the same as the module id for a working prototype.
 \p
 The end system can handle all functionalities expected for this project, the energy hub is able to send commands to the energy hub and data can be added or retrieved from the database. The error handling and the dynamic update of contents on the client side, improved the user experience for the control and navigation in the system.
+\p 
+The web interface is up and running at the address http://10.1.18.223 inside the university network.
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Dennis Thing
