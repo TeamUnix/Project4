@@ -1,10 +1,10 @@
 \section{Product evaluation}
 %You need to evaluate all elements that are part of the project (mechanics, electronics, software and documentation) and ask yourself if the customer received the product he wanted or an even better product. Finally, you should make a conclusion.
 Due to a limited development time the product was not completed, according to the requirements. The different requirements are listed below together with an status and a short description.
-\\\textbf{Status options:}
+\p \textbf{Status options:}
 \\ X : requirement implemented and tested.
 \\ / : Part of the requirement has been implemented and tested.
-\\ None, requirement not implemented.
+\\ None: requirement not implemented.
 % Functional Table
 \begin{table}[H]
 	\begin{tabular} [b] {| p{1.1cm} |  p{2.5cm} | p{11.0cm} | p{1.0cm} |}
@@ -22,7 +22,7 @@ Due to a limited development time the product was not completed, according to th
 	\end{tabular}
 	\caption{Functional: System shall do...}
 \end{table}
-Through the Power Line module developed, the system is able to send data from one module to another.
+Through the Power Line module developed, the system is able to send data from one module to another and vice versa. 
 \\With the user space application written (PORT), the system is able to control the Power Switches in a way that they can only be set as a consumer or producer.
 % Non-Function Table
 \begin{table}[H]
@@ -74,7 +74,7 @@ The interface buttons and LEDs is used on the Spartan 6 board, but the housing a
 	\caption{Behavioural: How the system shall react...}
 \end{table}
 The requirements regarding the user interface application were fulfilled except warnings are not send to the administrator in case of error occurrence. This requirement was not fulfilled since a SMTP server is needed to accomplish the email sending functionality in PHP. In a working product a server could be implemented or even an existent server can be used to manage the send of warning to the administrator.
-\p The requirements regarding stopping and starting modules are partly connected as the processor can control the different power switch modules connected. 
+\p The requirements regarding stopping and starting modules are partly fulfilled as the processor can control the different power switch modules connected. 
 
 
 %The requirement about the LPC2478 interfacing with an FPGA through the external memory controller has been fulfilled and it is working properly. Also the requirement about using wishbone standards between the blocks inside the Spartan 6 has been fulfilled. The analogue to digital converter in VHDL has not been made according to limited development time.
