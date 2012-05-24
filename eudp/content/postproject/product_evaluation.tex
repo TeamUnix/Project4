@@ -18,10 +18,12 @@ Due to a limited development time the product was not completed, according to th
 		F-2.1 & Direction		& When a module is connected the system shall automatically find out if it is an producer-, storage- or consumer module. & ~ \\ \hline
 		F-2.2 & Consumer		& Only allowed to take energy from the system. & ~ \\ \hline
 		F-2.3 & Producers 		& Only allowed to give energy to the system. & ~ \\ \hline
-		F-2.4 & Storage 		& Must acts either as a consumer or a producer (can be changed dynamically). & / \\ \hline
+		F-2.4 & Storage 		& Must acts either as a consumer or a producer (can be changed dynamically). & X \\ \hline
 	\end{tabular}
 	\caption{Functional: System shall do...}
 \end{table}
+Through the Power Line module developed, the system is able to send data from one module to another.
+\\With the user space application written (PORT), the system is able to control the Power Switches in a way that they can only be set as a consumer or producer.
 % Non-Function Table
 \begin{table}[H]
 	\begin{tabular} [b] {| p{1.1cm} |  p{2.5cm} | p{11.0cm} | p{1.0cm} |}
@@ -39,6 +41,7 @@ Due to a limited development time the product was not completed, according to th
 	\end{tabular}
 	\caption{Non-Function: System shall be...}
 \end{table}
+At the systems current state, it is only able to connect two modules. The switches on the FPGA board has been used as command buttons to control the modules where only 8 switches are available. The Power switch device has a build in level detection of 30V +/- 10 \%, where is shuts down the energy routing if the voltage level is not accepted.
 % Perfomance Table
 \begin{table}[H]
 	\begin{tabular} [b] {| p{1.1cm} |  p{2.5cm} | p{11.0cm} | p{1.0cm} |}
@@ -49,6 +52,7 @@ Due to a limited development time the product was not completed, according to th
 	\end{tabular}
 	\caption{Performance: How well does it have to be done...}
 \end{table}
+The interface buttons and LEDs is used on the Spartan 6 board, but the housing and cabinet for the system has not been made. This mean that the requirement for water resistant has not been fulfilled.\\
 % Behavioural Table
 \begin{table}[H]
 	\begin{tabular} [b] {| p{1.1cm} |  p{2.5cm} | p{11.0cm} | p{1.0cm} |}
@@ -69,16 +73,11 @@ Due to a limited development time the product was not completed, according to th
 	\end{tabular}
 	\caption{Behavioural: How the system shall react...}
 \end{table}
+The requirements regarding the user interface application were fulfilled except warnings are not send to the administrator in case of error occurrence. This requirement was not fulfilled since a SMTP server is needed to accomplish the email sending functionality in PHP. In a working product a server could be implemented or even an existent server can be used to manage the send of warning to the administrator.
+\p The requirements regarding stopping and starting modules are partly connected as the processor can control the different power switch modules connected. 
 
-\subsection{Mechanics}
-The interface buttons and LEDs is used on the Spartan 6 board, but the housing and cabinet for the system has not been made. This mean that the requirement for water resistant has not been fulfilled
-\subsection{Hardware}
-Requirement implemented: Shall be able to communicate with a connected module through power line.
-\subsection{Digital}
-The requirement about the LPC2478 interfacing with an FPGA through the external memory controller has been fulfilled and it is working properly. Also the requirement about using wishbone standards between the blocks inside the Spartan 6 has been fulfilled. The analogue to digital converter in VHDL has not been made according to limited development time.
-\subsection{Software}
-asd
-\subsection{Web}
-The requirements regarding the user interface application were fulfilled except warning are not send to the administrator in case of error occurrence. This requirement was not fulfilled since a SMTP server is needed to accomplish the email sending functionality in PHP. In a working product a server could be implemented or even an existent server can be used to manage the send of warning to the administrator.
+
+%The requirement about the LPC2478 interfacing with an FPGA through the external memory controller has been fulfilled and it is working properly. Also the requirement about using wishbone standards between the blocks inside the Spartan 6 has been fulfilled. The analogue to digital converter in VHDL has not been made according to limited development time.
+
 \subsection{Conclusion}
 The limited development time has affected the final product, the necessary requirements were not fulfilled in order for the product to be delivered to the costumer.
