@@ -37,6 +37,19 @@ Figure \ref{fig:plc_and_smps_pic} shows the mounted board with both switch mode 
 
 \section{Power switch}
 \writer{Paulo Fontes}
+The power switch system is the main functionality of the energy hub, it have to be able to switch the energy flow direction and turn off the port if needed. The analysis and prototype is described in time box 5, in time box 7 the verification for the power switch system is made.
+\p
+The tests were successful and a smaller PCB was designed:
+\begin{figure}[H]
+	\begin{centering}
+		\includegraphics[width=1\textwidth]{images/ps_evolution.png}
+		\caption{Power switch evolution.}
+	\end{centering}
+\end{figure}
+
+For a small scale working prototype of the energy hub, three power switch systems were printed and used to switch the energy flow from/to modules and to shut down or power up the hub directly from a power supply.
+\p
+The power switch is able to change or stop the energy flow direction a verification can be seen in time box 7. The accuracy of the current sensor implemented have to be improved, since for the conditions where tested the results don't coincide with the value from the component datasheet. For a fully functional power switch connectors which supports 30A have to me implemented in the payout and the tracks size in the PCB have to be increased.
 %
 
 \section{Interface}
