@@ -1,15 +1,84 @@
 \section{Product evaluation}
 %You need to evaluate all elements that are part of the project (mechanics, electronics, software and documentation) and ask yourself if the customer received the product he wanted or an even better product. Finally, you should make a conclusion.
-Due to a limited development time the product was not completed, according to the requirements. The different part of the product is and the requirements fulfilled is listed below.
+Due to a limited development time the product was not completed, according to the requirements. The different requirements are listed below together with an status and a short description.
+\\\textbf{Status options:}
+\\ X : requirement implemented and tested.
+\\ / : Part of the requirement has been implemented and tested.
+\\ None, requirement not implemented.
+% Functional Table
+\begin{table}[H]
+	\begin{tabular} [b] {| p{1.1cm} |  p{2.5cm} | p{11.0cm} | p{1.0cm} |}
+	\hline
+	\textbf{ID} & \textbf{Requirement} & \textbf{Description} & Status\\\hline
+		F-1 & Communication 	&  ~ & ~ \\ \hline
+		F-1.1 & Web Server 		& The hub shall be able to put data on a web-server. & X \\ \hline
+		F-1.2 & System 		& The hub shall be able to communicate with a connected module through power line communication. & X \\ \hline
+		F-1.2.1 & Protocol 		& The Power Line Communication shall be done according to the common protocol (see appendix: Protocol) & ~ \\ \hline
+		F-2 & Routing 			&~&~\\ \hline
+		F-2.1 & Direction		& When a module is connected the system shall automatically find out if it is an producer-, storage- or consumer module. & ~ \\ \hline
+		F-2.2 & Consumer		& Only allowed to take energy from the system. & ~ \\ \hline
+		F-2.3 & Producers 		& Only allowed to give energy to the system. & ~ \\ \hline
+		F-2.4 & Storage 		& Must acts either as a consumer or a producer (can be changed dynamically). & / \\ \hline
+	\end{tabular}
+	\caption{Functional: System shall do...}
+\end{table}
+% Non-Function Table
+\begin{table}[H]
+	\begin{tabular} [b] {| p{1.1cm} |  p{2.5cm} | p{11.0cm} | p{1.0cm} |}
+	\hline
+	\textbf{ID} & \textbf{Requirement} & \textbf{Description} & Status\\\hline
+		NF-1 & User Interface 	& ~  & ~ \\ \hline
+		NF-1.1 & Web Interface 	& Maximum 2 click to go where you want on the website. & X \\ \hline
+		NF-1.2 & HW Interface	& Able to connect 10 modules to the hub. & / \\ \hline
+		NF-1.3 & HW Interface	& A locker shall be unlocked to access the physical hw. & ~ \\ \hline
+		NF-1.4 & HW interface	& An Emergency stop shall be visible on the hub and shall shut down the system if pushed. & ~ \\ \hline
+		NF-1.5 & HW Interface	& 1 start button for the hub. 10 buttons to each start a module. & / \\ \hline
+		NF-2 & Electrical 		& ~ & ~ \\ \hline
+		NF-2.1 & Voltage 		& The input and output ports must work in the range 30V +/-  10\%. & X \\ \hline
+		NF-2.2 & Current 		& The maximum current on each port is defined to maximum 30 Amperes. & ~ \\ \hline
+	\end{tabular}
+	\caption{Non-Function: System shall be...}
+\end{table}
+% Perfomance Table
+\begin{table}[H]
+	\begin{tabular} [b] {| p{1.1cm} |  p{2.5cm} | p{11.0cm} | p{1.0cm} |}
+	\hline
+	\textbf{ID} & \textbf{Requirement} & \textbf{Description} & Status\\\hline
+		P-1 & Hardware 		&  ~ & ~ \\ \hline
+		P-1.1 & Housing 		& The housing have to be water-proof, to not harm the system. & ~ \\ \hline
+	\end{tabular}
+	\caption{Performance: How well does it have to be done...}
+\end{table}
+% Behavioural Table
+\begin{table}[H]
+	\begin{tabular} [b] {| p{1.1cm} |  p{2.5cm} | p{11.0cm} | p{1.0cm} |}
+	\hline
+	\textbf{ID} & \textbf{Requirement} & \textbf{Description} & Status\\\hline
+		B-1 	&  Status 			& ~ & ~ \\ \hline
+		B-1.1 & Web Interface	& Warnings are posted in the web interface. & X \\\hline
+		B-1.2 & Physical		& 1 diode showing when a module is off and one showing when it is on. & / \\ \hline
+		B-1.3 & Report			& An e-mail is sent to the defined user if an error occurs. & ~ \\\hline
+		B-2 & Energy Control	& ~ & ~ \\\hline
+		B-2.1 & Over-production	& Overproduced energy is wasted in a dummy load connected to the hub. & ~ \\\hline
+		B-2.2 & Over-production	& If two or more producers are connected and one can be without, it is stopped. & / \\\hline
+		B-2.2 & Under-production	& If there is no overproduction (dummy load is turned off), the grid is connected to the power line in case the producers cannot produce enough energy. & / \\\hline
+		B-3 & Errors	 		& Humidity and Temperature sensor will be placed inside the system housing. & ~ \\\hline
+		B-3.1 & Humidity		& If the humidity is above the maximum level 70\%, the system shuts down. & ~ \\\hline
+		B-3.2 & Temperature High& If the temperature is higher than 55 degrees,  the system shuts down. & ~ \\\hline
+		B-3.2 & Temperature Low & If the temperature is below 0 degrees, the system shuts down. & ~ \\\hline
+	\end{tabular}
+	\caption{Behavioural: How the system shall react...}
+\end{table}
+
 \subsection{Mechanics}
 The interface buttons and LEDs is used on the Spartan 6 board, but the housing and cabinet for the system has not been made. This mean that the requirement for water resistant has not been fulfilled
 \subsection{Hardware}
-asd
+Requirement implemented: Shall be able to communicate with a connected module through power line.
 \subsection{Digital}
 The requirement about the LPC2478 interfacing with an FPGA through the external memory controller has been fulfilled and it is working properly. Also the requirement about using wishbone standards between the blocks inside the Spartan 6 has been fulfilled. The analog to digital converter in VHDL has not been made according to limited development time.
 \subsection{Software}
 asd
 \subsection{Web}
-asd
+Requirements implemented: 
 \subsection{Conclusion}
-Clearly the limited development time has affected that the product could not be made to fulfil the necessary requirements in order to be delivered to the costumer.
+Clearly the limited development time has affected that the product could not be made to fulfill the necessary requirements in order to be delivered to the costumer.
