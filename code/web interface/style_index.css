@@ -1,0 +1,113 @@
+/* CSS Document */
+
+body {
+	font-family:Verdana, Geneva, sans-serif;
+	height:100%;
+	width: 100%;
+}
+
+h1 { font-size: 40px; }
+
+/* BACKGROUND */
+#bg {}	/*Empty ID for the background to satisfy W3 verificator*/
+		
+		/*Stretch the background image over the whole screen*/
+#bg img {	
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -999;	/*Put image behind everything else*/
+}
+
+/* DEVICES CONNECTED */
+.boxbg {
+	background-image:url(pic/ybg.png);
+	background-repeat:repeat-x;
+	height: 100px;
+	width: 150px;
+	border: 2px solid #999;	/* Put padding and round corners*/
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	display:inline-block;
+	vertical-align:middle;
+}
+
+.boxbg img { 
+	padding-left: 10px; 
+}
+
+#modules {
+	text-align:center;
+	width: 900px;
+	position:absolute;
+}
+	/*HUB position and size*/
+#hub {
+	width:295px;
+	height:100px; 
+	padding-top:10px;
+}
+
+#m1{
+	display:none;
+}
+
+#m2{
+	display:none;
+}
+
+
+/* ALTERNATIVE ENERGY READOUT */
+#linebox {
+	position: absolute;
+	top: 61%;
+	left: 5%;
+	width:90%;
+	height:110px;
+	border-bottom: 1px solid #999;
+	border-top: 1px solid #999;
+}
+
+.energyboxes {
+	position:inherit;
+	height: 70px;
+	width: 200px;
+	background-repeat:no-repeat;
+	background-position:left;
+	text-align:right;
+	padding-top:30px;
+}
+	/*Position and picture of the bulb div*/
+#bulb { left: 2%; background-image:url(pic/bulb.png);padding-left:20px;}
+	/*Position and picture of the coins div*/
+#coins { left: 34%; background-image:url(pic/coins.png);padding-left:25px;}
+	/*Position and picture of the co2 div*/
+#co2 { left: 66%; background-image:url(pic/co2.png); padding-left:20px;}
+
+/*THE DOCK*/
+#dock {
+	position: absolute;
+	width: 310px;
+	background-image:url(pic/dock_small.png);
+	background-repeat: no-repeat;
+	background-position: bottom;
+	bottom: 10px;
+	height: 100px;
+}
+
+#dock img {float: left; opacity:0.80;} /*All browsers exept IE*/
+
+	/*change position of the locker to float right instead of left as the other link(s)*/
+img#lock { float: right; padding-right: 50px;}
+	/*remove transparency when mouse over*/
+#dock img:hover {opacity:1.00;}  /*All browsers exept IE*/
+
+	/*set dot position to under the house (home)*/
+#dot {
+	position: absolute;
+	bottom: 3px;
+	left: 26px;
+	z-index: 1; /*put in front of everything else*/
+}
